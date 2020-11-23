@@ -1,0 +1,37 @@
+spring:
+  servlet:
+      multipart:
+        enabled: true
+        max-file-size: 5GB
+        max-request-size: 6GB 
+#  rabbitmq:
+#    host: ${RABBIT_MQ_HOST:172.16.0.6}
+#    port: ${RABBIT_MQ_PORT:30000}
+#    username: ${RABBIT_MQ_USERNAME:admin}
+#    password: ${RABBIT_MQ_PASSWORD:admin}
+  zipkin:
+    sender:
+      type: rabbit
+    enabled: true
+  sleuth:
+    sampler:
+      probability: 1.0
+    feign:
+      enabled: true
+      processor:
+        enabled: true
+    
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'  
+                 
+logging:
+  level:
+    org.springframework.cloud.sleuth: debug
+  path: logs/
+  file:
+    max-size: 1GB
+        
+

@@ -1,0 +1,14 @@
+
+spring:
+  application:
+    name: nacos_service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 172.16.0.6:30000
+      config:
+        server-addr: 172.16.0.6:30000
+        file-extension: yaml
+      sentinel:
+         transport:
+           dashboard: ${SENTINEL_DASHBOARD_HOST:172.16.0.8}:${SENTINEL_DASHBOARD_PORT:32076}  

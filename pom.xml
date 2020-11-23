@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.wenge</groupId>
+	<artifactId>app-manage-platform</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+
+	<modules>
+		<module>tbase-cicd-service</module>
+		<module>tbase-commons</module>
+		<module>tbase-k8s-service</module>
+		<module>tbase-microservice-service</module>
+	</modules>
+
+	<!-- 统一管理jar包版本 -->
+	<properties>
+		<java.version>1.8</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<mysql-connector.version>8.0.20</mysql-connector.version>
+		<spring-boot-alibaba-druid.version>1.1.13</spring-boot-alibaba-druid.version>
+		<mybatis-plus.version>3.0.5</mybatis-plus.version>
+		<velocity-engine.version>2.2</velocity-engine.version>
+		<junit.version>4.12</junit.version>
+		<log4j.version>1.2.17</log4j.version>
+		<lombok.version>1.16.18</lombok.version>
+		<swagger2.version>2.9.2</swagger2.version>
+	</properties>
+
+	<!-- 子模块继承之后，提供作用：锁定版本+子modlue不用写groupId和version -->
+	<dependencyManagement>
+		<dependencies>
+			<!--spring boot 2.2.2 -->
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>2.2.2.RELEASE</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<!--spring cloud Hoxton.SR1 -->
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>Hoxton.SR1</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<!--spring cloud alibaba 2.1.0.RELEASE -->
+			<dependency>
+				<groupId>com.alibaba.cloud</groupId>
+				<artifactId>spring-cloud-alibaba-dependencies</artifactId>
+				<version>2.1.0.RELEASE</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<!-- Mysql Begin -->
+			<dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<version>${mysql-connector.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-jdbc</artifactId>
+			</dependency>
+			<!-- Mysql End -->
+
+			<!-- Druid Begin -->
+			<dependency>
+				<groupId>com.alibaba</groupId>
+				<artifactId>druid-spring-boot-starter</artifactId>
+				<version>${spring-boot-alibaba-druid.version}</version>
+			</dependency>
+			<!-- Druid End -->
+	
+			<!--MyBatis Plus Begin -->
+			<dependency>
+				<groupId>com.baomidou</groupId>
+				<artifactId>mybatis-plus-boot-starter</artifactId>
+				<version>${mybatis-plus.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.baomidou</groupId>
+				<artifactId>mybatis-plus-generator</artifactId>
+				<version>${mybatis-plus.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.velocity</groupId>
+				<artifactId>velocity-engine-core</artifactId>
+				<version>${velocity-engine.version}</version>
+			</dependency>
+			<!--MyBatis Plus End -->
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${junit.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+				<version>${log4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>${lombok.version}</version>
+				<optional>true</optional>
+				<scope>compile</scope>
+			</dependency>
+			<!-- Swagger2 Begin -->
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger2</artifactId>
+				<version>${swagger2.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger-ui</artifactId>
+				<version>${swagger2.version}</version>
+			</dependency>
+			<!-- Swagger2 End -->
+		</dependencies>
+	</dependencyManagement>
+
+</project>

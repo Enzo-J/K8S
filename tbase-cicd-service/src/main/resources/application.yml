@@ -1,0 +1,60 @@
+server:
+  port: 10010
+spring:
+  application:
+    name: tbase-cicd-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 172.16.0.6:30000
+    sentinel:
+      transport:
+        dashboard: 172.16.0.8:32076
+        port: 32060 #默认8719，假如被占用了会自动从8719开始依次+1扫描。直至找到未被占用的端口
+
+  #mysql配置
+  datasource:
+    url: jdbc:mysql://172.16.0.6:31372/am_cicd?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Hongkong
+    username: root
+    password: uXsR08Ijsd
+    druid:
+      initial-size: 1
+      min-idle: 1
+      max-active: 20
+      test-on-borrow: true
+      driver-class-name: com.mysql.cj.jdbc.Driver
+
+#mybatis配置
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: auto
+      field-strategy: not_empty
+      #驼峰下划线转换
+      column-underline: true
+      #逻辑删除配置
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      db-type: mysql
+    refresh: false
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    #sql日志 上线屏蔽
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath:/mapper/*.xml
+  type-aliases-package: com.wenge.tbase.cicd.entity
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+# jenkins配置
+project:
+  jenkins:
+    uri: http://192.168.1.101:8888   #jenkins服务的地址
+    username: root    #jenkins账号
+    password: root    #jenkins密码
+    token: kaka
