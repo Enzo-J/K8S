@@ -26,7 +26,7 @@ node {
         }
     }
     stage('编译,安装公共子工程') {
-        sh "mvn -f tbase_commons clean install"
+        sh "mvn -f tbase-commons clean install"
     }
     stage('编译,打包,部署工程') {
         sh "mvn -f ${project_name} clean package dockerfile:build"
