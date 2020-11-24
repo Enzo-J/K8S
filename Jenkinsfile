@@ -29,7 +29,7 @@ node {
         sh "mvn -f tbase-commons clean install"
     }
     stage('编译,打包,部署工程') {
-        sh "mvn -f ${project_name} clean package dockerfile:build -f ${project_name}/src/main/docker/Dockerfile ."
+        sh "mvn -f ${project_name} clean package dockerfile:build "
         def imageName = "${project_name}:${tag}"
         //给镜像打标签
         sh "docker tag ${imageName} ${harbor_url}/${harbor_project_name}/${imageName}"
