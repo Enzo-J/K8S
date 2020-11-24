@@ -67,7 +67,7 @@ public class DemoController {
                     "</definition>\n" +
                     "</flow-definition>";
             // 创建 Job
-            jenkinsServer.createJob("wang-test-job", xml, true);
+            jenkinsServer.createJob("wang-test-job", xml , true);
             // data
             String data = "json: {\"\": \"0\", \n" +
                     "\"credentials\": {\"scope\": \"GLOBAL\", \"username\": \"test\", \"password\": \"test\", \"$redact\": \"password\", \"id\": \"\", \"description\": \"11111\", \"stapler-class\": \"com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl\", \"$class\": \"com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl\"}, \"Jenkins-Crumb\": \"af4dc308c3a68a75727715b84a3019ae576a1ab080a73b8cb88134552bd0d5ad\"}";
