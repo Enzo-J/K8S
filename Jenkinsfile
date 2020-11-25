@@ -28,11 +28,14 @@ node {
     stage('编译,安装公共子工程') {
         sh "mvn -f tbase-commons clean install"
     }
-    stage('编译,打包,部署工程') {
+    stage('编译,打包') {
         sh "mvn -f ${project_name} clean package dockerfile:build "
+        //sshPublisher(publishers: [sshPublisherDesc(configName: 'master_server', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: "/opt/jenkins_shell/deploy.sh $harbor_url $harbor_project_name $project_name $tag $port", execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+    }
+    stage('给镜像打标签,推送到镜像仓库'){
         def imageName = "${project_name}:${tag}"
         //给镜像打标签
-        sh "docker tag ${imageName} ${harbor_url}/${harbor_project_name}/${imageName}"
+        sh "docker  tag  ${imageName} ${harbor_url}/${harbor_project_name}/${imageName} "
         //把镜像推送到harbor
         withCredentials([usernamePassword(credentialsId: "${harbor_auth_id}", passwordVariable: 'password', usernameVariable: 'username')]) {
             //登录harbor
@@ -43,7 +46,6 @@ node {
         //删除本地镜像
         sh "docker rmi -f ${imageName}"
         sh "docker rmi -f ${harbor_url}/${harbor_project_name}/${imageName}"
-        //sshPublisher(publishers: [sshPublisherDesc(configName: 'master_server', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: "/opt/jenkins_shell/deploy.sh $harbor_url $harbor_project_name $project_name $tag $port", execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
     }
 
 }
