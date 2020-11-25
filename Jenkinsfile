@@ -5,7 +5,7 @@ def git_url="git@172.16.0.6:lh-economics/app-manage-platform.git"
 //tag标签版本
 def tag="latest"
 //harbor地址
-def harbor_url="https://172.16.0.11:80"
+def harbor_url="172.16.0.11:80"
 //harbor项目名称
 def harbor_project_name="app-manage-platform"
 //harbor凭证id
