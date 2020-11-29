@@ -5,6 +5,6 @@ import com.wenge.tbase.commons.generator.MyBatisPlusGenerator;
 
 public class CICDGeneratorMain {
     public static void main(String[] args) {
-        MyBatisPlusGenerator.generator(ModuleEnum.MODULE_CICD,"");
+        MyBatisPlusGenerator.generator(ModuleEnum.MODULE_CICD, "cicd_credential");
     }
 }

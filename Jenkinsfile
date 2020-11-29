@@ -35,7 +35,7 @@ node {
     stage('给镜像打标签,推送到镜像仓库'){
         def imageName = "${project_name}:${tag}"
         //给镜像打标签
-        sh "docker  tag  ${imageName} ${harbor_url}/${harbor_project_name}/${imageName} "
+        sh "docker tag ${imageName} ${harbor_url}/${harbor_project_name}/${imageName} "
         //把镜像推送到harbor
         withCredentials([usernamePassword(credentialsId: "${harbor_auth_id}", passwordVariable: 'password', usernameVariable: 'username')]) {
             //登录harbor

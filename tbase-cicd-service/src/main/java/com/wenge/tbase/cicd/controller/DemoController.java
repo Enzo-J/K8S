@@ -5,15 +5,20 @@ import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpClient;
 import com.offbytwo.jenkins.model.JobWithDetails;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -67,7 +72,7 @@ public class DemoController {
                     "</definition>\n" +
                     "</flow-definition>";
             // 创建 Job
-            jenkinsServer.createJob("wang-test-job", xml , true);
+            jenkinsServer.createJob("wang-test-job", xml, true);
             // data
             String data = "json: {\"\": \"0\", \n" +
                     "\"credentials\": {\"scope\": \"GLOBAL\", \"username\": \"test\", \"password\": \"test\", \"$redact\": \"password\", \"id\": \"\", \"description\": \"11111\", \"stapler-class\": \"com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl\", \"$class\": \"com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl\"}, \"Jenkins-Crumb\": \"af4dc308c3a68a75727715b84a3019ae576a1ab080a73b8cb88134552bd0d5ad\"}";
@@ -76,6 +81,14 @@ public class DemoController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @PostMapping("/createCredentials")
+    public void createCredentials() throws IOException {
+        String url = "/credentials/";
+        List<NameValuePair> data = new ArrayList<>();
+        final HttpResponse httpResponse = jenkinsHttpClient.post_form_with_result(url, data, true);
+        System.out.println(httpResponse);
     }
 }
 

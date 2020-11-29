@@ -1,5 +1,7 @@
 server:
   port: 10010
+  servlet:
+    context-path: /cicd
 spring:
   application:
     name: tbase-cicd-service
@@ -54,7 +56,6 @@ management:
 # jenkins配置
 project:
   jenkins:
-    uri: http://192.168.1.101:8888   #jenkins服务的地址
-    username: root    #jenkins账号
-    password: root    #jenkins密码
-    token: kaka
+    uri: http://172.16.0.12:8888   #jenkins服务的地址
+    username: szwg          #jenkins账号
+    password: szwg%2020     #jenkins密码
