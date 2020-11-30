@@ -51,6 +51,22 @@ node {
             def imageName = "${currentProjectName}:${tag}"
             //编译，构建本地镜像
             sh "mvn -f ${currentProjectName} clean package dockerfile:build "
+            //给镜像打标签
+            sh "docker tag ${imageName} ${harbor_url}/${harbor_project_name}/${imageName} "
+            //把镜像推送到harbor
+            withCredentials([usernamePassword(credentialsId: "${harbor_auth_id}", passwordVariable: 'password', usernameVariable: 'username')]) {
+                //登录harbor
+                sh "docker login -u ${username} -p ${password} ${harbor_url}"
+                //上传镜像
+                sh "docker push ${harbor_url}/${harbor_project_name}/${imageName}"
+            }
+            //删除本地镜像
+            sh "docker rmi -f ${imageName}"
+            sh "docker rmi -f ${harbor_url}/${harbor_project_name}/${imageName}"
+            echo "${currentProjectName}完成编译，构建镜像"
+            //从仓库拉取镜像,自动生成镜像
+            sshPublisher(publishers: [sshPublisherDesc(configName: 'master_server', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: "/opt/jenkins_shell/deploy.sh $harbor_url $harbor_project_name $currentProjectName $tag $currentProjectPort", execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+            echo "${currentProjectName}构建完成"
         }
     }
 }
