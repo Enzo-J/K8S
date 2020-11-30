@@ -113,7 +113,6 @@
                 <version>1.3.6</version>
                 <configuration>
                     <repository>${project.artifactId}</repository>
-                    <buildDirectory>${project.basedir}/src/main/docker</buildDirectory>
                     <buildArgs>
                         <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
                     </buildArgs>
