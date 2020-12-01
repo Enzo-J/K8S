@@ -1,21 +1,70 @@
 package com.wenge.tbase.cicd.controller;
 
 
-import org.springframework.web.bind.annotation.RequestMapping;
+import com.wenge.tbase.cicd.controller.service.SonarqubeControllerService;
+import com.wenge.tbase.cicd.entity.param.CreateAndUpdateSonarqubeParam;
+import com.wenge.tbase.commons.result.ResultCode;
+import com.wenge.tbase.commons.result.ResultVO;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.bind.annotation.RestController;
+import javax.annotation.Resource;
 
 /**
  * <p>
- *  前端控制器
+ * 前端控制器
  * </p>
  *
  * @author Wang XingPeng
  * @since 2020-11-30
  */
+@Api(description = "sonarqube文件管理API接口")
 @RestController
-@RequestMapping("/cicd/cicd-sonarqube")
 public class CicdSonarqubeController {
 
+    @Resource
+    private SonarqubeControllerService service;
+
+    @ApiOperation(value = "获取sonarqube文件列表")
+    @GetMapping(value = "/sonarqubeList")
+    public ResultVO getSonarqubeList(@RequestParam(required = false) String name,
+                                     @RequestParam Integer current,
+                                     @RequestParam Integer size) {
+        if (current == null) {
+            current = 0;
+        }
+        if (size == null || size == 0) {
+            size = 10;
+        }
+        return new ResultVO(ResultCode.SUCCESS, service.getSonarqubeList(name, current, size));
+    }
+
+    @ApiOperation(value = "添加sonarqube文件")
+    @PostMapping(value = "/sonarqube")
+    public ResultVO createSonarqube(@RequestBody CreateAndUpdateSonarqubeParam param) {
+        if (param == null || param.getName() == null || param.getContent() == null) {
+            return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        return new ResultVO(ResultCode.SUCCESS, service.createSonarqube(param));
+    }
+
+    @ApiOperation(value = "修改sonarqube文件")
+    @PutMapping(value = "/sonarqube")
+    public ResultVO updateSonarqube(@RequestBody CreateAndUpdateSonarqubeParam param) {
+        if (param == null || param.getId() == null || param.getName() == null || param.getContent() == null) {
+            return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        return new ResultVO(ResultCode.SUCCESS, service.updateSonarqube(param));
+    }
+
+    @ApiOperation(value = "删除sonarqube文件")
+    @DeleteMapping(value = "/sonarqube/{id}")
+    public ResultVO deleteSonarqube(@PathVariable Long id) {
+        if (id == null) {
+            return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        return new ResultVO(ResultCode.SUCCESS, service.deleteSonarqube(id));
+    }
 }
 

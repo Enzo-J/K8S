@@ -41,7 +41,7 @@ public class DockerfileControllerService {
     public ListVo getDockerfileList(String name, Integer current, Integer size) {
         QueryWrapper<CicdDockerfile> wrapper = new QueryWrapper();
         if (StringUtils.isNotEmpty(name)) {
-            wrapper.eq("name", name);
+            wrapper.like("name", name);
         }
         Page page = new Page(current, size);
         IPage list = dockerfileService.page(page, wrapper);

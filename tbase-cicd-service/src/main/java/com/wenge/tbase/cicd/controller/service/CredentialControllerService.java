@@ -48,7 +48,7 @@ public class CredentialControllerService {
     public ListVo getCredentialList(String username, Integer current, Integer size) {
         QueryWrapper<CicdCredential> wrapper = new QueryWrapper();
         if (StringUtils.isNotEmpty(username)) {
-            wrapper.eq("username", username);
+            wrapper.like("username", username);
         }
         Page page = new Page(current, size);
         IPage list = credentialService.page(page, wrapper);

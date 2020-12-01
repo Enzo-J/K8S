@@ -11,7 +11,7 @@ import lombok.Data;
  * @Date: 2020/11/27 10:35
  */
 @Data
-@ApiModel(value = "添加和更新凭证参数")
+@ApiModel(description = "添加和更新凭证参数")
 public class CreateAndUpdateCredentialParam {
 
     @ApiModelProperty(value = "编号 修改时使用")

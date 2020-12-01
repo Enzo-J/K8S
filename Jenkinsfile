@@ -39,7 +39,7 @@ node {
     stage('编译,安装公共子工程') {
         sh "mvn -f tbase-commons clean install"
     }
-    stage('编译,打包,推送镜像') {
+    stage('编译,打包,推送镜像,构建镜像'){
         for(int i=0;i<selectedProjects.size();i++){
             //取出每个项目的名称和端口
             def currentProject = selectedProjects[i];
