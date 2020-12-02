@@ -35,4 +35,5 @@ public class ScreenInfoController {
         return new ResultVO(result);
     }
 
+
 }

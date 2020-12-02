@@ -22,4 +22,9 @@ public class K8SServiceTest {
     public void getMachineInfo(){
         k8SService.getNodeInfo();
     }
+
+    @Test
+    public void getConfigMap(){
+        k8SService.findConfigMapDetail("jenkins","components");
+    }
 }
