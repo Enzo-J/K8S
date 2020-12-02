@@ -1,0 +1,39 @@
+server:
+  port: 10063
+spring:
+  application:
+    name: tbase-sysadmin-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 172.16.0.6:30000
+      config:
+        server-addr: 172.16.0.6:30000
+    sentinel:
+      transport:
+        dashboard: 172.16.0.8:32076
+        port: 8720
+        clientIp: 172.16.0.6
+  #mysql配置
+  datasource:
+    url: jdbc:mysql://172.16.0.6:31372/app-manage-platform?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Hongkong
+    username: root
+    password: uXsR08Ijsd
+    druid:
+      initial-size: 1
+      min-idle: 1
+      max-active: 20
+      test-on-borrow: true
+      driver-class-name: com.mysql.cj.jdbc.Driver
+
+#远程调用的超时时间配置
+ribbon:
+  eager-load:
+    enabled: true
+    clients: client1, client2, client3
+  ReadTimeout: 10000
+  ConnectTimeout: 10000
+  OkToRetryOnAllOperations: false #对所有操作请求都进行重试,默认false  maxAutoRetries: 0
+  MaxAutoRetries: 1
+  MaxAutoRetriesNextServer: 1 #切换实例的重试次数 1
+  ServerListRefreshInterval: 10  #刷新服务列表源的间隔时间
