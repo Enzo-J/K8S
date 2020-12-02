@@ -11,9 +11,9 @@
 
 
 	<modules>
-		<module>tbase-cicd-service</module>
+<!--		<module>tbase-cicd-service</module>-->
 		<module>tbase-commons</module>
-		<module>tbase-k8s-service</module>
+<!--		<module>tbase-k8s-service</module>-->
 		<module>tbase-microservice-service</module>
 		<module>tbase-sysadmin-service</module>
 

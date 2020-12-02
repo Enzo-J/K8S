@@ -13,7 +13,7 @@ spring:
       transport:
         dashboard: 172.16.0.8:32076
         port: 8720
-        clientIp: 172.16.0.6
+        clientIp: 172.16.0.9
   #mysql配置
   datasource:
     url: jdbc:mysql://172.16.0.6:31372/app-manage-platform?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Hongkong
