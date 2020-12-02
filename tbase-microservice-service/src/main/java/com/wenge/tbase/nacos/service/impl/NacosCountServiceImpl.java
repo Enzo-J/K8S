@@ -2,6 +2,7 @@ package com.wenge.tbase.nacos.service.impl;
 
 import java.util.HashMap;
 
+import com.wenge.tbase.commons.result.ResultCode;
 import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSONObject;
 import com.wenge.tbase.nacos.config.ConstantConfig;
@@ -64,7 +65,7 @@ public class NacosCountServiceImpl implements NacosCountService {
 		return RestResult.ok(countObject);
 	}	
 	catch (Exception e) {
-		return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+		return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 	}
 	}
 }

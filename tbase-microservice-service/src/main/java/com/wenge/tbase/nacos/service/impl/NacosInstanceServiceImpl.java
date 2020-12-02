@@ -2,6 +2,7 @@ package com.wenge.tbase.nacos.service.impl;
 
 import java.util.HashMap;
 
+import com.wenge.tbase.commons.result.ResultCode;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
@@ -20,7 +21,7 @@ public class NacosInstanceServiceImpl implements NacosInstanceService {
 			result = JsoupUtils.post(ConstantConfig.nacosInstanceAddress, instanceMap);
 			return RestResult.ok(result);
 		} catch (Exception e) {
-			return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+			return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
 	}
 
@@ -31,7 +32,7 @@ public class NacosInstanceServiceImpl implements NacosInstanceService {
 			result = JsoupUtils.delete(ConstantConfig.nacosInstanceAddress, instanceMap);
 			return RestResult.ok(result);
 		} catch (Exception e) {
-			return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+			return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
 	}
 
@@ -42,7 +43,7 @@ public class NacosInstanceServiceImpl implements NacosInstanceService {
 			result = JsoupUtils.get(ConstantConfig.nacosInstanceAddress+"/list", instanceMap);
 			return RestResult.ok(result);
 		} catch (Exception e) {
-			return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+			return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
 	}
 
@@ -53,7 +54,7 @@ public class NacosInstanceServiceImpl implements NacosInstanceService {
 			result = JsoupUtils.get(ConstantConfig.nacosInstanceAddress, instanceMap);
 			return RestResult.ok(result);
 		} catch (Exception e) {
-			return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+			return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
 	}
 
@@ -64,7 +65,7 @@ public class NacosInstanceServiceImpl implements NacosInstanceService {
 			result = JsoupUtils.put(ConstantConfig.nacosInstanceAddress + "/beat", instanceMap);
 			return RestResult.ok(result);
 		} catch (Exception e) {
-			return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+			return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
 
 	}
@@ -77,7 +78,7 @@ public class NacosInstanceServiceImpl implements NacosInstanceService {
 					.parseObject(JsoupUtils.put(ConstantConfig.nacosInstanceAddress + "/metadata/batch", instanceMap));
 			return RestResult.ok(result);
 		} catch (Exception e) {
-			return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+			return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
 	}
 	@Override
@@ -88,7 +89,7 @@ public class NacosInstanceServiceImpl implements NacosInstanceService {
 					JsoupUtils.delete(ConstantConfig.nacosInstanceAddress + "/metadata/batch", instanceMap));
 			return RestResult.ok(result);
 		} catch (Exception e) {
-			return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+			return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
 	}
 }

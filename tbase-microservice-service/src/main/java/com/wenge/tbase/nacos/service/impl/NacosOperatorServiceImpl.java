@@ -2,6 +2,7 @@ package com.wenge.tbase.nacos.service.impl;
 
 import java.util.HashMap;
 
+import com.wenge.tbase.commons.result.ResultCode;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
@@ -20,7 +21,7 @@ public class NacosOperatorServiceImpl implements NacosOperatorService{
 				result = JsoupUtils.get(ConstantConfig.nacosOperatorAddress);
 				return RestResult.ok(result);
 			} catch (Exception e) {
-				return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+				return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 			}
 	}
 
@@ -31,7 +32,7 @@ public class NacosOperatorServiceImpl implements NacosOperatorService{
 			result = JsoupUtils.put(ConstantConfig.nacosOperatorAddress,serviceMap);
 			return RestResult.ok(result);
 		} catch (Exception e) {
-			return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+			return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
 	}
 
@@ -42,7 +43,7 @@ public class NacosOperatorServiceImpl implements NacosOperatorService{
 			result = JsoupUtils.get(ConstantConfig.nacosOperatorAddress+"/metrics");
 			return RestResult.ok(result);
 		} catch (Exception e) {
-			return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+			return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
 	}
 
@@ -53,7 +54,7 @@ public class NacosOperatorServiceImpl implements NacosOperatorService{
 			result = JSONObject.parseObject(JsoupUtils.get(ConstantConfig.nacosOperatorAddress+"/servers",serviceMap));
 			return RestResult.ok(result);
 		} catch (Exception e) {
-			return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+			return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
 	}
   

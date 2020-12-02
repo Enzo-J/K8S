@@ -1,5 +1,6 @@
 package com.wenge.tbase.nacos.service.impl;
 
+import com.wenge.tbase.commons.result.ResultCode;
 import com.wenge.tbase.nacos.result.RestResult;
 import com.wenge.tbase.nacos.result.WengeStatusEnum;
 import com.wenge.tbase.nacos.config.ConstantConfig;
@@ -24,7 +25,7 @@ public class NacosServiceClusterServiceImpl implements NacosServiceClusterServic
             result = JsoupUtils.put(ConstantConfig.nacosClusterAddress, clusterMap);
             return RestResult.ok(result);
         } catch (Exception e) {
-            return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+            return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
         }
     }
 }

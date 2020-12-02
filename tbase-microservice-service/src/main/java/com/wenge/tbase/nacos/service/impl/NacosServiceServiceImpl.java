@@ -3,6 +3,7 @@ package com.wenge.tbase.nacos.service.impl;
 import java.util.HashMap;
 
 import com.alibaba.fastjson.JSONObject;
+import com.wenge.tbase.commons.result.ResultCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class NacosServiceServiceImpl implements NacosServiceService{
 				result =JsoupUtils.post(ConstantConfig.nacosServiceAddress, serviceMap);
 				return RestResult.ok(result);
 			} catch (Exception e) {
-				return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+				return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
 	}
 
@@ -37,7 +38,7 @@ public class NacosServiceServiceImpl implements NacosServiceService{
 				result =JsoupUtils.delete(ConstantConfig.nacosServiceAddress, serviceMap);
 				return RestResult.ok(result);
 			} catch (Exception e) {
-				return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+				return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
 	}
 
@@ -49,7 +50,7 @@ public class NacosServiceServiceImpl implements NacosServiceService{
 				result =JsoupUtils.put(ConstantConfig.nacosServiceAddress, serviceMap);
 				return RestResult.ok(result);
 			} catch (Exception e) {
-				return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+				return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
 	}
 
@@ -61,7 +62,7 @@ public class NacosServiceServiceImpl implements NacosServiceService{
 				result =JsoupUtils.getJson(ConstantConfig.nacosServiceAddress, serviceMap);
 				return RestResult.ok(result);
 			} catch (Exception e) {
-				return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+				return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
 	}
 
@@ -72,7 +73,7 @@ public class NacosServiceServiceImpl implements NacosServiceService{
 				result =JsoupUtils.getJson(ConstantConfig.nacosServiceListAddress, serviceMap);
 				return RestResult.ok(result);
 			} catch (Exception e) {
-				return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+				return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
 	}
 

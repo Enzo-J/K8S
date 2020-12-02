@@ -2,6 +2,7 @@ package com.wenge.tbase.nacos.service.impl;
 
 import java.util.HashMap;
 
+import com.wenge.tbase.commons.result.ResultCode;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
@@ -19,7 +20,7 @@ public class NacosNsServiceImpl implements NacosNsService{
 			result = JsoupUtils.get(ConstantConfig.nacosNsAddress+"/raft/leader");
 			return RestResult.ok(result);
 		} catch (Exception e) {
-			return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+			return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
 	}
 
@@ -30,7 +31,7 @@ public class NacosNsServiceImpl implements NacosNsService{
 			result = JsoupUtils.put(ConstantConfig.nacosNsAddress+"/health/instance",instanceMap);
 			return RestResult.ok(result);
 		} catch (Exception e) {
-			return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+			return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
 	}
 
