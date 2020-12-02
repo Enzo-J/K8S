@@ -19,7 +19,7 @@ public class SwaggerConfig{
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo()).enable(true)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.wenge.tbase.nacos"))
+                .apis(RequestHandlerSelectors.basePackage("com.wenge.tbase.nacos.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }

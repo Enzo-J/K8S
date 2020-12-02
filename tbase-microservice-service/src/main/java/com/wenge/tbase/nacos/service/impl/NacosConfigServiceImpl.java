@@ -1,28 +1,23 @@
 package com.wenge.tbase.nacos.service.impl;
-
 import java.util.HashMap;
 import java.util.Map;
-
+import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import com.wenge.tbase.nacos.config.ConstantConfig;
 import com.wenge.tbase.nacos.result.RestResult;
 import com.wenge.tbase.nacos.result.WengeStatusEnum;
 import com.wenge.tbase.nacos.service.NacosConfigService;
 import com.wenge.tbase.nacos.utils.JsoupUtils;
+
 @Service
+@Slf4j
 public class NacosConfigServiceImpl<V> implements NacosConfigService {
 	@Override
-	public RestResult<?> getConfigs(String tenant, String dataId, String group) {
-      Map<String, String> params=new HashMap<String, String>();
-      params.put("dataId", dataId);
-      params.put("group", group);
-      if(tenant!=null) {
-    	  params.put("tenant", tenant);
-      }
-	  String result;
+	public RestResult<?>  obtainConfig(HashMap<String, String> configMap) {
+	  JSONObject result;
 	try {
-		result = JsoupUtils.get(ConstantConfig.nacosConfigAddress, params);
+		result = JsoupUtils.getJson(ConstantConfig.nacosConfigAddress, configMap);
 		return RestResult.ok(result);
 	} catch (Exception e) {
 		return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
@@ -41,21 +36,12 @@ public class NacosConfigServiceImpl<V> implements NacosConfigService {
 			return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
 		}
 	}
+
 	@Override
-	public RestResult<?> releaseConfigs(String tenant, String dataId, String content, String group, String type) {
-		 Map<String, String> params=new HashMap<String, String>();
-	      params.put("dataId", dataId);
-	      params.put("content", content);
-	      if(tenant!=null) {
-	    	  params.put("tenant", tenant);
-	      }
-	      if(type!=null) {
-	    	  params.put("type", tenant);
-	      }
-	      params.put("group", group);
-		  String result;
+	public RestResult<?> deleteConfigs(HashMap<String, String> configMap) {
+		String result;
 		try {
-			result = JsoupUtils.post(ConstantConfig.nacosConfigAddress, params);
+			result = JsoupUtils.delete(ConstantConfig.nacosConfigAddress, configMap);
 			return RestResult.ok(result);
 		} catch (Exception e) {
 			return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
@@ -63,17 +49,22 @@ public class NacosConfigServiceImpl<V> implements NacosConfigService {
 	}
 
 	@Override
-	public RestResult<?> deleteConfigs(String tenant, String dataId, String group) {
-		 Map<String, String> params=new HashMap<String, String>();
-		 if(tenant!=null) {
-	    	  params.put("tenant", tenant);
-	      }
-	      params.put("dataId", dataId);
-	      params.put("group", group);
-		  String result;
+	public RestResult<?> releaseConfigs(HashMap<String, String> configMap) {
+		String result;
 		try {
-			result = JsoupUtils.delete(ConstantConfig.nacosConfigAddress, params);
+			result = JsoupUtils.post(ConstantConfig.nacosConfigAddress, configMap);
 			return RestResult.ok(result);
+		} catch (Exception e) {
+			return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+		}
+	}
+
+	@Override
+	public RestResult<?> obtainConfigLists(HashMap<String, String> configMap) {
+		JSONObject result;
+		try {
+			result = JsoupUtils.getJson(ConstantConfig.nacosConfigAddress, configMap);
+			return RestResult.ok(result.getJSONArray("pageItems"));
 		} catch (Exception e) {
 			return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
 		}

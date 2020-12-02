@@ -1,14 +1,20 @@
-
+server:
+  port: 10062
 spring:
   application:
-    name: nacos_service
+    name: tbase-microservice-service
   cloud:
     nacos:
       discovery:
         server-addr: 172.16.0.6:30000
       config:
         server-addr: 172.16.0.6:30000
-        file-extension: yaml
-      sentinel:
-         transport:
-           dashboard: ${SENTINEL_DASHBOARD_HOST:172.16.0.8}:${SENTINEL_DASHBOARD_PORT:32076}  
+    sentinel:
+      transport:
+        dashboard: 172.16.0.8:32076
+        port: 8719
+        clientIp: 172.16.0.6
+ribbon:
+  eager-load:
+    enabled: true
+    clients: tbase-sysadmin-service

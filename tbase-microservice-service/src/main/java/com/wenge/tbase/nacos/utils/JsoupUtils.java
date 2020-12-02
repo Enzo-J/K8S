@@ -9,10 +9,7 @@ import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.wenge.tbase.nacos.Exception.WengeException;
-import com.wenge.tbase.nacos.result.WengeStatusEnum;
 
 /**
  * 请求类
@@ -55,15 +52,20 @@ public class JsoupUtils {
 	 * @param url
 	 * @return
 	 */
-	public static JSONArray get(String url, int type) {
-		JSONArray result = null;
-		try {
-			Response response = Jsoup.connect(url).ignoreContentType(true).timeout(5000).execute();
-			String text = response.body();
-			result = JSONArray.parseArray(text);
-		} catch (IOException e) {
-			e.printStackTrace();
+	public static JSONObject getJson(String url, Map<String, String> params) throws IOException {
+		JSONObject result = null;
+		if (params != null && params.size() > 0) {
+			url = url + "?";
+			for (Map.Entry<String, String> entry : params.entrySet()) {
+				System.out.println("key= " + entry.getKey() + " and value= " + entry.getValue());
+				url = url + entry.getKey() + "=" + entry.getValue() + "&";
+			}
+			url = url.substring(0, url.length() - 1);
 		}
+		System.out.println("url:" + url);
+		Response response = Jsoup.connect(url).ignoreContentType(true).timeout(60000).execute();
+		String text = response.body();
+		result = JSONObject.parseObject(text);
 		return result;
 	}
 
@@ -88,7 +90,6 @@ public class JsoupUtils {
 			Response response = Jsoup.connect(url).ignoreContentType(true).timeout(60000).execute();
 			String text = response.body();
 			result = StringEscapeUtils.unescapeJava(text);
-		
 		return result;
 	}
 
@@ -108,7 +109,7 @@ public class JsoupUtils {
 				}
 				connection.data(params);
 			}
-			Response response = connection.timeout(5000).execute();
+			Response response = connection.timeout(6000).execute();
 			result = response.body();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -126,7 +127,7 @@ public class JsoupUtils {
 				}
 				connection.data(params);
 			}
-			Response response = connection.timeout(5000).execute();
+			Response response = connection.timeout(50000).execute();
 			result = response.body();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -148,7 +149,7 @@ public class JsoupUtils {
 				}
 				connection.data(params);
 			}
-			Response response = connection.timeout(5000).execute();
+			Response response = connection.timeout(50000).execute();
 			result = response.body();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -171,7 +172,7 @@ public class JsoupUtils {
 				}
 				connection.data(params);
 			}
-			Response response = connection.timeout(5000).execute();
+			Response response = connection.timeout(50000).execute();
 			result = response.body();
 		} catch (IOException e) {
 			e.printStackTrace();

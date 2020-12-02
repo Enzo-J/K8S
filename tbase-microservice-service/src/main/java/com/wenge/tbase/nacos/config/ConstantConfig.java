@@ -16,14 +16,16 @@ public class ConstantConfig {
 	private static InputStream profilepathOutJar = ConfigUtils.class.getClassLoader()
             .getResourceAsStream("config.properties");
     private static Properties props = new Properties();
-    public static String nacosConfigAddress;
-    public static String nacosInstanceAddress;
-    public static String nacosOperatorAddress;
-    public static  String nacosServiceAddress ;
-    public static  String nacosNsAddress ;
-    public static  String projectNum ;
-    public static  String pageNo ;
-    public static  String pageSize ;
+    public static  String nacosConfigAddress;
+    public static  String nacosInstanceAddress;
+    public static  String nacosOperatorAddress;
+    public static  String nacosServiceAddress;
+    public static  String nacosServiceListAddress;
+    public static  String nacosNsAddress;
+    public static  String nacosClusterAddress;
+    public static  String projectNum;
+    public static  String pageNo;
+    public static  String pageSize;
     static {
         try {
             props.load(profilepathOutJar);
@@ -31,6 +33,8 @@ public class ConstantConfig {
             nacosInstanceAddress = props.getProperty("nacosInstanceAddress");
             nacosOperatorAddress = props.getProperty("nacosOperatorAddress");
             nacosServiceAddress = props.getProperty("nacosServiceAddress");
+            nacosServiceListAddress = props.getProperty("nacosServiceListAddress");
+            nacosClusterAddress = props.getProperty("nacosClusterAddress");
             nacosNsAddress = props.getProperty("nacosNsAddress");
             projectNum = props.getProperty("projectNum");
             pageNo = props.getProperty("pageNo");

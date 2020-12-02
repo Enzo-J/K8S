@@ -16,7 +16,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
-@Api("nacos服务操作相关的接口")
+@Api(tags = "nacos服务操作相关的接口")
 @RestController
 @RequestMapping("/nacos/v1/ns/operator")
 public class NacosServiceOperatorController<V> {
@@ -29,8 +29,8 @@ public class NacosServiceOperatorController<V> {
 	}
 	
 	@ApiOperation(value = "修改系统开关", notes = "修改系统开关")
-	@ApiImplicitParams({ @ApiImplicitParam(name = "entry", value = "命名空间ID", required = true, dataType = "string"),
-			@ApiImplicitParam(name = "value", value = "开关值", required = true, dataType = "string"),
+	@ApiImplicitParams({ @ApiImplicitParam(name = "entry", value = "命名空间ID", required = true, dataType = "String"),
+			@ApiImplicitParam(name = "value", value = "开关值", required = true, dataType = "String"),
 			@ApiImplicitParam(name = "debug", value = "是否只在本机生效,true表示本机生效,false表示集群生效", required = false, dataType = "boolean") })
 	@PutMapping("/switches")
 	public RestResult<?> putSwitches(@Valid @RequestParam String entry, @Valid @RequestParam String value,

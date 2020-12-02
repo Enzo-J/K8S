@@ -1,4 +1,4 @@
-package com.wenge.tbase.nacos.Exception;
+package com.wenge.tbase.nacos.exception;
 
 import javax.servlet.http.HttpServletRequest;
 

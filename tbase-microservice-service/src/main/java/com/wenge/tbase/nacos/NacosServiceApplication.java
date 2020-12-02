@@ -1,23 +1,21 @@
 package com.wenge.tbase.nacos;
+
 import java.time.LocalDateTime;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import lombok.extern.slf4j.Slf4j;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
 @Slf4j
 @SpringBootApplication
 @EnableDiscoveryClient
-@ComponentScan(basePackages = {"com.wenge.tbase.nacos"})
+@EnableSwagger2
 public class NacosServiceApplication {
-//	private static final Logger log = LoggerFactory.getLogger(NacosServiceApplication.class);
-	//spring通过value注解读取配置信息的
-
-	public static void main(String[] args) {
+    //spring通过value注解读取配置信息的
+    public static void main(String[] args) {
         SpringApplication.run(NacosServiceApplication.class, args);
         //spring通过value注解读取配置信息的
         log.info("                                                                                                             \n" +

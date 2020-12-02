@@ -1,13 +1,10 @@
 package com.wenge.tbase.nacos.config;
 
+import com.wenge.tbase.nacos.interceptor.NacosServiceInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import com.alibaba.cloud.nacos.ribbon.NacosServerIntrospector;
-import com.wenge.tbase.nacos.interceptor.NacosServiceInterceptor;
 
 
 @Configuration
@@ -23,12 +20,12 @@ public class WebServerMvcConfigurerAdapter implements WebMvcConfigurer {
 //	    }
     @Override
 	public  void addResourceHandlers(ResourceHandlerRegistry registry) {
-		    registry.addResourceHandler("/").addResourceLocations("classpath:/static/");
-		    
-	        registry.addResourceHandler("swagger-ui.html")
-	                .addResourceLocations("classpath:/META-INF/resources/");
+//		    registry.addResourceHandler("/").addResourceLocations("classpath:/static/");
 //
-	        registry.addResourceHandler("/webjars/**")
-	                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+//	        registry.addResourceHandler("swagger-ui.html")
+//	                .addResourceLocations("classpath:/META-INF/resources/");
+////
+//	        registry.addResourceHandler("/webjars/**")
+//	                .addResourceLocations("classpath:/META-INF/resources/webjars/");
 	    }
 }

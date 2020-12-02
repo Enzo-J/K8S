@@ -1,4 +1,4 @@
-package com.wenge.tbase.nacos.Exception;
+package com.wenge.tbase.nacos.exception;
 
 
 import lombok.Getter;

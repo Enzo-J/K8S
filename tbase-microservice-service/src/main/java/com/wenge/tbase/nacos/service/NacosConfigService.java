@@ -2,9 +2,12 @@ package com.wenge.tbase.nacos.service;
 
 import com.wenge.tbase.nacos.result.RestResult;
 
+import java.util.HashMap;
+
 public interface NacosConfigService {
-	RestResult<?> getConfigs(String tenant, String dataId, String group);
+	RestResult<?> obtainConfig(HashMap<String, String> configMap);
 	RestResult<?> listenConfigs(String listeningConfigs);
-	RestResult<?> releaseConfigs(String tenant, String dataId, String content, String group,String type);
-	RestResult<?> deleteConfigs(String tenant, String dataId, String group);
+	RestResult<?> deleteConfigs(HashMap<String, String> configMap);
+	RestResult<?> releaseConfigs(HashMap<String, String> configMap);
+	RestResult<?> obtainConfigLists(HashMap<String, String> configMap);
 }

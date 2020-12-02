@@ -19,7 +19,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
-@Api("nacos服务系统数据相关接口")
+@Api(tags = "nacos服务系统数据相关接口")
 @RestController
 @RequestMapping("/nacos/v1/ns")
 public class NacosServiceNsController<V> {
@@ -35,12 +35,12 @@ public class NacosServiceNsController<V> {
 	
 	@ApiOperation(value = "更新实例的健康状态", notes = "删除服务更新实例的健康状态")
 	@ApiImplicitParams({ 
-	    @ApiImplicitParam(name = "ip", value = "服务实例IP", required = true, dataType = "string"),
-		@ApiImplicitParam(name = "port", value = "服务实例port", required = true, dataType = "integer"),
-		@ApiImplicitParam(name = "namespaceId", value = "命名空间ID", required = false, dataType = "string"),
-		@ApiImplicitParam(name = "clusterName", value = "集群名", required = false, dataType = "string"),
-		@ApiImplicitParam(name = "serviceName", value = "服务名", required = true, dataType = "string"),
-		@ApiImplicitParam(name = "groupName", value = "分组名", required = false, dataType = "string"),
+	    @ApiImplicitParam(name = "ip", value = "服务实例IP", required = true, dataType = "String"),
+		@ApiImplicitParam(name = "port", value = "服务实例port", required = true, dataType = "Int"),
+		@ApiImplicitParam(name = "namespaceId", value = "命名空间ID", required = false, dataType = "String"),
+		@ApiImplicitParam(name = "clusterName", value = "集群名", required = false, dataType = "String"),
+		@ApiImplicitParam(name = "serviceName", value = "服务名", required = true, dataType = "String"),
+		@ApiImplicitParam(name = "groupName", value = "分组名", required = false, dataType = "String"),
 		@ApiImplicitParam(name = "healthy", value = "是否健康", required = true, dataType = "boolean") }) // @PostMapping(value
 	@PutMapping("/health/instance")
 	public RestResult<?> updateHealthInstance(

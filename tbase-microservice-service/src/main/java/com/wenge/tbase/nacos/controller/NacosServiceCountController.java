@@ -11,18 +11,19 @@ import com.wenge.tbase.nacos.service.NacosCountService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-@Api("nacos配置管理接口")
+
+@Api(tags = "nacos应用大屏的统计服务接口")
 @RestController
 @RequestMapping("/nacos/v1/cs/count")
-public class NacosServiceCountController {	
-    @Autowired
+public class NacosServiceCountController {
+	@Autowired
 	private NacosCountService nacosCountService;
 	@ApiOperation(value = "获取nacos上面应用服务的统计数", notes = "获取nacos上面应用服务的统计数")
-	
+
 	//须标明什么情况必须传递tenant
-    @GetMapping("/getCounts")
+	@GetMapping("/getCounts")
 	public RestResult<?> getCounts() {
 		return nacosCountService.getCounts();
-	}	
-	
+	}
+
 }

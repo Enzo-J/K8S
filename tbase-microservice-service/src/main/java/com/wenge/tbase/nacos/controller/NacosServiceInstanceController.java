@@ -1,9 +1,7 @@
 package com.wenge.tbase.nacos.controller;
 
 import java.util.HashMap;
-
 import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,36 +10,38 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.wenge.tbase.nacos.result.RestResult;
 import com.wenge.tbase.nacos.service.NacosInstanceService;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
-@Api("nacos服务发现服务接口")
+@Api(tags = "nacos服务发现服务接口")
 @RestController
 @RequestMapping("/nacos/v1/ns/instance")
 public class NacosServiceInstanceController<V> {
 	@Autowired
 	private NacosInstanceService nacosInstanceService;
 	@ApiOperation(value = "注册实例", notes = "注册实例")
-	@ApiImplicitParams({ @ApiImplicitParam(name = "ip", value = "服务实例IP", required = true, dataType = "string"),
-			@ApiImplicitParam(name = "port", value = "服务实例port", required = true, dataType = "integer"),
-			@ApiImplicitParam(name = "namespaceId", value = "命名空间ID", required = false, dataType = "string"),
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "ip", value = "服务实例IP", required = true, dataType = "String"),
+			@ApiImplicitParam(name = "port", value = "服务实例port", required = true, dataType = "Int"),
+			@ApiImplicitParam(name = "namespaceId", value = "命名空间ID", required = false, dataType = "String"),
 			@ApiImplicitParam(name = "weight", value = "权重", required = false, dataType = "double"),
-			@ApiImplicitParam(name = "enabled", value = "是否上线", required = false, dataType = "boolean"),
-			@ApiImplicitParam(name = "healthy", value = "是否健康", required = false, dataType = "boolean"),
-			@ApiImplicitParam(name = "clusterName", value = "集群名", required = false, dataType = "string"),
-			@ApiImplicitParam(name = "metadata", value = "扩展信息", required = false, dataType = "string"),
-			@ApiImplicitParam(name = "serviceName", value = "服务名", required = true, dataType = "string"),
-			@ApiImplicitParam(name = "groupName", value = "分组名", required = false, dataType = "string"),
-			@ApiImplicitParam(name = "ephemeral", value = "是否临时实例", required = false, dataType = "boolean") }) // @PostMapping(value
+			@ApiImplicitParam(name = "enabled", value = "是否上线", required = false, dataType = "Boolean"),
+			@ApiImplicitParam(name = "healthy", value = "是否健康", required = false, dataType = "Boolean"),
+			@ApiImplicitParam(name = "clusterName", value = "集群名", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "metadata", value = "扩展信息", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "serviceName", value = "服务名", required = true, dataType = "String"),
+			@ApiImplicitParam(name = "groupName", value = "分组名", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "ephemeral", value = "是否临时实例", required = false, dataType = "Boolean") }) // @PostMapping(value
 	@PostMapping
-	public RestResult<?> registeredInstance(@Valid @RequestParam(required = false) String namespaceId,
-			@Valid @RequestParam String ip, @Valid @RequestParam int port, @Valid @RequestParam String serviceName,
+	public RestResult<?> registeredInstance(
+			@Valid @RequestParam(required = false) String namespaceId,
+			@Valid @RequestParam String ip,
+			@Valid @RequestParam int port,
+			@Valid @RequestParam String serviceName,
 			@Valid @RequestParam(required = false) Double weight,
 			@Valid @RequestParam(required = false) Boolean enabled,
 			@Valid @RequestParam(required = false) Boolean healthy,
@@ -68,6 +68,9 @@ public class NacosServiceInstanceController<V> {
 		if (clusterName != null) {
 			instanceMap.put("clusterName", clusterName);
 		}
+		if (metadata != null) {
+			instanceMap.put("metadata", metadata);
+		}
 		if (groupName != null) {
 			instanceMap.put("groupName", groupName);
 		}
@@ -79,13 +82,14 @@ public class NacosServiceInstanceController<V> {
 	
 	
 	@ApiOperation(value = "注销实例", notes = "注销实例")
-	@ApiImplicitParams({ @ApiImplicitParam(name = "ip", value = "服务实例IP", required = true, dataType = "string"),
-			@ApiImplicitParam(name = "port", value = "服务实例port", required = true, dataType = "integer"),
-			@ApiImplicitParam(name = "namespaceId", value = "命名空间ID", required = false, dataType = "string"),
-			@ApiImplicitParam(name = "clusterName", value = "集群名", required = false, dataType = "string"),
-			@ApiImplicitParam(name = "serviceName", value = "服务名", required = true, dataType = "string"),
-			@ApiImplicitParam(name = "groupName", value = "分组名", required = false, dataType = "string"),
-			@ApiImplicitParam(name = "ephemeral", value = "是否临时实例", required = false, dataType = "boolean") }) // @PostMapping(value
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "ip", value = "服务实例IP", required = true, dataType = "String"),
+			@ApiImplicitParam(name = "port", value = "服务实例port", required = true, dataType = "Int"),
+			@ApiImplicitParam(name = "namespaceId", value = "命名空间ID", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "clusterName", value = "集群名", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "serviceName", value = "服务名", required = true, dataType = "String"),
+			@ApiImplicitParam(name = "groupName", value = "分组名", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "ephemeral", value = "是否临时实例", required = false, dataType = "Boolean") }) // @PostMapping(value
 	@DeleteMapping
 	public RestResult<?> deleteInstance(
 			@Valid @RequestParam(required = false) String namespaceId,
@@ -116,19 +120,22 @@ public class NacosServiceInstanceController<V> {
 	
 	@ApiOperation(value = "修改实例", notes = "修改实例")
 	@ApiImplicitParams({ 
-		    @ApiImplicitParam(name = "ip", value = "服务实例IP", required = true, dataType = "string"),
-			@ApiImplicitParam(name = "port", value = "服务实例port", required = true, dataType = "integer"),
-			@ApiImplicitParam(name = "namespaceId", value = "命名空间ID", required = false, dataType = "string"),
+		    @ApiImplicitParam(name = "ip", value = "服务实例IP", required = true, dataType = "String"),
+			@ApiImplicitParam(name = "port", value = "服务实例port", required = true, dataType = "Int"),
+			@ApiImplicitParam(name = "namespaceId", value = "命名空间ID", required = false, dataType = "String"),
 			@ApiImplicitParam(name = "weight", value = "权重", required = false, dataType = "double"),
-			@ApiImplicitParam(name = "enabled", value = "是否上线", required = false, dataType = "boolean"),
-			@ApiImplicitParam(name = "clusterName", value = "集群名", required = false, dataType = "string"),
-			@ApiImplicitParam(name = "metadata", value = "扩展信息", required = false, dataType = "string"),
-			@ApiImplicitParam(name = "serviceName", value = "服务名", required = true, dataType = "string"),
-			@ApiImplicitParam(name = "groupName", value = "分组名", required = false, dataType = "string"),
-			@ApiImplicitParam(name = "ephemeral", value = "是否临时实例", required = false, dataType = "boolean") }) // @PostMapping(value
+			@ApiImplicitParam(name = "enabled", value = "是否上线（此字段进行服务实例的上线、下线管理配置）", required = false, dataType = "Boolean"),
+			@ApiImplicitParam(name = "clusterName", value = "集群名", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "metadata", value = "扩展信息", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "serviceName", value = "服务名", required = true, dataType = "String"),
+			@ApiImplicitParam(name = "groupName", value = "分组名", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "ephemeral", value = "是否临时实例", required = false, dataType = "Boolean") }) // @PostMapping(value
 	@PutMapping
-	public RestResult<?> updateInstance(@Valid @RequestParam(required = false) String namespaceId,
-			@Valid @RequestParam String ip, @Valid @RequestParam int port, @Valid @RequestParam String serviceName,
+	public RestResult<?> updateInstance(
+			@Valid @RequestParam(required = false) String namespaceId,
+			@Valid @RequestParam String ip,
+			@Valid @RequestParam int port,
+			@Valid @RequestParam String serviceName,
 			@Valid @RequestParam(required = false) Double weight,
 			@Valid @RequestParam(required = false) Boolean enabled,
 			@Valid @RequestParam(required = false) String clusterName,
@@ -151,6 +158,9 @@ public class NacosServiceInstanceController<V> {
 		if (clusterName != null) {
 			instanceMap.put("clusterName", clusterName);
 		}
+		if (metadata != null) {
+			instanceMap.put("metadata", metadata);
+		}
 		if (groupName != null) {
 			instanceMap.put("groupName", groupName);
 		}
@@ -161,11 +171,11 @@ public class NacosServiceInstanceController<V> {
 	}
 	@ApiOperation(value = "获取实例列表", notes = "获取实例列表")
 	@ApiImplicitParams({ 
-			@ApiImplicitParam(name = "clusters", value = "服务实例port", required = false, dataType = "integer"),
-			@ApiImplicitParam(name = "namespaceId", value = "命名空间ID", required = false, dataType = "string"),
-			@ApiImplicitParam(name = "serviceName", value = "服务名", required = true, dataType = "string"),
-			@ApiImplicitParam(name = "groupName", value = "分组名", required = false, dataType = "string"),
-			@ApiImplicitParam(name = "healthyOnly", value = "是否只返回健康实例", required = false, dataType = "boolean") }) // @PostMapping(value
+			@ApiImplicitParam(name = "clusters", value = "服务实例port", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "namespaceId", value = "命名空间ID", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "serviceName", value = "服务名", required = true, dataType = "String"),
+			@ApiImplicitParam(name = "groupName", value = "分组名", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "healthyOnly", value = "是否只返回健康实例", required = false, dataType = "Boolean") }) // @PostMapping(value
 	@GetMapping("/list")
 	public RestResult<?> getInstanceList(
 			@Valid @RequestParam String serviceName,
@@ -192,25 +202,28 @@ public class NacosServiceInstanceController<V> {
 	
 	@ApiOperation(value = "查询实例详情", notes = "查询实例列详情")
 	@ApiImplicitParams({ 
-		 @ApiImplicitParam(name = "ip", value = "服务实例IP", required = true, dataType = "string"),
-			@ApiImplicitParam(name = "port", value = "服务实例port", required = true, dataType = "integer"),
-			@ApiImplicitParam(name = "namespaceId", value = "命名空间ID", required = false, dataType = "string"),
-			@ApiImplicitParam(name = "healthyOnly", value = "是否只返回健康实例", required = false, dataType = "boolean"),
-			@ApiImplicitParam(name = "cluster", value = "集群名称", required = false, dataType = "string"),
-			@ApiImplicitParam(name = "serviceName", value = "服务名", required = true, dataType = "string"),
-			@ApiImplicitParam(name = "groupName", value = "分组名", required = false, dataType = "string"),
-			@ApiImplicitParam(name = "ephemeral", value = "是否临时实例", required = false, dataType = "boolean") }) // @PostMapping(value
+		 @ApiImplicitParam(name = "ip", value = "服务实例IP", required = true, dataType = "String"),
+			@ApiImplicitParam(name = "port", value = "服务实例port", required = true, dataType = "Int"),
+			@ApiImplicitParam(name = "namespaceId", value = "命名空间ID", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "healthyOnly", value = "是否只返回健康实例", required = false, dataType = "Boolean"),
+			@ApiImplicitParam(name = "cluster", value = "集群名称", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "serviceName", value = "服务名", required = true, dataType = "String"),
+			@ApiImplicitParam(name = "groupName", value = "分组名", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "ephemeral", value = "是否临时实例", required = false, dataType = "Boolean") }) // @PostMapping(value
 	@GetMapping
-	public RestResult<?> updateInstance(
+	public RestResult<?> getInstance(
 			@Valid @RequestParam(required = false) String namespaceId,
 			@Valid @RequestParam String ip, 
 			@Valid @RequestParam int port,
 			@Valid @RequestParam String serviceName,
 			@Valid @RequestParam(required = false) String cluster,
 			@Valid @RequestParam(required = false) String groupName,
+			@Valid @RequestParam(required = false) Boolean healthyOnly,
 			@Valid @RequestParam(required = false) Boolean ephemeral) {
 		HashMap<String, String> instanceMap = new HashMap<String, String>();
 		instanceMap.put("serviceName", serviceName);
+		instanceMap.put("ip", ip);
+		instanceMap.put("port", String.valueOf(port));
 		if (namespaceId != null) {
 			instanceMap.put("namespaceId", namespaceId);
 		}
@@ -220,15 +233,21 @@ public class NacosServiceInstanceController<V> {
 		if (groupName != null) {
 			instanceMap.put("groupName", groupName);
 		}
+		if (ephemeral != null) {
+			instanceMap.put("ephemeral", String.valueOf(ephemeral));
+		}
+		if (healthyOnly != null) {
+			instanceMap.put("healthyOnly", String.valueOf(healthyOnly));
+		}
 		return nacosInstanceService.getInstance(instanceMap);
 	}
 	
 	@ApiOperation(value = "发送实例心跳", notes = "发送实例心跳")
 	@ApiImplicitParams({ 
-			@ApiImplicitParam(name = "beat", value = "实例心跳内容(JSON格式字符串)", required = false, dataType = "string"),
-			@ApiImplicitParam(name = "serviceName", value = "服务名", required = true, dataType = "string"),
-			@ApiImplicitParam(name = "groupName", value = "分组名", required = false, dataType = "string"),
-			@ApiImplicitParam(name = "ephemeral", value = "是否临时实例", required = false, dataType = "boolean") }) // @PostMapping(value
+			@ApiImplicitParam(name = "beat", value = "实例心跳内容(JSON格式字符串)", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "serviceName", value = "服务名", required = true, dataType = "String"),
+			@ApiImplicitParam(name = "groupName", value = "分组名", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "ephemeral", value = "是否临时实例", required = false, dataType = "Boolean") }) // @PostMapping(value
 	@PutMapping("/beat")
 	public RestResult<?> putBeatInstance(
 			@Valid @RequestParam(required = false) String beat,
@@ -251,11 +270,11 @@ public class NacosServiceInstanceController<V> {
 	
 	@ApiOperation(value = "批量更新实例元数据(Beta)", notes = "批量更新实例元数据(Beta)")
 	@ApiImplicitParams({ 
-			@ApiImplicitParam(name = "namespaceId", value = "命名空间ID", required = true, dataType = "string"),
-			@ApiImplicitParam(name = "serviceName", value = "服务名", required = true, dataType = "string"),
-			@ApiImplicitParam(name = "consistencyType", value = "实例的类型(ephemeral/persist)", required = false, dataType = "string"),
-			@ApiImplicitParam(name = "metadata", value = "元数据信息(JSON格式字符串)", required = true, dataType = "string"),
-			@ApiImplicitParam(name = "instances", value = "需要更新的实例(JSON格式字符串)", required = false, dataType = "string") }) // @PostMapping(value
+			@ApiImplicitParam(name = "namespaceId", value = "命名空间ID", required = true, dataType = "String"),
+			@ApiImplicitParam(name = "serviceName", value = "服务名", required = true, dataType = "String"),
+			@ApiImplicitParam(name = "consistencyType", value = "实例的类型(ephemeral/persist)", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "metadata", value = "元数据信息(JSON格式字符串)", required = true, dataType = "String"),
+			@ApiImplicitParam(name = "instances", value = "需要更新的实例(JSON格式字符串)", required = false, dataType = "String") }) // @PostMapping(value
 	@PutMapping("/metadata/batch")
 	public RestResult<?> putBatchMetadata(
 			@Valid @RequestParam String metadata,
@@ -278,11 +297,11 @@ public class NacosServiceInstanceController<V> {
 	
 	@ApiOperation(value = "批量删除实例元数据(Beta)", notes = "批量删除实例元数据(Beta)")
 	@ApiImplicitParams({ 
-		@ApiImplicitParam(name = "namespaceId", value = "命名空间ID", required = true, dataType = "string"),
-		@ApiImplicitParam(name = "consistencyType", value = "实例的类型(ephemeral/persist)", required = false, dataType = "string"),
-		@ApiImplicitParam(name = "serviceName", value = "服务名", required = true, dataType = "string"),
-		@ApiImplicitParam(name = "instances", value = "需要更新的实例(JSON格式字符串)", required = false, dataType = "string"),
-		@ApiImplicitParam(name = "metadata", value = "元数据信息", required = true, dataType = "string") }) // @PostMapping(value
+		@ApiImplicitParam(name = "namespaceId", value = "命名空间ID", required = true, dataType = "String"),
+		@ApiImplicitParam(name = "consistencyType", value = "实例的类型(ephemeral/persist)", required = false, dataType = "String"),
+		@ApiImplicitParam(name = "serviceName", value = "服务名", required = true, dataType = "String"),
+		@ApiImplicitParam(name = "instances", value = "需要更新的实例(JSON格式字符串)", required = false, dataType = "String"),
+		@ApiImplicitParam(name = "metadata", value = "元数据信息", required = true, dataType = "String") }) // @PostMapping(value
 	@DeleteMapping("/metadata/batch")
 	public RestResult<?> deleteBatchMetadata(
 			@Valid @RequestParam String namespaceId,
