@@ -11,7 +11,7 @@ public class RestResult<T> implements Serializable {
 	@ApiModelProperty(value = "返回状态码")
 	public int status = ErrorType.SUCCESS.getCode();
 	@ApiModelProperty(value = "返回信息")
-    public T msg ;
+    public T data ;
     
     public static <T> RestResult<T> ok() {
         RestResult<T> restResult = new RestResult<>();
@@ -20,21 +20,21 @@ public class RestResult<T> implements Serializable {
 
     public static <T> RestResult<T> ok(T data) {
         RestResult<T> restResult = new RestResult<>();
-        restResult.msg = data;
+        restResult.data = data;
         return restResult;
     }
 
     public static <T> RestResult<T> error(T data) {
         RestResult<T> restResult = new RestResult<>();
         restResult.status = ErrorType.FAILED.getCode();
-        restResult.msg = data;
+        restResult.data = data;
         return restResult;
     }
     
     public static <T> RestResult<T> error(T data,int code) {
         RestResult<T> restResult = new RestResult<>();
         restResult.status = code;
-        restResult.msg = data;
+        restResult.data = data;
         return restResult;
     }
     
