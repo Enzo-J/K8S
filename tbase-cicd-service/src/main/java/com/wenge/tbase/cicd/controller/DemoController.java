@@ -4,6 +4,7 @@ package com.wenge.tbase.cicd.controller;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpClient;
 import com.offbytwo.jenkins.model.JobWithDetails;
+import com.offbytwo.jenkins.model.QueueReference;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -89,6 +90,21 @@ public class DemoController {
         List<NameValuePair> data = new ArrayList<>();
         final HttpResponse httpResponse = jenkinsHttpClient.post_form_with_result(url, data, true);
         System.out.println(httpResponse);
+    }
+
+    @GetMapping("/getXml")
+    public String getXml(){
+        try {
+            String jobXml = jenkinsServer.getJobXml("test-pipeline");
+            Map<String, String> param = new HashMap<>();
+            param.put("token", "123456");
+            QueueReference build = jenkinsServer.getJob("test-pipeline").build(param,true);
+            log.info(jobXml);
+            return jobXml;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
 
