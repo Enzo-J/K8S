@@ -33,6 +33,9 @@ public class CicdPipeline implements Serializable {
     @ApiModelProperty(value = "流水线名称")
     private String name;
 
+    @ApiModelProperty(value = "流水线描述")
+    private String description;
+
     @ApiModelProperty(value = "执行结果 0.执行失败 1.执行成功 2.未执行 默认2")
     private Integer execResult;
 
