@@ -19,7 +19,7 @@ import java.util.HashMap;
  * FileName: NacosServiceClusterController
  * Description: nacos服务集群配置管理
  */
-@Api(tags= "服务集群配置管理接口")
+@Api(tags= "微服务集群配置管理接口")
 @RestController
 @Slf4j
 @RequestMapping("/nacos/v1/ns/cluster")

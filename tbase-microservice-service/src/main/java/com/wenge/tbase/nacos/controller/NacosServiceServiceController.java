@@ -23,7 +23,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
-@Api(tags = "nacos服务注册发现相关接口")
+@Api(tags = "微服务模块服务管理相关接口")
 @RestController
 @RequestMapping("/nacos/v1/ns/service")
 public class NacosServiceServiceController<V> {

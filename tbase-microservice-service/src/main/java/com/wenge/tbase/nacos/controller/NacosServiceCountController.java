@@ -12,7 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 
-@Api(tags = "nacos应用大屏的统计服务接口")
+@Api(tags = "微服务应用大屏的统计服务接口")
 @RestController
 @RequestMapping("/nacos/v1/cs/count")
 public class NacosServiceCountController {

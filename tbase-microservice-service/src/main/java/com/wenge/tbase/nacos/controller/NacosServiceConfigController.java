@@ -21,7 +21,7 @@ import java.util.HashMap;
  * FileName: NacosServiceClusterController
  * Description: nacos服务配置管理接口
  */
-@Api(tags = "nacos配置管理接口")
+@Api(tags = "微服务配置管理相关接口")
 @RestController
 @RequestMapping("/nacos/v1/cs/configs")
 public class NacosServiceConfigController {	
