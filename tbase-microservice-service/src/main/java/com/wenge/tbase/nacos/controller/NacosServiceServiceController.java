@@ -33,10 +33,10 @@ public class NacosServiceServiceController<V> {
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "namespaceId", value = "命名空间ID", required = false, dataType = "String"),
 			@ApiImplicitParam(name = "protectThreshold", value = "保护阈值,取值0到1,默认0", required = false, dataType = "Float"),
-			@ApiImplicitParam(name = "metadata", value = "元数据", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "metadata", value = "元数据 (json格式)", required = false, dataType = "String"),
 			@ApiImplicitParam(name = "groupName", value = "分组名", required = false, dataType = "String"),
 			@ApiImplicitParam(name = "serviceName", value = "服务名", required = true, dataType = "String"),
-			@ApiImplicitParam(name = "selector", value = "访问策略(json格式的字符串)", required = false, dataType = "String")
+			@ApiImplicitParam(name = "selector", value = "访问策略 (json格式的字符串)", required = false, dataType = "String")
 			})
 	@PostMapping
 	public RestResult<?> createService(
