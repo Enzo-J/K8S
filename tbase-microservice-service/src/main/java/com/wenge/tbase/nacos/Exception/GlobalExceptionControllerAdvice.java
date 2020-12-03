@@ -1,4 +1,4 @@
-package com.wenge.tbase.nacos.exception;
+package com.wenge.tbase.nacos.Exception;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,12 +26,12 @@ public class GlobalExceptionControllerAdvice {
 	        bindingResult.getFieldErrors().forEach((fieldError)->{
 	            errorMap.put(fieldError.getField(), fieldError.getDefaultMessage());
 	        });
-	        return RestResult.error(WengeStatusEnum.SYSYTM_CLIENT_ERROR.getMsg(),WengeStatusEnum.SYSYTM_CLIENT_ERROR.getCode());
+	        return RestResult.error(WengeStatusEnum.SYSYTEM_CLIENT_ERROR.getMsg(),WengeStatusEnum.SYSYTEM_CLIENT_ERROR.getCode());
 	    }
 
 	    @ExceptionHandler(value=Throwable.class)
 	    public RestResult<?> handleException(Throwable throwable) {
 	        log.error("未知异常{}，异常类型：{}", throwable.getMessage(), throwable.getClass());
-	        return RestResult.error( WengeStatusEnum.SYSYTM_CLIENT_ERROR.getMsg(),WengeStatusEnum.SYSYTM_CLIENT_ERROR.getCode());
+	        return RestResult.error( WengeStatusEnum.SYSYTEM_CLIENT_ERROR.getMsg(),WengeStatusEnum.SYSYTEM_CLIENT_ERROR.getCode());
 	    }
 }
