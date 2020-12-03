@@ -20,25 +20,7 @@
             <groupId>com.wenge</groupId>
             <artifactId>tbase-commons</artifactId>
             <version>1.0-SNAPSHOT</version>
-            <!-- 数据库 Begin-->
-           <!-- <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-            </dependency>
-            <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-boot-starter</artifactId>
-            </dependency>
-            <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-generator</artifactId>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.velocity</groupId>
-                <artifactId>velocity-engine-core</artifactId>
-            </dependency>-->
-            <!-- 数据库 End-->
-
+            <!--忽略加载包-->
             <exclusions>
                 <exclusion>
                     <groupId>mysql</groupId>
@@ -62,6 +44,7 @@
                     <artifactId>druid-spring-boot-starter</artifactId>
                 </exclusion>
             </exclusions>
+
         </dependency>
         <!--日志-->
         <!--<dependency>

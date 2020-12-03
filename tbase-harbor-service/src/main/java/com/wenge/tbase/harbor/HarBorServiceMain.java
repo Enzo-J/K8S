@@ -2,10 +2,11 @@ package com.wenge.tbase.harbor;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
-//@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
+//@SpringBootApplication(exclude={DataSourceAutoConfiguration.class})  //忽略本子工程pom下的包
 @EnableDiscoveryClient
 public class HarBorServiceMain {
     public static void main(String[] args) {
