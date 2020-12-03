@@ -13,7 +13,9 @@ public enum ResultCode {
 
     SUCCESS(200, "操作成功"),
 
-    SYSYTM_CLIENT_ERROR(400,"客户端请求中的语法错误"),
+    FAILED(400, "响应失败"),
+
+    SYSYTM_CLIENT_ERROR(401,"客户端请求中的语法错误"),
 
     NO_PERMISSION(403, "没有权限"),
 
