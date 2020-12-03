@@ -1,8 +1,10 @@
 server:
   port: 10030
+  servlet:
+    context-path: /harbor
 spring:
   application:
-    name: harbor_service
+    name: tbase-harbor-service
   cloud:
     nacos:
       discovery:
