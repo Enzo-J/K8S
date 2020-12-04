@@ -66,7 +66,7 @@ public class NacosServiceConfigController {
 			@ApiImplicitParam(name = "tenant", value = "租户信息，对应Nacos的命名空间ID字段(此字段若有对应信息，必须进行传递)", required = false, dataType = "String"),
 			@ApiImplicitParam(name = "dataId", value = "配置ID", required = true, dataType = "String"),
 			@ApiImplicitParam(name = "group", value = "配置分组", required = true, dataType = "String"),
-			@ApiImplicitParam(name = "show", value = "展示配置信息，如果需要获取详细配置请填充为all", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "show", value = "展示详细配置请填充为all", required = true, dataType = "String"),
 			@ApiImplicitParam(name = "namespaceId", value = "命名空间", required = false, dataType = "String")
 	})
 		//须标明什么情况必须传递tenant
@@ -75,15 +75,13 @@ public class NacosServiceConfigController {
 										  @Valid @RequestParam(required = false) String namespaceId,
 										  @Valid @RequestParam String dataId,
 										  @Valid @RequestParam String group,
-										  @Valid @RequestParam(required = false) String show) {
+										  @Valid @RequestParam String show) {
 			HashMap<String, String> configMap = new HashMap<String, String>();
 			configMap.put("dataId", dataId);
 			configMap.put("group", group);
+			configMap.put("show", show);
 			if (tenant != null) {
 				configMap.put("tenant", tenant);
-			}
-			if (show != null) {
-				configMap.put("show", show);
 			}
 			if (namespaceId != null) {
 				configMap.put("namespaceId", namespaceId);
