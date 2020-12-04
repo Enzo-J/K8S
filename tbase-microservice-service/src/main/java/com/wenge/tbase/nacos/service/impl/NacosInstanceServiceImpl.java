@@ -38,9 +38,9 @@ public class NacosInstanceServiceImpl implements NacosInstanceService {
 
 	@Override
 	public RestResult<?> getInstanceList(HashMap<String, String> instanceMap) {
-		String result;
+		JSONObject result;
 		try {
-			result = JsoupUtils.get(ConstantConfig.nacosInstanceAddress+"/list", instanceMap);
+			result = JsoupUtils.getJson(ConstantConfig.nacosInstanceAddress+"/list", instanceMap);
 			return RestResult.ok(result);
 		} catch (Exception e) {
 			return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
