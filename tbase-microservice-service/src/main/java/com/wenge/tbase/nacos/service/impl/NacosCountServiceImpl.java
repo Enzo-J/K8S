@@ -35,11 +35,9 @@ public class NacosCountServiceImpl implements NacosCountService {
 			HashMap<String, String> serviceMap = new HashMap<String, String>();
 			serviceMap.put("pageNo", pageNo);
 			serviceMap.put("pageSize", pageSize);
-			serviceMap.put("hasIpCount", "false");
-			JSONObject serviceFalseList =JSONObject.parseObject(JsoupUtils.get(ConstantConfig.nacosServiceListAddress, serviceMap));
 			serviceMap.put("hasIpCount", "true");
 			JSONObject serviceTrueList =JSONObject.parseObject(JsoupUtils.get(ConstantConfig.nacosServiceListAddress, serviceMap));
-			serverCount = serviceFalseList.getInteger("count");
+			serverCount = serviceTrueList.getInteger("count");
 			for (Object serverName : serviceTrueList.getJSONArray("serviceList")) {
 				JSONObject serverNameObject = JSONObject.parseObject(serverName.toString());
 				String name = String.valueOf(serverNameObject.getString("name"));
