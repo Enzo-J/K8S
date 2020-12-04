@@ -21,7 +21,7 @@ public class NacosCountServiceImpl implements NacosCountService {
 			String projectNum=ConstantConfig.projectNum;
 			int serverCount=0;
 			int InstanceTotalSize=0;
-			int InstanceOnlineSize=0;
+			int InstanceOfflineSize=0;
 			countObject.put("projectNum", projectNum);
 			String pageNo=ConstantConfig.pageNo;
 			String pageSize=ConstantConfig.pageSize;
@@ -35,11 +35,11 @@ public class NacosCountServiceImpl implements NacosCountService {
 				HashMap<String, String> serverNameMap = new HashMap<String, String>();
 				serverNameMap.put("serviceName", String.valueOf(serverName));
 				JSONObject serverNameJson = JSONObject.parseObject(JsoupUtils.get(ConstantConfig.nacosInstanceAddress+"/list", serverNameMap));
-				serverNameMap.put("healthyOnly", String.valueOf(true));
+				serverNameMap.put("enabled", String.valueOf(false));
 				JSONObject serverHealthyJson = JSONObject.parseObject(JsoupUtils.get(ConstantConfig.nacosInstanceAddress+"/list", serverNameMap));
 
 				InstanceTotalSize += serverNameJson.getJSONArray("hosts").size();
-				InstanceOnlineSize += serverHealthyJson.getJSONArray("hosts").size();
+				InstanceOfflineSize += serverHealthyJson.getJSONArray("hosts").size();
 			}
 			if(serverCount>=Integer.parseInt(pageSize)) {
 				serviceMap.put("pageNo", pageNo);
@@ -51,9 +51,9 @@ public class NacosCountServiceImpl implements NacosCountService {
 					serverNameMap.put("serviceName", String.valueOf(serverName));
 					JSONObject serverNameJson = JSONObject.parseObject(JsoupUtils.get(ConstantConfig.nacosInstanceAddress+"/list", serverNameMap));
 					InstanceTotalSize += serverNameJson.getJSONArray("hosts").size();
-					serverNameMap.put("healthyOnly", String.valueOf(true));
+					serverNameMap.put("enabled", String.valueOf(false));
 					JSONObject serverHealthyJson = JSONObject.parseObject(JsoupUtils.get(ConstantConfig.nacosInstanceAddress+"/list", serverNameMap));
-					InstanceOnlineSize += serverHealthyJson.getJSONArray("hosts").size();
+					InstanceOfflineSize += serverHealthyJson.getJSONArray("hosts").size();
 					InstanceTotalSize += serverNameJson.getJSONArray("hosts").size();
 				}
 				serverCount+= service2List.getInteger("count");
@@ -61,7 +61,7 @@ public class NacosCountServiceImpl implements NacosCountService {
 			countObject.put("projectNum", projectNum);
 			countObject.put("serverCount",serverCount);
 			countObject.put("instanceTotalCount",InstanceTotalSize);
-			countObject.put("instanceOfflineCount",InstanceTotalSize-InstanceOnlineSize);
+			countObject.put("instanceOfflineCount",InstanceOfflineSize);
 		return RestResult.ok(countObject);
 	}	
 	catch (Exception e) {
