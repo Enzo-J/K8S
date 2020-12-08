@@ -13,4 +13,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface CicdPipelineMapper extends BaseMapper<CicdPipeline> {
 
+    Long insertPipeline(CicdPipeline cicdPipeline);
 }

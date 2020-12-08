@@ -19,7 +19,7 @@ import javax.annotation.Resource;
  * @author Wang XingPeng
  * @since 2020-11-30
  */
-@Api(description = "dockerfile管理API接口")
+@Api(description = "dockerfile管理API接口",tags = "dockerfile管理API接口")
 @RestController
 public class CicdDockerfileController {
 

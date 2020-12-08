@@ -1,17 +1,11 @@
 package com.wenge.tbase.cicd.config;
 
-import com.baomidou.mybatisplus.core.toolkit.EncryptUtils;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpClient;
 import com.wenge.tbase.cicd.entity.Jenkins;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 
-import javax.annotation.Resource;
 import java.net.URI;
 import java.net.URISyntaxException;
 

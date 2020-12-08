@@ -2,8 +2,6 @@ package com.wenge.tbase.cicd;
 
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.model.Build;
-import com.offbytwo.jenkins.model.JobWithDetails;
-import com.wenge.tbase.cicd.entity.Jenkins;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -28,15 +26,6 @@ public class Test {
 
     @org.junit.jupiter.api.Test
     public void test() {
-        try {
-            List<Build> list = jenkinsServer.getJob("tensquare_back").getAllBuilds();
-            for (Build build : list) {
-                System.out.println(build.getNumber());
-                System.out.println(build.getQueueId());
-                System.out.println(build.details().getResult());
-                System.out.println(build.getUrl());
-            }
-        } catch (IOException e) {
-        }
+        System.out.println("aaaa");
     }
 }

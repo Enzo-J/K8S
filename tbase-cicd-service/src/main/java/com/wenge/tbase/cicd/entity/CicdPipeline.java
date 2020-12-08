@@ -42,6 +42,9 @@ public class CicdPipeline implements Serializable {
     @ApiModelProperty(value = "0.已终止 1.运行中")
     private Integer runningStatus;
 
+    @ApiModelProperty(value = "0.未禁用 1.已禁用")
+    private Integer disabled;
+
     @ApiModelProperty(value = "逻辑删除标志 0.未删除 1.已删除")
     @TableLogic
     private Integer deleted;
