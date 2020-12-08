@@ -57,7 +57,16 @@ public class NacosInstanceServiceImpl implements NacosInstanceService {
 			return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
 	}
-
+	@Override
+	public RestResult<?> updateInstance(HashMap<String, String> instanceMap) {
+		String result;
+		try {
+			result = JsoupUtils.put(ConstantConfig.nacosInstanceAddress, instanceMap);
+			return RestResult.ok(result);
+		} catch (Exception e) {
+			return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
+		}
+	}
 	@Override
 	public RestResult<?> putInstanceBeat(HashMap<String, String> instanceMap) {
 		String result;
@@ -92,4 +101,6 @@ public class NacosInstanceServiceImpl implements NacosInstanceService {
 			return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
 	}
+
+
 }

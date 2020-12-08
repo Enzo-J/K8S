@@ -167,7 +167,7 @@ public class NacosServiceInstanceController<V> {
 		if (ephemeral != null) {
 			instanceMap.put("ephemeral", String.valueOf(ephemeral));
 		}
-		return nacosInstanceService.getInstanceList(instanceMap);
+		return nacosInstanceService.updateInstance(instanceMap);
 	}
 	@ApiOperation(value = "获取实例列表", notes = "获取实例列表")
 	@ApiImplicitParams({ 
