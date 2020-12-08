@@ -16,8 +16,9 @@
 		<module>tbase-k8s-service</module>
 		<module>tbase-microservice-service</module>
 		<module>tbase-sysadmin-service</module>
+        <module>tbase-harbor-service</module>
 
-	</modules>
+    </modules>
 
 	<!-- 统一管理jar包版本 -->
 	<properties>

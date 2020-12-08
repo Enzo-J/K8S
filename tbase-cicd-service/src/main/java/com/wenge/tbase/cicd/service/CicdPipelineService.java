@@ -13,4 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface CicdPipelineService extends IService<CicdPipeline> {
 
+    Long insertPipeline(CicdPipeline cicdPipeline);
 }

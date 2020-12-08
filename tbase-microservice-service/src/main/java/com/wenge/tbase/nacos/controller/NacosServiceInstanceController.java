@@ -17,7 +17,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
-@Api(tags = "nacos服务发现服务接口")
+@Api(tags = "微服务模块服务实例管理接口")
 @RestController
 @RequestMapping("/nacos/v1/ns/instance")
 public class NacosServiceInstanceController<V> {
@@ -167,7 +167,7 @@ public class NacosServiceInstanceController<V> {
 		if (ephemeral != null) {
 			instanceMap.put("ephemeral", String.valueOf(ephemeral));
 		}
-		return nacosInstanceService.getInstanceList(instanceMap);
+		return nacosInstanceService.updateInstance(instanceMap);
 	}
 	@ApiOperation(value = "获取实例列表", notes = "获取实例列表")
 	@ApiImplicitParams({ 

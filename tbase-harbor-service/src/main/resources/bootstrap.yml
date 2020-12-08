@@ -1,0 +1,38 @@
+server:
+  port: 10030
+  servlet:
+    context-path: /harbor
+spring:
+  application:
+    name: tbase-harbor-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 172.16.0.6:30000
+      config:
+        server-addr: 172.16.0.6:30000
+        file-extension: yaml
+      sentinel:
+        transport:
+          dashboard: ${SENTINEL_DASHBOARD_HOST:172.16.0.8}:${SENTINEL_DASHBOARD_PORT:32076}
+
+#/projects/1/scanner
+harbor:
+  host: 172.16.0.11
+  url: http://172.16.0.11/api/v2.0
+  login_address: http://172.16.0.11/c/login
+  username: admin
+  password: Szwg%2020
+  encoding: UTF-8
+  connect_timeout: 60000
+  socket_timeout: 60000
+  user_agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36
+
+
+
+logging:
+  level:
+    org.springframework.cloud.sleuth: debug
+  path: logs/
+  file:
+    max-size: 1GB

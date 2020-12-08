@@ -19,7 +19,7 @@ import javax.annotation.Resource;
  * @author Wang XingPeng
  * @since 2020-11-27
  */
-@Api(description = "凭证管理API接口")
+@Api(description = "凭证管理API接口",tags = "凭证管理API接口")
 @RestController
 public class CicdCredentialController {
 

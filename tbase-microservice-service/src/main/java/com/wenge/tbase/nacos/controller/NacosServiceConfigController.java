@@ -21,7 +21,7 @@ import java.util.HashMap;
  * FileName: NacosServiceClusterController
  * Description: nacos服务配置管理接口
  */
-@Api(tags = "nacos配置管理接口")
+@Api(tags = "微服务配置管理相关接口")
 @RestController
 @RequestMapping("/nacos/v1/cs/configs")
 public class NacosServiceConfigController {	
@@ -61,13 +61,12 @@ public class NacosServiceConfigController {
 		return nacosConfigService.obtainConfigLists(configMap);
 	}
 
-
-		@ApiOperation(value = "获取nacos配置详情信息", notes = "获取nacos配置详情信息")
+		@ApiOperation(value = "获取微服务配置详情信息", notes = "获取微服务配置详情信息")
 		@ApiImplicitParams({
 			@ApiImplicitParam(name = "tenant", value = "租户信息，对应Nacos的命名空间ID字段(此字段若有对应信息，必须进行传递)", required = false, dataType = "String"),
 			@ApiImplicitParam(name = "dataId", value = "配置ID", required = true, dataType = "String"),
 			@ApiImplicitParam(name = "group", value = "配置分组", required = true, dataType = "String"),
-			@ApiImplicitParam(name = "show", value = "展示配置信息，如果需要获取详细配置请填充为all", required = false, dataType = "String"),
+			@ApiImplicitParam(name = "show", value = "展示详细配置请填充为all", required = true, dataType = "String"),
 			@ApiImplicitParam(name = "namespaceId", value = "命名空间", required = false, dataType = "String")
 	})
 		//须标明什么情况必须传递tenant
@@ -76,15 +75,13 @@ public class NacosServiceConfigController {
 										  @Valid @RequestParam(required = false) String namespaceId,
 										  @Valid @RequestParam String dataId,
 										  @Valid @RequestParam String group,
-										  @Valid @RequestParam(required = false) String show) {
+										  @Valid @RequestParam String show) {
 			HashMap<String, String> configMap = new HashMap<String, String>();
 			configMap.put("dataId", dataId);
 			configMap.put("group", group);
+			configMap.put("show", show);
 			if (tenant != null) {
 				configMap.put("tenant", tenant);
-			}
-			if (show != null) {
-				configMap.put("show", show);
 			}
 			if (namespaceId != null) {
 				configMap.put("namespaceId", namespaceId);
@@ -99,7 +96,7 @@ public class NacosServiceConfigController {
 		return nacosConfigService.listenConfigs(listeningConfigs);
 	}	
 	
-	@ApiOperation(value = "创建发布nacos配置", notes = "创建发布nacos配置")
+	@ApiOperation(value = "创建发布微服务配置", notes = "创建发布微服务配置")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "tenant", value = "租户信息，对应 Nacos 的命名空间ID字段", required = false, dataType = "String"),
 			@ApiImplicitParam(name = "dataId", value = "配置ID", required = true, dataType = "String"),
@@ -148,7 +145,7 @@ public class NacosServiceConfigController {
 		return nacosConfigService.releaseConfigs(configMap);
 	}	
 	
-	@ApiOperation(value = "删除nacos配置", notes = "删除nacos配置")
+	@ApiOperation(value = "删除微服务配置", notes = "删除微服务配置")
 	@ApiImplicitParams({
         @ApiImplicitParam(name = "tenant", value = "租户信息，对应 Nacos 的命名空间ID字段", required = false, dataType = "String"),
         @ApiImplicitParam(name = "dataId", value = "配置ID", required = true, dataType = "String"),

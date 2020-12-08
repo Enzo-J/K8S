@@ -12,5 +12,5 @@ public interface NacosInstanceService {
 	RestResult<?> putInstanceBeat(HashMap<String, String> instanceMap);
 	RestResult<?> putBatchMetadata(HashMap<String, String> instanceMap);
 	RestResult<?> deleteBatchMetadata(HashMap<String, String> instanceMap);
-
+	RestResult<?> updateInstance(HashMap<String, String> instanceMap);
 }

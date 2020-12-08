@@ -1,0 +1,62 @@
+package com.wenge.tbase.cicd.controller.service;
+
+import cn.hutool.json.JSONUtil;
+import com.wenge.tbase.cicd.entity.CicdPipelineStage;
+import com.wenge.tbase.cicd.entity.enums.PipelineStageTypeEnum;
+import com.wenge.tbase.cicd.entity.param.CreatePipelineStageParam;
+import com.wenge.tbase.cicd.service.CicdPipelineStageService;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+
+/**
+ * @ClassName: PipelineStageControllerService
+ * @Description: PipelineStageControllerService
+ * @Author: Wang XingPeng
+ * @Date: 2020/12/3 9:55
+ */
+@Component
+public class PipelineStageControllerService {
+
+    @Resource
+    private CicdPipelineStageService pipelineStageService;
+
+    /**
+     * 创建流水线阶段
+     */
+    @Transactional(rollbackFor = {RuntimeException.class, Error.class})
+    public Boolean createPipelineStage(CreatePipelineStageParam param) {
+        CicdPipelineStage pipelineStage;
+        // 1.代码拉取步骤
+        if (param.getCodePullParam() != null) {
+            pipelineStage = new CicdPipelineStage();
+            pipelineStage.setPipelineId(param.getPipelineId());
+            pipelineStage.setType(PipelineStageTypeEnum.CODE_PULL.getType());
+            pipelineStage.setName(param.getCodePullParam().getStageName());
+            pipelineStage.setParameter(JSONUtil.toJsonStr(param.getCodePullParam()));
+            pipelineStageService.save(pipelineStage);
+        }
+        // 2.代码检测步骤
+        if (param.getCodeCheckParam() != null) {
+            pipelineStage = new CicdPipelineStage();
+            pipelineStage.setPipelineId(param.getPipelineId());
+            pipelineStage.setType(PipelineStageTypeEnum.CODE_CHECK.getType());
+            pipelineStage.setName(param.getCodeCheckParam().getStageName());
+            pipelineStage.setParameter(JSONUtil.toJsonStr(param.getCodeCheckParam()));
+            pipelineStageService.save(pipelineStage);
+        }
+        // 3.代码打包构建步骤
+        if (param.getPackageParam() != null) {
+            pipelineStage = new CicdPipelineStage();
+            pipelineStage.setPipelineId(param.getPipelineId());
+            pipelineStage.setType(PipelineStageTypeEnum.PACKAGE.getType());
+            pipelineStage.setName(param.getPackageParam().getStageName());
+            pipelineStage.setParameter(JSONUtil.toJsonStr(param.getPackageParam()));
+            pipelineStageService.save(pipelineStage);
+        }
+        // 4.镜像上传步骤
+        // 5.部署步骤
+        return true;
+    }
+}
