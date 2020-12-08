@@ -61,4 +61,23 @@ public interface K8SService {
      * 服务部署
      */
     Deployment createDeployment(K8SDeployment k8SDeployment);
+
+
+    /**
+     * 查看K8S存储
+     */
+    Map findStorageInfo();
+
+    /**
+     * 查看K8S存储的yaml配置文件
+     * @param name 存储名称
+     * @return 存储配置文件
+     */
+    String findStorageDescribeInfo(String name);
+
+    /**
+     * 查看命名空间下的详细信息
+     * @param namespace
+     */
+    void findNamespaceDetailInfo(String namespace);
 }

@@ -1,12 +1,10 @@
 package com.wenge.tbase.k8s.service.impl;
 
-import com.wenge.tbase.k8s.bean.vo.K8SDeployment;
+import com.wenge.tbase.k8s.bean.vo.*;
 import com.wenge.tbase.k8s.constant.K8SConstant;
-import com.wenge.tbase.k8s.bean.vo.K8SConfigMap;
-import com.wenge.tbase.k8s.bean.vo.K8SNameSpace;
-import com.wenge.tbase.k8s.bean.vo.K8SNode;
 import com.wenge.tbase.k8s.service.K8SService;
 import com.wenge.tbase.k8s.utils.CommonUtils;
+import com.wenge.tbase.k8s.utils.DateUtil;
 import com.wenge.tbase.k8s.utils.MyClient;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.autoscaling.v1.CrossVersionObjectReference;
@@ -15,9 +13,14 @@ import io.fabric8.kubernetes.api.model.autoscaling.v1.HorizontalPodAutoscalerSpe
 import io.fabric8.kubernetes.api.model.extensions.Deployment;
 import io.fabric8.kubernetes.api.model.extensions.DeploymentSpec;
 import io.fabric8.kubernetes.api.model.metrics.v1beta1.NodeMetrics;
+import io.fabric8.kubernetes.api.model.storage.DoneableStorageClass;
+import io.fabric8.kubernetes.api.model.storage.StorageClass;
+import io.fabric8.kubernetes.api.model.storage.StorageClassList;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.yaml.snakeyaml.Yaml;
+
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -329,10 +332,62 @@ public class K8SServiceImpl implements K8SService {
     private void deleteService(String namespace,String serviceName) {
         try {
             kClient.extensions().deployments().inNamespace(namespace).withName(serviceName).delete();
+//            kClient.customResourceDefinitions().create();
+//            kClient.load().createOrReplace();
         } catch (KubernetesClientException e) {
             log.info("delete deployment failed, serviceName={}", serviceName);
         }
     }
 
+    /**
+     * 获取存储资源
+     * tip:
+     *     存储卷声明   metadata--  namespace+name    创建时间   now-creationTimestamp
+     *     容量/状态    status--  capacity  phase
+     *     名称         spec  -- volumnName
+     */
+    public Map findStorageInfo(){
+         Map<String, List<K8SStorage>> result=new HashMap<>();
+         StorageClassList storageClassList = kClient.storage().storageClasses().list();
+         List<String> nameList= new ArrayList<>();
+         storageClassList.getItems().forEach(f->{
+             //获取名称
+             nameList.add(f.getMetadata().getName());
+         });
+         PersistentVolumeClaimList persistentVolumeClaimList=kClient.persistentVolumeClaims().list();
 
+         nameList.forEach(n->{
+             List<K8SStorage> tmp=new ArrayList<>();
+             persistentVolumeClaimList.getItems().forEach(p->{
+                 if(n.equals(p.getSpec().getStorageClassName())){
+                     K8SStorage k8SStorage=new K8SStorage();
+                     k8SStorage.setPvClaim(p.getMetadata().getNamespace()+"/"+p.getMetadata().getName());
+                     k8SStorage.setCreateTime(DateUtil.timeStampFormat(p.getMetadata().getCreationTimestamp()));
+                     k8SStorage.setStatus(p.getStatus().getPhase());
+                     if(k8SStorage.getStatus().equals("Pending")){
+                         k8SStorage.setCapacity("0Gi");
+                     }else {
+                         k8SStorage.setCapacity(p.getStatus().getCapacity().get("storage").getAmount() + p.getStatus().getCapacity().get("storage").getFormat());
+                     }
+                     k8SStorage.setName(p.getSpec().getVolumeName());
+                     tmp.add(k8SStorage);
+                 }
+             });
+            result.put(n,tmp);
+         });
+         return result;
+
+    }
+
+    public String findStorageDescribeInfo(String name){
+        StorageClass storageClass=kClient.storage().storageClasses().withName(name).get();
+        Yaml yaml=new Yaml();
+        return yaml.dump(storageClass);
+    }
+
+
+    public void findNamespaceDetailInfo(String namespace){
+        Namespace namespaceInfo = kClient.namespaces().withName(namespace).get();
+        System.out.println(namespaceInfo);
+    }
 }
