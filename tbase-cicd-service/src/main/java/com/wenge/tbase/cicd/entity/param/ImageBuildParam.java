@@ -26,6 +26,9 @@ public class ImageBuildParam {
     @ApiModelProperty(value = "平台配置dockerfileId 来源为2时使用")
     private Long dockerfileId;
 
+    @ApiModelProperty(value = "项目名称")
+    private String projectName;
+
     @ApiModelProperty(value = "镜像名称")
     private String imageName;
 

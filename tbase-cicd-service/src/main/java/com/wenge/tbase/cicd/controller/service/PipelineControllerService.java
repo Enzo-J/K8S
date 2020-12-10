@@ -12,9 +12,7 @@ import com.wenge.tbase.cicd.entity.CicdPipelineStage;
 import com.wenge.tbase.cicd.entity.Jenkins;
 import com.wenge.tbase.cicd.entity.dto.JenkinsTemplateDTO;
 import com.wenge.tbase.cicd.entity.enums.PipelineStageTypeEnum;
-import com.wenge.tbase.cicd.entity.param.CodeCheckParam;
-import com.wenge.tbase.cicd.entity.param.CodePullParam;
-import com.wenge.tbase.cicd.entity.param.PackageParam;
+import com.wenge.tbase.cicd.entity.param.*;
 import com.wenge.tbase.cicd.entity.vo.LargeScreenPipelineVo;
 import com.wenge.tbase.cicd.entity.vo.OverviewVo;
 import com.wenge.tbase.cicd.jenkins.template.JenkinsTemplate;
@@ -132,15 +130,31 @@ public class PipelineControllerService {
             if (pipelineStage.getType() == PipelineStageTypeEnum.CODE_CHECK.getType()) {
                 CodeCheckParam codeCheckParam = JSONUtil.toBean(pipelineStage.getParameter(), CodeCheckParam.class);
                 //来源于仓库
-                if (codeCheckParam.getSonarFileSource() == 2) {
-                    //
+                if (codeCheckParam.getSonarFileSource() == 1) {
+                    script.append(JenkinsTemplate.getCodeCheckStage(codeCheckParam.getSonarFileAddress()));
+                } else if (codeCheckParam.getSonarFileSource() == 2) {
+                    //来源于平台
                 }
-                script.append(JenkinsTemplate.getCodeCheckStage(codeCheckParam.getSonarFileAddress()));
             }
-            //编译打包
-            if(pipelineStage.getType() == PipelineStageTypeEnum.PACKAGE.getType()){
+            //编译打包公共子工程
+            if (pipelineStage.getType() == PipelineStageTypeEnum.PACKAGE_COMMON.getType()) {
+                PackageCommonParam packageCommonParam = JSONUtil.toBean(pipelineStage.getParameter(), PackageCommonParam.class);
+                script.append(JenkinsTemplate.getPackageCommonStage(packageCommonParam));
+            }
+            //编译打包工程
+            if (pipelineStage.getType() == PipelineStageTypeEnum.PACKAGE.getType()) {
                 PackageParam packageParam = JSONUtil.toBean(pipelineStage.getParameter(), PackageParam.class);
                 script.append(JenkinsTemplate.getPackageStage(packageParam));
+            }
+            //镜像构建
+            if (pipelineStage.getType() == PipelineStageTypeEnum.IMAGE_BUILD.getType()) {
+                ImageBuildParam imageBuildParam = JSONUtil.toBean(pipelineStage.getParameter(), ImageBuildParam.class);
+                //来源于仓库
+                if (imageBuildParam.getDockerfileSource() == 1) {
+                    script.append(JenkinsTemplate.getImageBuildStage(imageBuildParam));
+                } else if (imageBuildParam.getDockerfileSource() == 2) {
+                    //来源于平台
+                }
             }
         }
         script.append(" \n}");

@@ -46,7 +46,15 @@ public class PipelineStageControllerService {
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getCodeCheckParam()));
             pipelineStageService.save(pipelineStage);
         }
-        // 3.代码打包构建步骤
+        if (param.getPackageCommonParam() != null) {
+            pipelineStage = new CicdPipelineStage();
+            pipelineStage.setPipelineId(param.getPipelineId());
+            pipelineStage.setType(PipelineStageTypeEnum.PACKAGE_COMMON.getType());
+            pipelineStage.setName(param.getPackageCommonParam().getStageName());
+            pipelineStage.setParameter(JSONUtil.toJsonStr(param.getPackageCommonParam()));
+            pipelineStageService.save(pipelineStage);
+        }
+        // 3.编译打包步骤
         if (param.getPackageParam() != null) {
             pipelineStage = new CicdPipelineStage();
             pipelineStage.setPipelineId(param.getPipelineId());
@@ -55,8 +63,17 @@ public class PipelineStageControllerService {
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getPackageParam()));
             pipelineStageService.save(pipelineStage);
         }
-        // 4.镜像上传步骤
-        // 5.部署步骤
+        // 4.镜像构建步骤
+        if (param.getImageBuildParam() != null) {
+            pipelineStage = new CicdPipelineStage();
+            pipelineStage.setPipelineId(param.getPipelineId());
+            pipelineStage.setType(PipelineStageTypeEnum.IMAGE_BUILD.getType());
+            pipelineStage.setName(param.getImageBuildParam().getStageName());
+            pipelineStage.setParameter(JSONUtil.toJsonStr(param.getImageBuildParam()));
+            pipelineStageService.save(pipelineStage);
+        }
+        // 5.镜像上传步骤
+        // 6.部署步骤
         return true;
     }
 }

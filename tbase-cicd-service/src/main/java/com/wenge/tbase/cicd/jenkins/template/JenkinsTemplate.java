@@ -2,7 +2,10 @@ package com.wenge.tbase.cicd.jenkins.template;
 
 
 import com.wenge.tbase.cicd.entity.dto.JenkinsTemplateDTO;
+import com.wenge.tbase.cicd.entity.param.ImageBuildParam;
+import com.wenge.tbase.cicd.entity.param.PackageCommonParam;
 import com.wenge.tbase.cicd.entity.param.PackageParam;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @ClassName: JenkinsTemplate
@@ -108,17 +111,52 @@ public class JenkinsTemplate {
      * @param param
      * @return
      */
-    public static String getPackageStage(PackageParam param) {
-        String stage = null;
-        if (param.getPackageType() == 1) {
-            stage = "\tstage('编译打包工程') {\n" +
-                    "\t\tsh \"mvn -f " + param.getProjectName() + " clean install\"\n" +
-                    "\t}\n";
-        }
+    public static String getPackageCommonStage(PackageCommonParam param) {
+        //后端
+        String stage = "\tstage('" + param.getStageName() + "') {\n" +
+                "\t\tsh \"mvn -f " + param.getProjectName() + " clean install\"\n" +
+                "\t}\n";
+        //前端
         return stage;
     }
 
-    public static String getImageBuildStage(){
-        return null;
+    /**
+     * 获取编译打包阶段内容
+     *
+     * @param param
+     * @return
+     */
+    public static String getPackageStage(PackageParam param) {
+        String stage = null;
+        //后端
+        if (param.getPackageType() == 1) {
+            stage = "\tstage('" + param.getStageName() + "') {\n" +
+                    "\t\tsh \"mvn -f " + param.getProjectName() + " clean package\"\n" +
+                    "\t}\n";
+        }
+        //前端
+        return stage;
+    }
+
+    /**
+     * 获取镜像构建阶段内容
+     *
+     * @param param
+     * @return
+     */
+    public static String getImageBuildStage(ImageBuildParam param) {
+        StringBuffer stage = new StringBuffer();
+        stage.append("\tstage('" + param.getStageName() + "') {\n")
+                .append("\t\tsh \"docker build --build-arg JAR_FILE=")
+                .append(param.getProjectName())
+                .append(" -t ").append(param.getImageName()).append(":").append(param.getImageTag());
+        if (StringUtils.isNotEmpty(param.getDockerfileAddress())) {
+            stage.append(" -f ").append(param.getDockerfileAddress());
+        } else {
+            stage.append(" -f ").append("${env.WORKSPACE}/").append(param.getProjectName()).append("/Dockerfile");
+        }
+        stage.append(" .\"\n");
+        stage.append("\t}\n");
+        return stage.toString();
     }
 }
