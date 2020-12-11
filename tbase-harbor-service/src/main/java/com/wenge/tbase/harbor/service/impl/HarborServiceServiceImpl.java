@@ -1,5 +1,8 @@
 package com.wenge.tbase.harbor.service.impl;
 
+import cn.hutool.json.JSONObject;
+import com.alibaba.fastjson.JSON;
+import com.sun.org.apache.xalan.internal.xsltc.compiler.Pattern;
 import com.wenge.tbase.harbor.bean.Artifacts;
 import com.wenge.tbase.harbor.bean.Projects;
 import com.wenge.tbase.harbor.bean.Repositories;
@@ -14,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -52,7 +56,9 @@ public class HarborServiceServiceImpl implements HarborServiceService {
 //			https://172.16.0.11/api/v2.0/projects/donson/repositories/kafka-eagle/artifacts?with_tag=true&with_scan_overview=true&with_label=true&page_size=15&page=1
 			System.out.println((url+"/projects/"+nameParam[0]+"/repositories/"+nameParam[1]+"/artifacts?"+param));
 			HttpResponse response = HttpUtils.doGetWithHeader(url+"/projects/"+nameParam[0]+"/repositories/"+nameParam[1]+"/artifacts?"+param, mapHeader,null);
-			return RestResult.ok(EntityUtils.toString(response.getEntity()));
+			String string = EntityUtils.toString(response.getEntity());
+			Object jsonObject = JSON.parse(string);
+			return RestResult.ok(jsonObject);
 		} catch (Exception e) {
 			System.err.println(e);
 			return RestResult.error(WengeStatusEnum.SYSTEM_ERROR.getMsg());
@@ -70,7 +76,9 @@ public class HarborServiceServiceImpl implements HarborServiceService {
 //			https://172.16.0.11/api/v2.0/projects/donson/repositories?q=name%253D~jr&page_size=15&page=1
 			System.out.println((url+"/projects/"+repositories.getProject_name()+"/repositories?"+param));
 			HttpResponse response = HttpUtils.doGetWithHeader(url+"/projects/"+repositories.getProject_name()+"/repositories?"+param, mapHeader,null);
-			return RestResult.ok(EntityUtils.toString(response.getEntity()));
+			String string = EntityUtils.toString(response.getEntity());
+			Object jsonObject = JSON.parse(string);
+			return RestResult.ok(jsonObject);
 		} catch (Exception e) {
 			System.err.println(e);
 			return RestResult.error(WengeStatusEnum.SYSTEM_ERROR.getMsg());
@@ -90,12 +98,16 @@ public class HarborServiceServiceImpl implements HarborServiceService {
 			}
 			System.out.println((url+"/projects?"+param));
 			HttpResponse response = HttpUtils.doGetWithHeader(url+"/projects?"+param, mapHeader,null);
-			return RestResult.ok(EntityUtils.toString(response.getEntity()));
+			String string = EntityUtils.toString(response.getEntity());
+			Object jsonObject = JSON.parse(string);
+			return RestResult.ok(jsonObject);
 		} catch (Exception e) {
 			System.err.println(e);
 			return RestResult.error(WengeStatusEnum.SYSTEM_ERROR.getMsg());
 		}
 	}
+
+
 
 	@Override
 	public RestResult<?> addProjectsListService(Projects projects) {
