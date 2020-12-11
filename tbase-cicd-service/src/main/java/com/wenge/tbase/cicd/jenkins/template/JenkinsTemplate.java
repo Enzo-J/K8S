@@ -1,8 +1,9 @@
 package com.wenge.tbase.cicd.jenkins.template;
 
 
-import com.wenge.tbase.cicd.entity.dto.JenkinsTemplateDTO;
+import com.wenge.tbase.cicd.entity.CicdRepos;
 import com.wenge.tbase.cicd.entity.param.ImageBuildParam;
+import com.wenge.tbase.cicd.entity.param.ImageUploadParam;
 import com.wenge.tbase.cicd.entity.param.PackageCommonParam;
 import com.wenge.tbase.cicd.entity.param.PackageParam;
 import org.apache.commons.lang3.StringUtils;
@@ -156,6 +157,29 @@ public class JenkinsTemplate {
             stage.append(" -f ").append("${env.WORKSPACE}/").append(param.getProjectName()).append("/Dockerfile");
         }
         stage.append(" .\"\n");
+        stage.append("\t}\n");
+        return stage.toString();
+    }
+
+    /**
+     * 获取镜像上传阶段内容
+     *
+     * @param repos
+     * @param param
+     * @return
+     */
+    public static String getImageUploadStage(CicdRepos repos, ImageUploadParam param, String harborUrl) {
+        StringBuffer stage = new StringBuffer();
+        String imageName = param.getImageName() + ":" + param.getImageTag();
+        String harborImageName = harborUrl + "/" + repos.getProjectName() + "/" + imageName;
+        stage.append("\tstage('" + param.getStageName() + "') {\n");
+        stage.append("\t\tsh \"docker tag " + imageName + " " + harborUrl + "/" + repos.getProjectName() + "/" + imageName + " \"\n");
+        stage.append("\t\twithCredentials([usernamePassword(credentialsId: \"" + repos.getCredentialId() + "\", passwordVariable: 'password', usernameVariable: 'username')]) {\n" +
+                "\t\t\tsh \"docker login -u ${username} -p ${password} " + harborUrl + "\"\n" +
+                "\t\t\tsh \"docker push " + harborImageName + "\"\n" +
+                "\t\t}\n");
+        stage.append("\t\tsh \"docker rmi -f " + imageName + "\"\n");
+        stage.append("\t\tsh \"docker rmi -f " + harborImageName + "\"\n");
         stage.append("\t}\n");
         return stage.toString();
     }

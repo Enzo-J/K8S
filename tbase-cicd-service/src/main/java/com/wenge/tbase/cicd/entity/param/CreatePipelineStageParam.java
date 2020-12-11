@@ -36,4 +36,7 @@ public class CreatePipelineStageParam {
 
     @ApiModelProperty(value = "镜像构建参数类")
     private ImageBuildParam imageBuildParam;
+
+    @ApiModelProperty(value = "镜像上传参数类")
+    private ImageUploadParam imageUploadParam;
 }

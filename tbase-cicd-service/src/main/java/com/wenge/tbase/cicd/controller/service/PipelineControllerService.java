@@ -2,23 +2,22 @@ package com.wenge.tbase.cicd.controller.service;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.model.QueueReference;
-import com.wenge.tbase.cicd.entity.CicdPipeline;
-import com.wenge.tbase.cicd.entity.CicdPipelineStage;
-import com.wenge.tbase.cicd.entity.Jenkins;
+import com.wenge.tbase.cicd.entity.*;
 import com.wenge.tbase.cicd.entity.dto.JenkinsTemplateDTO;
 import com.wenge.tbase.cicd.entity.enums.PipelineStageTypeEnum;
 import com.wenge.tbase.cicd.entity.param.*;
 import com.wenge.tbase.cicd.entity.vo.LargeScreenPipelineVo;
 import com.wenge.tbase.cicd.entity.vo.OverviewVo;
 import com.wenge.tbase.cicd.jenkins.template.JenkinsTemplate;
-import com.wenge.tbase.cicd.service.CicdPipelineService;
-import com.wenge.tbase.cicd.service.CicdPipelineStageService;
+import com.wenge.tbase.cicd.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,7 +43,20 @@ public class PipelineControllerService {
     private JenkinsServer jenkinsServer;
 
     @Resource
+    private CicdReposService reposService;
+
+    @Resource
+    private CicdDockerfileService dockerfileService;
+
+    @Resource
+    private CicdSonarqubeService sonarqubeService;
+
+    @Resource
     private Jenkins jenkins;
+
+    @Value("${harbor.url}")
+    private String harborUrl;
+
 
     /**
      * 获取大屏信息
@@ -129,12 +141,14 @@ public class PipelineControllerService {
             //代码检测
             if (pipelineStage.getType() == PipelineStageTypeEnum.CODE_CHECK.getType()) {
                 CodeCheckParam codeCheckParam = JSONUtil.toBean(pipelineStage.getParameter(), CodeCheckParam.class);
-                //来源于仓库
-                if (codeCheckParam.getSonarFileSource() == 1) {
-                    script.append(JenkinsTemplate.getCodeCheckStage(codeCheckParam.getSonarFileAddress()));
-                } else if (codeCheckParam.getSonarFileSource() == 2) {
-                    //来源于平台
+                //来源于平台
+                if (codeCheckParam.getSonarFileSource() == 2) {
+                    CicdSonarqube sonarqube = sonarqubeService.getById(codeCheckParam.getSonarId());
+                    String property = System.getProperty("user.dir");
+                    FileWriter writer = new FileWriter(property + "/" + codeCheckParam.getSonarFileAddress() + "/" + "sonar-project.properties");
+                    writer.write(sonarqube.getContent());
                 }
+                script.append(JenkinsTemplate.getCodeCheckStage(codeCheckParam.getSonarFileAddress()));
             }
             //编译打包公共子工程
             if (pipelineStage.getType() == PipelineStageTypeEnum.PACKAGE_COMMON.getType()) {
@@ -149,12 +163,20 @@ public class PipelineControllerService {
             //镜像构建
             if (pipelineStage.getType() == PipelineStageTypeEnum.IMAGE_BUILD.getType()) {
                 ImageBuildParam imageBuildParam = JSONUtil.toBean(pipelineStage.getParameter(), ImageBuildParam.class);
-                //来源于仓库
-                if (imageBuildParam.getDockerfileSource() == 1) {
-                    script.append(JenkinsTemplate.getImageBuildStage(imageBuildParam));
-                } else if (imageBuildParam.getDockerfileSource() == 2) {
-                    //来源于平台
+                //来源于平台
+                if (imageBuildParam.getDockerfileSource() == 2) {
+                    CicdDockerfile dockerfile = dockerfileService.getById(imageBuildParam.getDockerfileId());
+                    String property = System.getProperty("user.dir");
+                    FileWriter writer = new FileWriter(property + "/" + imageBuildParam.getProjectName() + "/" + "Dockerfile");
+                    writer.write(dockerfile.getContent());
                 }
+                script.append(JenkinsTemplate.getImageBuildStage(imageBuildParam));
+            }
+            //镜像上传
+            if (pipelineStage.getType() == PipelineStageTypeEnum.IMAGE_UPLOAD.getType()) {
+                ImageUploadParam imageUploadParam = JSONUtil.toBean(pipelineStage.getParameter(), ImageUploadParam.class);
+                CicdRepos cicdRepos = reposService.getById(imageUploadParam.getReposId());
+                script.append(JenkinsTemplate.getImageUploadStage(cicdRepos, imageUploadParam, harborUrl));
             }
         }
         script.append(" \n}");

@@ -18,7 +18,8 @@ public enum PipelineStageTypeEnum {
     CODE_CHECK(3, "代码检查"),
     PACKAGE_COMMON(4, "编译打包公共工程"),
     PACKAGE(5, "编译打包"),
-    IMAGE_BUILD(6, "镜像构建");
+    IMAGE_BUILD(6, "镜像构建"),
+    IMAGE_UPLOAD(7, "镜像上传");
 
     private Integer type;
 

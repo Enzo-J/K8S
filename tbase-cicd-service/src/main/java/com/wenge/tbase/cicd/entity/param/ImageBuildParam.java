@@ -20,7 +20,7 @@ public class ImageBuildParam {
     @ApiModelProperty(value = "Dockerfile文件来源 1.代码库 2.来自平台配置")
     private Integer dockerfileSource;
 
-    @ApiModelProperty(value = "Dockerfile文件地址 来源为1时使用")
+    @ApiModelProperty(value = "Dockerfile文件地址")
     private String dockerfileAddress;
 
     @ApiModelProperty(value = "平台配置dockerfileId 来源为2时使用")

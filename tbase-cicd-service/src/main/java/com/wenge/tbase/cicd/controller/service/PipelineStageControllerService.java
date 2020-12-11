@@ -73,6 +73,14 @@ public class PipelineStageControllerService {
             pipelineStageService.save(pipelineStage);
         }
         // 5.镜像上传步骤
+        if (param.getImageUploadParam() != null) {
+            pipelineStage = new CicdPipelineStage();
+            pipelineStage.setPipelineId(param.getPipelineId());
+            pipelineStage.setType(PipelineStageTypeEnum.IMAGE_UPLOAD.getType());
+            pipelineStage.setName(param.getImageUploadParam().getStageName());
+            pipelineStage.setParameter(JSONUtil.toJsonStr(param.getImageUploadParam()));
+            pipelineStageService.save(pipelineStage);
+        }
         // 6.部署步骤
         return true;
     }

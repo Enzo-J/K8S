@@ -1,7 +1,7 @@
 server:
   port: 10010
   servlet:
-    context-path: /cicd
+    context-path: /cicd/api/v1
 spring:
   application:
     name: tbase-cicd-service
@@ -60,3 +60,7 @@ project:
     username: szwg          #jenkins账号
     password: szwg%2020     #jenkins密码
     token: wenge            #远程构建使用token
+
+# harbor仓库地址
+harbor:
+  url: 172.16.0.11
