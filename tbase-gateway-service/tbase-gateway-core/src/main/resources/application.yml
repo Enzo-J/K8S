@@ -1,0 +1,74 @@
+spring:
+  rabbitmq:
+    host: ${RABBIT_MQ_HOST:172.16.0.13}
+    port: ${RABBIT_MQ_PORT:31352}
+    username: ${RABBIT_MQ_USERNAME:user}
+    password: ${RABBIT_MQ_PASSWORD:szwg%2020}
+  redis:
+    host: ${REDIS_HOST:172.16.0.8}
+    port: ${REDIS_PORT:31268}
+    #password: ${REDIS_PASSWORD:}
+    lettuce:
+      pool:
+        max-active: 10000
+        max-wait: -1
+
+  #jwt密码
+  #security:
+   # oauth2:
+    #  jwt:
+     #   signingKey: 123456
+  cloud:
+    gateway:
+      default-filters:
+        - name: Retry
+          args:
+            retries: 3
+            statuses: BAD_GATEWAY
+        - AddResponseHeader=X-Response-Default-Foo, Default-Bar
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: 2  #流速 每秒
+            redis-rate-limiter.burstCapacity: 10   #令牌桶的容积
+            rate-limiter: "#{@defaultRedisRateLimiter}"  #SPEL表达式去的对应的bean
+            key-resolver: "#{@apiKeyResolver}" #SPEL表达式去的对应的bean
+
+
+jetcache:
+  statIntervalMinutes: 1
+  areaInCacheName: false
+  hidePackages: com.wenge.tbase.gateway
+  local:
+    # 默认永久本地缓存
+    default:
+      type: caffeine
+      keyConvertor: fastjson
+  remote:
+    # 默认永久的远程缓存
+    default:
+      type: redis.lettuce
+      keyConvertor: fastjson
+      valueEncoder: kryo
+      valueDecoder: kryo
+      uri: redis://${spring.redis.host}:${spring.redis.port}/
+
+
+#网关白名单，无需要签权url
+#gate:
+ # ignore:
+  #  authentication:
+   #   startWith: /oauth,/open,/v2/api-docs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+logging:
+  level:
+    com.springboot.cloud: debug
+    com.jalja.org.spring: debug
+  path: logs/
+  file:
+    max-size: 1GB
