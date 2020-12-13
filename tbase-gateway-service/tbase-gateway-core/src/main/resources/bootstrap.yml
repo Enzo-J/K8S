@@ -2,7 +2,7 @@ server:
   port: ${SERVER_PORT:10070}
 spring:
   application:
-    name: gateway-core
+    name: tbase-gateway-core
   cloud:
     nacos:
       discovery: 

@@ -2,7 +2,7 @@ server:
   port: ${SERVER_PORT:10071}
 spring:
   application:
-    name: gateway-web
+    name: tabse-gateway-web
   cloud:
     nacos:
       discovery: 
