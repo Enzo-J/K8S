@@ -2,19 +2,15 @@ package com.wenge.tbase.harbor.controller;
 
 import com.wenge.tbase.harbor.bean.Users;
 import com.wenge.tbase.harbor.result.RestResult;
-import com.wenge.tbase.harbor.service.HarborRequest;
-import com.wenge.tbase.harbor.service.HarborServiceService;
 import com.wenge.tbase.harbor.service.HarborUsersService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
 
 @Api("Harbor服务用户服务相关接口")
 @RestController
@@ -39,7 +35,7 @@ public class HarborUsersServiceController<V> {
 	}
 
 	@ApiOperation(value = "删除指定用户", notes = "通过用户ID删除指定用户")
-	@ApiImplicitParams({@ApiImplicitParam(name = "user_id", value = "用户ID", required = true, dataType = "integer")})
+	@ApiImplicitParams({@ApiImplicitParam(name = "user_id", value = "用户ID", required = true, dataType = "Int")})
 	@GetMapping("/deleteUsers")
 	public RestResult<?> deleteUsers(@Valid @RequestParam(required = true,value = "user_id") Integer user_id) {
 		Users users = new Users();
@@ -48,7 +44,7 @@ public class HarborUsersServiceController<V> {
 	}
 
 	@ApiOperation(value = "重置密码", notes = "通过用户ID重置密码")
-	@ApiImplicitParams({@ApiImplicitParam(name = "user_id", value = "用户ID", required = true, dataType = "integer")})
+	@ApiImplicitParams({@ApiImplicitParam(name = "user_id", value = "用户ID", required = true, dataType = "Int")})
 	@GetMapping("/resetPassword")
 	public RestResult<?> resetPassword(@Valid @RequestParam(required = true,value = "user_id") Integer user_id,
 									   @Valid @RequestParam(required = true,value = "old_password") String old_password,
@@ -74,7 +70,7 @@ public class HarborUsersServiceController<V> {
 	}
 
 	@ApiOperation(value = "用户详情", notes = "根据用户ID查询用户详情")
-	@ApiImplicitParams({@ApiImplicitParam(name = "user_id", value = "用户ID", required = true, dataType = "integer")})
+	@ApiImplicitParams({@ApiImplicitParam(name = "user_id", value = "用户ID", required = true, dataType = "Int")})
 	@GetMapping("/getUsersById")
 	public RestResult<?> getUsersById(@Valid @RequestParam(required = true,value = "user_id") Integer user_id) {
 		Users users = new Users();

@@ -47,7 +47,6 @@ public class HarborUsersServiceImpl implements HarborUsersService {
             Map<String,String> mapHeader = HttpClientUtil.getBasicHearder();
             HttpResponse response = HttpUtils.doPost(host,path+"/users", mapHeader,null,JSON.toJSONString(users));
             System.out.println(EntityUtils.toString(response.getEntity()));
-
             return RestResult.ok(result);
         } catch (Exception e) {
             System.err.println(e);
@@ -83,8 +82,9 @@ public class HarborUsersServiceImpl implements HarborUsersService {
             }
             System.out.println((url+"/users?"+param));
             HttpResponse response = HttpUtils.doGetWithHeader(url+"/users?"+param, mapHeader,null);
-//          HttpResponse response = HttpUtils.doGetWithHeader("https://172.16.0.11/api/v2.0/users?page=1&page_size=15", mapHeader,null);
-            return RestResult.ok(EntityUtils.toString(response.getEntity()));
+            String string = EntityUtils.toString(response.getEntity());
+            Object jsonObject = JSON.parse(string);
+            return RestResult.ok(jsonObject);
         } catch (Exception e) {
             System.err.println(e);
             return RestResult.error(WengeStatusEnum.SYSTEM_ERROR.getMsg());

@@ -1,7 +1,7 @@
 package com.wenge.tbase.harbor.service.impl;
 
-import cn.hutool.json.JSONObject;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.sun.org.apache.xalan.internal.xsltc.compiler.Pattern;
 import com.wenge.tbase.harbor.bean.Artifacts;
 import com.wenge.tbase.harbor.bean.Projects;
@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +38,54 @@ public class HarborServiceServiceImpl implements HarborServiceService {
 	@Value("${harbor.timeout}")
 	private Long timeout;
 
+
+	@Override
+	public RestResult<?> getProjectSummaryByIdService(Integer project_id) {
+		try {
+			Map<String,String> mapHeader = HttpClientUtil.getBasicHearder();
+//			https://172.16.0.11/api/v2.0/projects/6/summary
+			System.out.println(url+"/projects/"+project_id+"/summary");
+			HttpResponse response = HttpUtils.doGetWithParams(url+"/projects/"+project_id+"/summary", mapHeader);
+			String string = EntityUtils.toString(response.getEntity());
+			Object jsonObject = JSON.parse(string);
+			return RestResult.ok(jsonObject);
+		} catch (Exception e) {
+			System.err.println(e);
+			return RestResult.error(WengeStatusEnum.SYSTEM_ERROR.getMsg());
+		}
+	}
+
+	@Override
+	public RestResult<?> getProjectStorageService() {
+		try {
+			Map<String,String> mapHeader = HttpClientUtil.getBasicHearder();
+//			https://172.16.0.11/api/v2.0/systeminfo/volumes
+			System.out.println(url+"/systeminfo/volumes");
+			HttpResponse response = HttpUtils.doGetWithHeader(url+"/systeminfo/volumes", mapHeader);
+			String string = EntityUtils.toString(response.getEntity());
+			Object jsonObject = JSON.parse(string);
+			return RestResult.ok(jsonObject);
+		} catch (Exception e) {
+			System.err.println(e);
+			return RestResult.error(WengeStatusEnum.SYSTEM_ERROR.getMsg());
+		}
+	}
+
+	@Override
+	public RestResult<?> getProjectStatisticsService() {
+		try {
+			Map<String,String> mapHeader = HttpClientUtil.getBasicHearder();
+//			https://172.16.0.11/api/v2.0/statistics
+			System.out.println(url+"/statistics");
+			HttpResponse response = HttpUtils.doGetWithHeader(url+"/statistics", mapHeader);
+			String string = EntityUtils.toString(response.getEntity());
+			Object jsonObject = JSON.parse(string);
+			return RestResult.ok(jsonObject);
+		} catch (Exception e) {
+			System.err.println(e);
+			return RestResult.error(WengeStatusEnum.SYSTEM_ERROR.getMsg());
+		}
+	}
 
 	@Override
 	public RestResult<?> getArtifactsListService(Artifacts artifacts) {
@@ -110,35 +159,33 @@ public class HarborServiceServiceImpl implements HarborServiceService {
 
 
 	@Override
-	public RestResult<?> addProjectsListService(Projects projects) {
-		return null;
-	}
-
-	@Override
-	public RestResult<?> updateProjectsListService(Projects projects) {
-		return null;
-	}
-
-	@Override
-	public RestResult<?> getImageByNamespaceAppId(HashMap<String, Object> serviceMap) {
-		String result;
+	public RestResult<?> addProjectsService(Projects projects) {
 		try {
-
-			return RestResult.ok();
+			Map<String,String> mapHeader = HttpClientUtil.getBasicHearder();
+			JSONObject json = new JSONObject();
+			JSONObject json1 = new JSONObject();
+			json1.put("public",projects.getIs_public());
+			json.put("metadata", json1);
+			json.put("project_name",projects.getProject_name());
+			json.put("storage_limit",projects.getStorage_limit());
+			System.out.println(url+"/projects");
+		HttpResponse response = null;
+			System.out.println(JSON.toJSONString(projects));
+			response = HttpUtils.doPost(host,path+"/projects", mapHeader,null,JSON.toJSONString(json));
+//			HttpResponse response1 = HttpUtils.doPost(host,path+"/projects", mapHeader,null,json);
+		String string = null;
+			string = EntityUtils.toString(response.getEntity());
+		Object jsonObject = JSON.parse(string);
+			return RestResult.ok(jsonObject);
 		} catch (Exception e) {
-			return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
+			System.err.println(e);
+			return RestResult.error(WengeStatusEnum.SYSTEM_ERROR.getMsg());
 		}
 	}
 
 	@Override
-	public RestResult<?> getImageByNamespaceAppName(HashMap<String, Object> serviceMap) {
-		String result;
-		try {
-
-			return RestResult.ok();
-		} catch (Exception e) {
-			return RestResult.error(WengeStatusEnum.NOT_FIND_RESOURCE.getMsg());
-		}
+	public RestResult<?> updateProjectsService(Projects projects) {
+		return null;
 	}
 
 }
