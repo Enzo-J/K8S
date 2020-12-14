@@ -1,0 +1,58 @@
+spring:
+  rabbitmq:
+    host: ${RABBIT_MQ_HOST:172.16.0.13}
+    port: ${RABBIT_MQ_PORT:31352}
+    username: ${RABBIT_MQ_USERNAME:user}
+    password: ${RABBIT_MQ_PASSWORD:szwg%2020}
+  redis:
+    host: ${REDIS_HOST:172.16.0.8}
+    port: ${REDIS_PORT:31268}
+    #password: ${REDIS_PASSWORD:}
+    lettuce:
+      pool:
+        max-active: 10000
+        max-wait: -1
+  
+  datasource:
+    url: jdbc:${DATASOURCE_DBTYPE:mysql}://${DATASOURCE_HOST:172.16.0.6}:${DATASOURCE_PORT:31372}/am_gateway?characterEncoding=UTF-8&useUnicode=true&useSSL=false&serverTimezone=Hongkong
+    username: ${DATASOURCE_USERNAME:root}
+    password: ${DATASOURCE_PASSWORD:uXsR08Ijsd}
+    druid:
+      initial-size: 1
+      min-idle: 1
+      max-active: 20
+      test-on-borrow: true
+      driver-class-name: com.mysql.cj.jdbc.Driver
+  
+jetcache:
+  statIntervalMinutes: 15
+  areaInCacheName: false
+  hidePackages: com.springboot.cloud
+  local:
+    # 默认永久本地缓存
+    default:
+      type: caffeine
+      keyConvertor: fastjson
+  remote:
+    # 默认永久的远程缓存
+    default:
+      type: redis.lettuce
+      uri: redis://${spring.redis.host}:${spring.redis.port}/
+      keyConvertor: fastjson
+      valueEncoder: kryo
+      valueDecoder: kryo
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+logging:
+  level:
+    com.springboot.cloud.gateway: debug
+    com.jalja.org.spring: debug
+  path: logs/
+  file:
+    max-size: 1GB
