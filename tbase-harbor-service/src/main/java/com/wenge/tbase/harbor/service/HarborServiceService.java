@@ -9,19 +9,21 @@ import java.util.HashMap;
 
 public interface HarborServiceService {
 
+
+	RestResult<?> getProjectSummaryByIdService(Integer project_id);
+
+	RestResult<?> getProjectStorageService();
+
+	RestResult<?> getProjectStatisticsService();
+
 	RestResult<?> getArtifactsListService(Artifacts artifacts);
 
 	RestResult<?> getRepositoriesListService(Repositories repositories);
 
 	RestResult<?> getProjectsListService(Projects projects);
 
-	RestResult<?> addProjectsListService(Projects projects);
+	RestResult<?> addProjectsService(Projects projects);
 
-	RestResult<?> updateProjectsListService(Projects projects);
+	RestResult<?> updateProjectsService(Projects projects);
 
-
-
-	RestResult<?> getImageByNamespaceAppId(HashMap<String, Object> serviceMap);
-
-	RestResult<?> getImageByNamespaceAppName(HashMap<String, Object> serviceMap);
 }

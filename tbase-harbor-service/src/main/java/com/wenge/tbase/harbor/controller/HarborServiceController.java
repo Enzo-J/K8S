@@ -3,10 +3,8 @@ package com.wenge.tbase.harbor.controller;
 import com.wenge.tbase.harbor.bean.Artifacts;
 import com.wenge.tbase.harbor.bean.Projects;
 import com.wenge.tbase.harbor.bean.Repositories;
-import com.wenge.tbase.harbor.bean.Users;
 import com.wenge.tbase.harbor.result.RestResult;
 import com.wenge.tbase.harbor.result.WengeStatusEnum;
-import com.wenge.tbase.harbor.service.HarborRequest;
 import com.wenge.tbase.harbor.service.HarborServiceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -17,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
 
 @Api("Harbor服务服务相关接口")
 @RestController
@@ -74,36 +71,32 @@ public class HarborServiceController<V> {
 		return harborServiceService.getArtifactsListService(artifacts);
 	}
 
+	@ApiOperation(value = "创建项目", notes = "创建项目")
+	@ApiImplicitParams({@ApiImplicitParam(name = "projects", value = "项目实体", required = true, dataType = "Projects")})
+	@PostMapping("/addProject")
+	public RestResult<?> addProject(@RequestBody Projects projects) {
+		return harborServiceService.addProjectsService(projects);
+	}
 
-//	@ApiOperation(value = "获取项目（应用）列表", notes = "获取项目（应用）列表")
-//	@ApiImplicitParams({
-//			@ApiImplicitParam(name = "namespaceId", value = "命名空间ID", required = true, dataType = "integer"),
-//			@ApiImplicitParam(name = "applicationId", value = "应用ID", required = true, dataType = "integer")})
-//	@GetMapping("/search/ImageId")
-//	public RestResult<?> getImageByNamespaceAppId(
-//			@Valid @RequestParam(required = true) Integer namespaceId,
-//			@Valid @RequestParam(required = true) Integer applicationId) {
-//		HashMap<String, Object> serviceMap = new HashMap<String, Object>();
-//		serviceMap.put("namespaceId", namespaceId);
-//		serviceMap.put("applicationId", applicationId);
-//		if (namespaceId != null) {
-//			serviceMap.put("namespaceId", namespaceId);
-//		}
-//		return harborServiceService.getImageByNamespaceAppId(serviceMap);
-//	}
-//
-//	@ApiOperation(value = "获取镜像", notes = "根据命名空间名称和应用名称获取镜像路径")
-//	@ApiImplicitParams({
-//			@ApiImplicitParam(name = "namespaceName", value = "命名空间名称", required = true, dataType = "string"),
-//			@ApiImplicitParam(name = "applicationName", value = "应用名称", required = true, dataType = "string")})
-//	@GetMapping("/search/ImageName")
-//	public RestResult<?> getImageByNamespaceAppName(
-//			@Valid @RequestParam(required = true) String namespaceName,
-//			@Valid @RequestParam(required = true) String applicationName) {
-//		HashMap<String, Object> serviceMap = new HashMap<String, Object>();
-//		serviceMap.put("namespaceName", namespaceName);
-//		serviceMap.put("applicationName", applicationName);
-//		return harborServiceService.getImageByNamespaceAppName(serviceMap);
-//	}
+	@ApiOperation(value = "获取项目概要", notes = "根据项目的ID获取项目的概要信息")
+	@ApiImplicitParams({@ApiImplicitParam(name = "project_id", value = "项目ID", required = true, dataType = "Int")})
+	@PostMapping("/getProjectSummaryById")
+	public RestResult<?>  getProjectSummaryById (@Valid @RequestParam(required = true,value = "project_id") Integer project_id) {
+		return harborServiceService.getProjectSummaryByIdService(project_id);
+	}
+
+	@ApiOperation(value = "获取项目（应用）以及镜像统计", notes = "获取项目（应用）以及项目下镜像的数量统计及其公私有镜像统计")
+	@GetMapping("/getProjectStatistics")
+	public RestResult<?> getProjectStatistics(){
+		return harborServiceService.getProjectStatisticsService();
+	}
+
+	@ApiOperation(value = "获取所以项目（应用）占用的存储信息", notes = "获取占用的存储信息-包含总数、已占用（返回值是一个kb为单位的long型，前端展示需要转换 1024）")
+	@GetMapping("/getProjectStorage")
+	public RestResult<?> getProjectStorage(){
+		return harborServiceService.getProjectStorageService();
+	}
+
+
 	
 }
