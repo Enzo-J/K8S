@@ -54,8 +54,8 @@ public class MicroserviceRegistryController {
    //4、删除注册中心记录
    @ApiOperation(value = "删除注册中心记录", notes = "删除注册中心记录")
    @PostMapping("/delete")
-   public RestResult<?> deleteRegistry(@RequestBody MicroserviceRegistry microserviceRegistry){
-       boolean b = registryInfoService.remove(new QueryWrapper<>(microserviceRegistry));
+   public RestResult<?> deleteRegistry(@RequestParam Long id){
+       boolean b = registryInfoService.removeById(id);
        if(b){
            return RestResult.ok(b) ;
        }else {
