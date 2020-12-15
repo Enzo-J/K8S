@@ -17,9 +17,9 @@
 		<module>tbase-microservice-service</module>
 		<module>tbase-sysadmin-service</module>
         <module>tbase-harbor-service</module>
-        <module>tbase-auth</module>
-
-    </modules>
+		<module>tbase-auth</module>
+		<module>tbase-gateway-service</module>
+	</modules>
 
 	<!-- 统一管理jar包版本 -->
 	<properties>

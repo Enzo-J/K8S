@@ -1,0 +1,10 @@
+#Harbor服务相关的配置
+harbor:
+  host: 172.16.0.11
+  path: /api/v2.0
+  url: https://172.16.0.11/api/v2.0
+  username: admin
+  password: Szwg%2020
+  encoding: UTF-8
+  timeout: 60000
+

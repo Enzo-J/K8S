@@ -41,8 +41,10 @@ public class NacosCountServiceImpl implements NacosCountService {
 			for (Object serverName : serviceTrueList.getJSONArray("serviceList")) {
 				JSONObject serverNameObject = JSONObject.parseObject(serverName.toString());
 				String name = String.valueOf(serverNameObject.getString("name"));
+				String groupName = String.valueOf(serverNameObject.getString("groupName"));
 				serviceMap.put("serviceName", name);
 				serviceMap.put("clusterName","DEFAULT");
+				serviceMap.put("groupName",groupName);
 				JSONObject serverHealthyJson = JSONObject.parseObject(JsoupUtils.get(ConstantConfig.nacosInstanceListAddress, serviceMap));
 				JSONArray lists = serverHealthyJson.getJSONArray("list");
 				instanceTotalSize += serverHealthyJson.getInteger("count");
@@ -69,8 +71,10 @@ public class NacosCountServiceImpl implements NacosCountService {
 				for (Object serverName : serviceTrueList2.getJSONArray("serviceList")) {
 					JSONObject serverNameObject = JSONObject.parseObject(serverName.toString());
 					String name = serverNameObject.getString("name");
+					String groupName = serverNameObject.getString("groupName");
 					serviceMap.put("serviceName", name);
 					serviceMap.put("clusterName", "DEFAULT");
+					serviceMap.put("groupName", groupName);
 					JSONObject serverHealthyJson = JSONObject.parseObject(JsoupUtils.get(ConstantConfig.nacosInstanceListAddress, serviceMap));
 					JSONArray lists = serverHealthyJson.getJSONArray("list");
 					instanceTotalSize += serverHealthyJson.getInteger("count");

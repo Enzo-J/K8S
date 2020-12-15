@@ -1,6 +1,8 @@
 package com.wenge.tbase.cicd.controller;
 
 
+import cn.hutool.core.io.file.FileReader;
+import cn.hutool.core.io.file.FileWriter;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpClient;
 import com.offbytwo.jenkins.model.JobWithDetails;
@@ -93,18 +95,26 @@ public class DemoController {
     }
 
     @GetMapping("/getXml")
-    public String getXml(){
+    public String getXml() {
         try {
             String jobXml = jenkinsServer.getJobXml("test-pipeline");
             Map<String, String> param = new HashMap<>();
             param.put("token", "123456");
-            QueueReference build = jenkinsServer.getJob("test-pipeline").build(param,true);
+            QueueReference build = jenkinsServer.getJob("test-pipeline").build(param, true);
             log.info(jobXml);
             return jobXml;
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void main(String[] args) {
+        String property = System.getProperty("user.dir");
+        System.out.println(property);
+        FileReader fileReader = new FileReader(property + "/" + "tbase-cicd-service/src/main/sonar/sonar-project.properties");
+        String result = fileReader.readString();
+        System.out.println(result);
     }
 }
 

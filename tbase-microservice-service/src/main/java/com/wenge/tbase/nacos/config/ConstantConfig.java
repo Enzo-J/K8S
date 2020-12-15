@@ -24,6 +24,8 @@ public class ConstantConfig {
     public static  String nacosServiceListAddress;
     public static  String nacosNsAddress;
     public static  String nacosClusterAddress;
+    public static  String  sentinalServiceAddress;
+    public static  String  sentinalDashboardAddress;
     public static  String projectNum;
     public static  String pageNo;
     public static  String pageSize;
@@ -37,6 +39,8 @@ public class ConstantConfig {
             nacosServiceAddress = props.getProperty("nacosServiceAddress");
             nacosServiceListAddress = props.getProperty("nacosServiceListAddress");
             nacosClusterAddress = props.getProperty("nacosClusterAddress");
+            sentinalServiceAddress = props.getProperty("sentinalServiceAddress");
+            sentinalDashboardAddress = props.getProperty("sentinalDashboardAddress");
             nacosNsAddress = props.getProperty("nacosNsAddress");
             projectNum = props.getProperty("projectNum");
             pageNo = props.getProperty("pageNo");

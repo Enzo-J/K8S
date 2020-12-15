@@ -1,7 +1,7 @@
 server:
   port: 10010
   servlet:
-    context-path: /cicd
+    context-path: /cicd/api/v1
 spring:
   application:
     name: tbase-cicd-service
@@ -25,7 +25,11 @@ spring:
       max-active: 20
       test-on-borrow: true
       driver-class-name: com.mysql.cj.jdbc.Driver
-
+#redis配置
+  redis:
+    host: 172.16.0.8  # Redis服务器地址
+    port: 31268       # Redis服务器连接端口
+    password:         # Redis服务器连接密码（默认为空）
 #mybatis配置
 mybatis-plus:
   global-config:
@@ -60,3 +64,7 @@ project:
     username: szwg          #jenkins账号
     password: szwg%2020     #jenkins密码
     token: wenge            #远程构建使用token
+
+# harbor仓库地址
+harbor:
+  url: 172.16.0.11

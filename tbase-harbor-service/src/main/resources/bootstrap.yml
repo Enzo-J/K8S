@@ -5,6 +5,8 @@ server:
 spring:
   application:
     name: tbase-harbor-service
+  profiles:
+    active: dev #默认为开发环境
   cloud:
     nacos:
       discovery:
@@ -16,17 +18,15 @@ spring:
         transport:
           dashboard: ${SENTINEL_DASHBOARD_HOST:172.16.0.8}:${SENTINEL_DASHBOARD_PORT:32076}
 
-#/projects/1/scanner
-harbor:
-  host: 172.16.0.11
-  url: http://172.16.0.11/api/v2.0
-  login_address: http://172.16.0.11/c/login
-  username: admin
-  password: Szwg%2020
-  encoding: UTF-8
-  connect_timeout: 60000
-  socket_timeout: 60000
-  user_agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36
+#Harbor服务相关的配置
+#harbor:
+#  host: 172.16.0.11
+#  path：/api/v2.0
+#  url: https://172.16.0.11/api/v2.0
+#  username: admin
+#  password: Szwg%2020
+#  encoding: UTF-8
+#  timeout: 60000
 
 
 

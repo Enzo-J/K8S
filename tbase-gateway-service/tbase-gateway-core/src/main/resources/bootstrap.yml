@@ -1,0 +1,15 @@
+server:
+  port: ${SERVER_PORT:10070}
+spring:
+  application:
+    name: tbase-gateway-core
+  cloud:
+    nacos:
+      discovery: 
+        server-addr: ${REGISTER_HOST:172.16.0.6}:${REGISTER_PORT:30000}
+      config:
+        server-addr: ${REGISTER_HOST:172.16.0.6}:${REGISTER_PORT:30000}
+        file-extension: yml
+    sentinel:
+      transport:
+        dashboard: ${SENTINEL_DASHBOARD_HOST:172.16.0.8}:${SENTINEL_DASHBOARD_PORT:32076}
