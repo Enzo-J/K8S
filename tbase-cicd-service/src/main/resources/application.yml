@@ -25,7 +25,11 @@ spring:
       max-active: 20
       test-on-borrow: true
       driver-class-name: com.mysql.cj.jdbc.Driver
-
+#redis配置
+  redis:
+    host: 172.16.0.8  # Redis服务器地址
+    port: 31268       # Redis服务器连接端口
+    password:         # Redis服务器连接密码（默认为空）
 #mybatis配置
 mybatis-plus:
   global-config:
