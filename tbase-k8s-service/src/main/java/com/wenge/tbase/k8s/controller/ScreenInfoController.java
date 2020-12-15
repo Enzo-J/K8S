@@ -9,10 +9,8 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
@@ -55,17 +53,17 @@ public class ScreenInfoController {
     }
 
     @ApiOperation("创建deployment")
-    @GetMapping("/createDeployment")
+    @PostMapping("/createDeployment")
     @ApiImplicitParams(@ApiImplicitParam(name = "K8SDeployment",value = "部署对象",dataType = "K8SDeployment"))
-    public ResultVO createDeployment(@RequestParam K8SDeployment k8SDeployment){
+    public ResultVO createDeployment(@RequestBody K8SDeployment k8SDeployment){
         String result=k8SService.createDeployment(k8SDeployment);
         return new ResultVO(result);
     }
 
     @ApiOperation("创建service")
-    @GetMapping("/createService")
+    @PostMapping("/createService")
     @ApiImplicitParams(@ApiImplicitParam(name = "K8SDeployment",value = "Service对象",dataType = "K8SDeployment"))
-    public ResultVO createService(@RequestParam K8SDeployment k8SDeployment){
+    public ResultVO createService(@RequestBody K8SDeployment k8SDeployment){
         String result=k8SService.createService(k8SDeployment);
         return new ResultVO(result);
     }
