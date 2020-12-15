@@ -1,30 +1,35 @@
 package com.wenge.tbase.k8s.service.impl;
 
+import cn.hutool.json.JSONObject;
 import com.wenge.tbase.k8s.bean.vo.*;
 import com.wenge.tbase.k8s.constant.K8SConstant;
+import com.wenge.tbase.k8s.listener.SimpleListener;
 import com.wenge.tbase.k8s.service.K8SService;
 import com.wenge.tbase.k8s.utils.CommonUtils;
 import com.wenge.tbase.k8s.utils.DateUtil;
 import com.wenge.tbase.k8s.utils.MyClient;
 import io.fabric8.kubernetes.api.model.*;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 import io.fabric8.kubernetes.api.model.autoscaling.v1.CrossVersionObjectReference;
 import io.fabric8.kubernetes.api.model.autoscaling.v1.HorizontalPodAutoscaler;
 import io.fabric8.kubernetes.api.model.autoscaling.v1.HorizontalPodAutoscalerSpec;
-import io.fabric8.kubernetes.api.model.extensions.Deployment;
-import io.fabric8.kubernetes.api.model.extensions.DeploymentSpec;
 import io.fabric8.kubernetes.api.model.metrics.v1beta1.NodeMetrics;
-import io.fabric8.kubernetes.api.model.storage.DoneableStorageClass;
 import io.fabric8.kubernetes.api.model.storage.StorageClass;
 import io.fabric8.kubernetes.api.model.storage.StorageClassList;
 import io.fabric8.kubernetes.client.KubernetesClientException;
+import io.fabric8.kubernetes.client.Watcher;
+import io.fabric8.kubernetes.client.dsl.ExecWatch;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.Yaml;
-
 import javax.annotation.Resource;
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -107,29 +112,10 @@ public class K8SServiceImpl implements K8SService {
 
 
     /**
-     * TODO:这个这样写不知道有没有问题
-     * @param k8SConfigMap
+     * TODO : 未完，待续
+     * @param namespace
      * @return
      */
-    @Override
-    public ConfigMap createConfigMap(K8SConfigMap k8SConfigMap) {
-        ConfigMap configMap=new ConfigMap();
-        //配置文件基本信息
-        ObjectMeta objectMeta=new ObjectMeta();
-        //所属命名空间
-        objectMeta.setNamespace(k8SConfigMap.getNamespace());
-        //ConfigMap名称
-        objectMeta.setName(k8SConfigMap.getName());
-        //label
-        objectMeta.setLabels(k8SConfigMap.getLabels());
-        //保存用户配置信息
-        configMap.setData(k8SConfigMap.getData());
-        //保存配置文件基本信息
-        configMap.setMetadata(objectMeta);
-        ConfigMap result=kClient.configMaps().create(configMap);
-        return result;
-    }
-
     @Override
     public List<String> findConfigMapByNamespace(String namespace) {
         ConfigMapList configMapList=kClient.configMaps().list();
@@ -159,117 +145,126 @@ public class K8SServiceImpl implements K8SService {
         return configMap;
     }
 
-    public void createSecret(){
-        Secret secret=new Secret();
-
+    /**
+     *
+     * TODO ：未调试
+     * @return
+     */
+    public Secret createHarborSecret(K8SHarborSecret harborSecret){
+        try {
+            String auth = harborSecret.getDockerUsername() + ":" + harborSecret.getDockerSecret();
+            //Base64编码
+            String baseAuth=Base64.getEncoder().encodeToString(auth.getBytes("utf-8"));
+            //拼接秘钥
+            JSONObject mainObject=new JSONObject();
+            Map tmpMap=new HashMap();
+            tmpMap.put("username",harborSecret.getDockerUsername());
+            tmpMap.put("password",harborSecret.getDockerSecret());
+            tmpMap.put("auth",baseAuth);
+            mainObject.put(harborSecret.getDockerServer(),tmpMap);
+            JSONObject authObject=new JSONObject();
+            authObject.put("auths",mainObject);
+            //生成最终的秘钥
+            String finalAuth=Base64.getEncoder().encodeToString(authObject.toJSONString(0).getBytes("utf-8"));
+            Secret secret = new Secret();
+            Map data = new HashMap();
+            data.put(".dockerconfigjson",">-"+finalAuth);
+            secret.setData(data);
+            ObjectMeta objectMeta=new ObjectMeta();
+            objectMeta.setCreationTimestamp(new Date().toString());
+            objectMeta.setName(harborSecret.getSecretName());
+            objectMeta.setNamespace(harborSecret.getNamespace());
+            List<ManagedFieldsEntry> managedFieldsEntryList=new ArrayList<>();
+            ManagedFieldsEntry managedFieldsEntry=new ManagedFieldsEntry();
+            managedFieldsEntry.setApiVersion("v1");
+            managedFieldsEntry.setManager("Mozilla");
+            managedFieldsEntry.setOperation("Update");
+            managedFieldsEntry.setFieldsType("FieldsV1");
+            managedFieldsEntry.setTime(new Date().toString());
+            managedFieldsEntryList.add(managedFieldsEntry);
+            objectMeta.setManagedFields(managedFieldsEntryList);
+            secret.setMetadata(objectMeta);
+            secret.setType("kubernetes.io/dockerconfigjson");
+            Secret result = kClient.secrets().inNamespace(harborSecret.getNamespace()).create(secret);
+            return result;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
 
-
     @Override
-    public Deployment createDeployment(K8SDeployment k8SDeployment) {
-        log.info("****************开始创建Deployment**************");
-
-        Deployment deployment = new Deployment();
-        // 设置Deployment的metadata
-        ObjectMeta meta = new ObjectMeta();
-        meta.setName(k8SDeployment.getName());
-        meta.setNamespace(k8SDeployment.getNamespace());
-        Map<String, String> labelMap = new HashMap<>(16);
-        labelMap.put(K8SConstant.KEY, k8SDeployment.getServiceName());
-        meta.setLabels(labelMap);
-        deployment.setMetadata(meta);
-
-        // 设置Deployment的replicas和selector
-        DeploymentSpec deploymentSpec = new DeploymentSpec();
-        deploymentSpec.setReplicas(K8SConstant.DEFAULT_REPLICAS);
-        LabelSelector labelSelector = new LabelSelector();
-        labelSelector.setMatchLabels(labelMap);
-        deploymentSpec.setSelector(labelSelector);
-
-        // 设置pod模板下面的meta
-        PodTemplateSpec podTemplateSpec = new PodTemplateSpec();
-        ObjectMeta objectMeta = new ObjectMeta();
-        objectMeta.setLabels(labelMap);
-        podTemplateSpec.setMetadata(objectMeta);
-
-        // 设置pod模板下面的spec
-        PodSpec podSpec = new PodSpec();
-        Container container = new Container();
-        container.setName(k8SDeployment.getServiceName());
-        container.setImagePullPolicy("Always");
-        //  镜像地址
-        container.setImage(k8SDeployment.getImageUrl());
-
-        // 设置容器端口信息
-        ContainerPort containerPort = new ContainerPort();
-        containerPort.setContainerPort(k8SDeployment.getPort());
-        List<ContainerPort> containerPorts = new ArrayList<>();
-        containerPorts.add(containerPort);
-        container.setPorts(containerPorts);
-
-        // 申请资源
-        ResourceRequirements resourceRequireents = new ResourceRequirements();
-        Map<String, Quantity> requestSourceMap = new HashMap<>(16);
-        // 格式化参数
-        String cpu = String.valueOf(k8SDeployment.getCpu());
-        String memory =k8SDeployment.getMemory() + "Gi";
-
-        requestSourceMap.put("cpu", new Quantity(cpu));
-        requestSourceMap.put("memory", new Quantity(memory));
-        resourceRequireents.setRequests(requestSourceMap);
-        resourceRequireents.setLimits(requestSourceMap);
-        container.setResources(resourceRequireents);
-
-        List<Container> containers = new ArrayList<>();
-        containers.add(container);
-        podSpec.setContainers(containers);
-
-        podTemplateSpec.setSpec(podSpec);
-        deploymentSpec.setTemplate(podTemplateSpec);
-        deployment.setSpec(deploymentSpec);
-
-        // 创建实例
-        Deployment result=kClient.extensions().deployments().create(deployment);
-        log.info("*******************Deployment创建完成****************");
-        return result;
+    public String createDeployment(K8SDeployment k8SDeployment) {
+        try {
+            Deployment deployment = new DeploymentBuilder()
+                .withNewMetadata()
+                .withName(k8SDeployment.getName())
+                .endMetadata()
+                .withNewSpec()
+                .withReplicas(1)
+                .withNewTemplate()
+                .withNewMetadata()
+                .addToLabels("app", k8SDeployment.getName())
+                .endMetadata()
+                .withNewSpec()
+                .addNewContainer()
+                .withName(k8SDeployment.getName())
+                .withImage(k8SDeployment.getImageUrl())
+                .addNewPort()
+                .withContainerPort(k8SDeployment.getPort())
+                .endPort()
+                .endContainer()
+                .endSpec()
+                .endTemplate()
+                .withNewSelector()
+                .addToMatchLabels("app", k8SDeployment.getName())
+                .endSelector()
+                .endSpec()
+                .build();
+            log.info("Created deployment");
+            deployment=kClient.apps().deployments().inNamespace(k8SDeployment.getNamespace()).create(deployment);
+//            HasMetadata hasMetadata = kClient.resource(deployment).inNamespace(k8SDeployment.getNamespace()).waitUntilReady(30, TimeUnit.SECONDS);
+            checkEventInfo(k8SDeployment.getNamespace(),k8SDeployment.getName());
+            return null;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
      * 创建Service, 供外部访问使用
      */
-    public void createService(K8SDeployment k8SDeployment) {
-        log.info("*******开始创建服务*****, ServiceName={}", k8SDeployment.getServiceName());
+    public String createService(K8SDeployment k8SDeployment) {
+        io.fabric8.kubernetes.api.model.Service service = new ServiceBuilder()
+            .withNewMetadata()
+            .withName(k8SDeployment.getName())
+            .withNamespace(k8SDeployment.getNamespace())
+            .endMetadata()
+            .withNewSpec()
+            .withSelector(Collections.singletonMap("app", k8SDeployment.getName()))
+            .addNewPort()
+            .withName(k8SDeployment.getName())
+            .withProtocol("TCP")
+            .withPort(k8SDeployment.getPort())
+            .withTargetPort(new IntOrString(k8SDeployment.getPort()))
+            .endPort()
+            .withType("NodePort")
+            .endSpec()
+            .withNewStatus()
+            .withNewLoadBalancer()
+            .addNewIngress()
+            .endIngress()
+            .endLoadBalancer()
+            .endStatus()
+            .build();
 
-        io.fabric8.kubernetes.api.model.Service service = new io.fabric8.kubernetes.api.model.Service();
-        // 设置Service的meta
-        ObjectMeta objectMeta = new ObjectMeta();
-        objectMeta.setName(k8SDeployment.getServiceName());
-        objectMeta.setNamespace(k8SDeployment.getNamespace());
-        Map<String, String> labelMap = new HashMap<>(16);
-        labelMap.put(K8SConstant.KEY, k8SDeployment.getServiceName());
-        objectMeta.setLabels(labelMap);
-        service.setMetadata(objectMeta);
+        service = kClient.services().inNamespace(kClient.getNamespace()).create(service);
+        log.info("Created service with name ", service.getMetadata().getName());
 
-        // 设置Service的spec
-        ServiceSpec serviceSpec = new ServiceSpec();
-        ServicePort servicePort = new ServicePort();
-
-        servicePort.setPort(k8SDeployment.getPort());
-        servicePort.setTargetPort(new IntOrString(k8SDeployment.getPort()));
-        servicePort.setNodePort(k8SDeployment.getNodePort());
-
-        List<ServicePort> ports = new ArrayList<>();
-        ports.add(servicePort);
-        serviceSpec.setPorts(ports);
-        serviceSpec.setType(K8SConstant.NODE_PORT);
-        serviceSpec.setSelector(labelMap);
-        service.setSpec(serviceSpec);
-
-        // 创建服务
-        kClient.services().create(service);
-
-        log.info("*******************创建服务完成******************");
+        String serviceURL = kClient.services().inNamespace(k8SDeployment.getNamespace()).withName(service.getMetadata().getName()).getURL(k8SDeployment.getName());
+        return serviceURL;
     }
 
     /**
@@ -312,32 +307,6 @@ public class K8SServiceImpl implements K8SService {
         return horizontalPodAutoscaler;
     }
 
-    //TODO 是否要写成websocket实时推送
-    private String getLogWithNamespaceAndPod(String namespace,String podName) {
-        // 校验该podName是否存在
-        Pod pod = kClient.pods().inNamespace(namespace).withName(podName).get();
-        if (pod == null) {
-            return "该pod不存在";
-        }
-        // 查询指定namespace和pod的日志信息
-        String podLogs = kClient.pods().inNamespace(namespace).withName(podName).getLog();
-        // 把换行符替换成页面的换行符
-        if(!podLogs.equals("")) {
-            return podLogs.replaceAll("\n", "<br>");
-        }
-        return null;
-    }
-
-    //删除service
-    private void deleteService(String namespace,String serviceName) {
-        try {
-            kClient.extensions().deployments().inNamespace(namespace).withName(serviceName).delete();
-//            kClient.customResourceDefinitions().create();
-//            kClient.load().createOrReplace();
-        } catch (KubernetesClientException e) {
-            log.info("delete deployment failed, serviceName={}", serviceName);
-        }
-    }
 
     /**
      * 获取存储资源
@@ -386,8 +355,74 @@ public class K8SServiceImpl implements K8SService {
     }
 
 
-    public void findNamespaceDetailInfo(String namespace){
-        Namespace namespaceInfo = kClient.namespaces().withName(namespace).get();
-        System.out.println(namespaceInfo);
+    public void checkEventInfo(String namespace,String name){
+        kClient.events().inNamespace(namespace).withName(name).watch(new Watcher<Event>() {
+            @Override
+            public void eventReceived(Action action, Event resource) {
+                log.info(resource.getMessage());
+            }
+
+            @Override
+            public void onClose(KubernetesClientException cause) {
+            }
+        }).close();
     }
+
+    public void findEventInfoByNamespace(String namespace){
+        EventList event=kClient.events().inNamespace("default").list();
+    }
+
+    @Override
+    public void rollImagesVersion(String namespace,String name) {
+    }
+
+
+    @Override
+    public String executeCommandOnPod(String podName, String namespace, String... cmd) {
+        Pod pod = kClient.pods().inNamespace(namespace).withName(podName).get();
+        log.info("pod connect success");
+        CompletableFuture<String> data = new CompletableFuture<>();
+        try (ExecWatch execWatch = execCmd(pod, data, cmd)) {
+            return data.get(10, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public Namespace createNamespace(String name) {
+        //创建命名空间对象
+        Namespace namespace=new Namespace();
+        //命名空间对象进行赋值
+        ObjectMeta objectMeta=new ObjectMeta();
+        objectMeta.setName(name);
+        namespace.setMetadata(objectMeta);
+        Namespace result = kClient.namespaces().create(namespace);
+        return result;
+    }
+
+    @Override
+    public Boolean deleteNamespace(String name) {
+        //创建命名空间对象
+        Namespace namespace=new Namespace();
+        //命名空间对象进行赋值
+        ObjectMeta objectMeta=new ObjectMeta();
+        objectMeta.setName(name);
+        namespace.setMetadata(objectMeta);
+        Boolean delete = kClient.namespaces().delete(namespace);
+        return delete;
+    }
+
+    private ExecWatch execCmd(Pod pod, CompletableFuture<String> data, String... command) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        return kClient.pods()
+            .inNamespace(pod.getMetadata().getNamespace())
+            .withName(pod.getMetadata().getName())
+            .writingOutput(baos)
+            .writingError(baos)
+            .usingListener(new SimpleListener(data, baos))
+            .exec(command);
+    }
+
 }

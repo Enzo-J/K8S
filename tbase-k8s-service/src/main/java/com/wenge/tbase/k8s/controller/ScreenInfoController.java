@@ -2,6 +2,7 @@ package com.wenge.tbase.k8s.controller;
 
 
 import com.wenge.tbase.commons.result.ResultVO;
+import com.wenge.tbase.k8s.bean.vo.K8SDeployment;
 import com.wenge.tbase.k8s.service.K8SService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -50,6 +51,22 @@ public class ScreenInfoController {
     @ApiImplicitParams(@ApiImplicitParam(name = "name",value = "存储类名称",dataType = "String"))
     public ResultVO getStorageDescribeInfo(@RequestParam String name){
         String result=k8SService.findStorageDescribeInfo(name);
+        return new ResultVO(result);
+    }
+
+    @ApiOperation("创建deployment")
+    @GetMapping("/createDeployment")
+    @ApiImplicitParams(@ApiImplicitParam(name = "K8SDeployment",value = "部署对象",dataType = "K8SDeployment"))
+    public ResultVO createDeployment(@RequestParam K8SDeployment k8SDeployment){
+        String result=k8SService.createDeployment(k8SDeployment);
+        return new ResultVO(result);
+    }
+
+    @ApiOperation("创建service")
+    @GetMapping("/createService")
+    @ApiImplicitParams(@ApiImplicitParam(name = "K8SDeployment",value = "Service对象",dataType = "K8SDeployment"))
+    public ResultVO createService(@RequestParam K8SDeployment k8SDeployment){
+        String result=k8SService.createService(k8SDeployment);
         return new ResultVO(result);
     }
 }
