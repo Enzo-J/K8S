@@ -1,17 +1,25 @@
 package com.wenge.tbase.cicd.controller.service;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONUtil;
 import com.offbytwo.jenkins.JenkinsServer;
+import com.offbytwo.jenkins.helper.Range;
+import com.offbytwo.jenkins.model.Build;
 import com.offbytwo.jenkins.model.JobWithDetails;
 import com.wenge.tbase.cicd.entity.CicdPipelineStage;
+import com.wenge.tbase.cicd.entity.enums.BuildStatusEnum;
 import com.wenge.tbase.cicd.entity.enums.PipelineStageTypeEnum;
 import com.wenge.tbase.cicd.entity.param.CreatePipelineStageParam;
+import com.wenge.tbase.cicd.entity.vo.BuildHistoryVo;
 import com.wenge.tbase.cicd.service.CicdPipelineStageService;
+import com.wenge.tbase.commons.result.ListVo;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @ClassName: PipelineStageControllerService
@@ -93,14 +101,65 @@ public class PipelineStageControllerService {
 
 
     /**
-     * 获取流水线日志
+     * 获取最后构建日志
      *
      * @return
      */
-    public String getPipelineStageLog(String name) {
+    public String getLastBuildLog(String name) {
         try {
             JobWithDetails job = jenkinsServer.getJob(name);
             return job.getLastBuild().details().getConsoleOutputText();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 获取历史构建列表
+     *
+     * @param name
+     * @param current
+     * @param size
+     * @return
+     */
+    public ListVo getBuildHistoryList(String name, Integer current, Integer size) {
+        try {
+            JobWithDetails job = jenkinsServer.getJob(name);
+            int f = current;
+            int t = f + size;
+            Range range = Range.build().from(f).to(t);
+            List<Build> buildList = job.getAllBuilds(range);
+            int number = job.getLastBuild().getNumber();
+            ListVo listVo = new ListVo();
+            listVo.setTotal(Long.valueOf(number));
+            List<BuildHistoryVo> buildHistoryVoList = new ArrayList<>();
+            for (Build b : buildList) {
+                BuildHistoryVo vo = new BuildHistoryVo();
+                vo.setBuildNumber(b.getNumber());
+                vo.setBuildDate(DateUtil.date(b.details().getTimestamp()));
+                vo.setBuildStatus(BuildStatusEnum.getBuildStatus(b.details().getResult().toString()));
+                buildHistoryVoList.add(vo);
+            }
+            listVo.setDataList(buildHistoryVoList);
+            return listVo;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 获取构建历史日志
+     *
+     * @param name
+     * @param buildNumber
+     * @return
+     */
+    public String getBuildHistroyLog(String name, Integer buildNumber) {
+        try {
+            JobWithDetails job = jenkinsServer.getJob(name);
+            return job.getBuildByNumber(buildNumber).details().getConsoleOutputText();
         } catch (IOException e) {
             e.printStackTrace();
         }

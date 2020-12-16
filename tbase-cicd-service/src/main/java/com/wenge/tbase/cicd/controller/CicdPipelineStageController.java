@@ -27,13 +27,40 @@ public class CicdPipelineStageController {
         return new ResultVO(ResultCode.SUCCESS, service.createPipelineStage(param));
     }
 
-    @ApiOperation(value = "获取流水线日志")
-    @GetMapping(value = "/pipelineStageLog")
-    public ResultVO getPipelineLog(@RequestParam String name) {
+    @ApiOperation(value = "获取最后构建日志")
+    @GetMapping(value = "/getLastBuildLog")
+    public ResultVO getLastBuildLog(@RequestParam String name) {
         if (name == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
-        return new ResultVO(ResultCode.SUCCESS, service.getPipelineStageLog(name));
+        return new ResultVO(ResultCode.SUCCESS, service.getLastBuildLog(name));
+    }
+
+    @ApiOperation(value = "获取构建列表数据")
+    @GetMapping(value = "/getBuildHistoryList")
+    public ResultVO getBuildHistoryList(@RequestParam String name,
+                                        @RequestParam Integer current,
+                                        @RequestParam Integer size) {
+        if (name == null) {
+            return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        if (current == null) {
+            current = 0;
+        }
+        if (size == null) {
+            size = 10;
+        }
+        return new ResultVO(ResultCode.SUCCESS, service.getBuildHistoryList(name, current, size));
+    }
+
+    @ApiOperation(value = "获取构建历史日志")
+    @GetMapping(value = "/getBuildHistoryLog")
+    public ResultVO getBuildHistoryLog(@RequestParam String name,
+                                       @RequestParam Integer buildNumber) {
+        if (name == null || buildNumber == null) {
+            return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        return new ResultVO(ResultCode.SUCCESS, service.getBuildHistroyLog(name, buildNumber));
     }
 }
 

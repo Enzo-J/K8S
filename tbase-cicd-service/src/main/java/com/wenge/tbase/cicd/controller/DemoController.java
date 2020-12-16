@@ -5,9 +5,11 @@ import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpClient;
+import com.offbytwo.jenkins.helper.Range;
 import com.offbytwo.jenkins.model.*;
 import com.wenge.tbase.cicd.entity.vo.K8SDeployment;
 import com.wenge.tbase.cicd.feignService.FeignK8SService;
+import com.wenge.tbase.commons.result.ResultCode;
 import com.wenge.tbase.commons.result.ResultVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
@@ -114,7 +116,7 @@ public class DemoController {
     }
 
     @GetMapping(value = "/createDeployment")
-    public void createDeployment(){
+    public void createDeployment() {
         K8SDeployment deployment = new K8SDeployment();
         deployment.setNamespace("dp");
         deployment.setName("cicd-service");
@@ -122,30 +124,48 @@ public class DemoController {
         deployment.setPort(10010);
         ResultVO resultVO = k8SService.createDeployment(deployment);
         Object data = resultVO.getData();
-        if(data != null){
+        if (data != null) {
             System.out.println(data);
         }
     }
 
     @GetMapping(value = "/createService")
-    public void createService(){
+    public void createService() {
         K8SDeployment deployment = new K8SDeployment();
         deployment.setNamespace("dp");
         deployment.setName("cicd-service");
         deployment.setPort(10010);
         ResultVO resultVO = k8SService.createService(deployment);
         Object data = resultVO.getData();
-        if(data != null){
+        if (data != null) {
             System.out.println(data);
         }
     }
 
     @GetMapping(value = "/getJenkinsLog")
-    public String getJenkinsLog(){
+    public String getJenkinsLog() {
         try {
             JobWithDetails job = jenkinsServer.getJob("test-101");
             BuildWithDetails details = job.getLastBuild().details();
             return details.getConsoleOutputHtml();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @GetMapping(value = "/getBuildList")
+    public ResultVO getBuildList() {
+        try {
+            JobWithDetails job = jenkinsServer.getJob("test-101");
+            Range range = Range.build().from(1).to(3);
+            List<Build> allBuilds = job.getAllBuilds(range);
+            for (Build build: allBuilds) {
+                System.out.println(build.getNumber());
+                System.out.println(build.details().getTimestamp());
+                System.out.println(build.details().getResult());
+            }
+            return new ResultVO(ResultCode.SUCCESS, allBuilds);
         } catch (IOException e) {
             e.printStackTrace();
         }
