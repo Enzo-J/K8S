@@ -5,8 +5,7 @@ import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpClient;
-import com.offbytwo.jenkins.model.JobWithDetails;
-import com.offbytwo.jenkins.model.QueueReference;
+import com.offbytwo.jenkins.model.*;
 import com.wenge.tbase.cicd.entity.vo.K8SDeployment;
 import com.wenge.tbase.cicd.feignService.FeignK8SService;
 import com.wenge.tbase.commons.result.ResultVO;
@@ -139,6 +138,18 @@ public class DemoController {
         if(data != null){
             System.out.println(data);
         }
+    }
+
+    @GetMapping(value = "/getJenkinsLog")
+    public String getJenkinsLog(){
+        try {
+            JobWithDetails job = jenkinsServer.getJob("test-101");
+            BuildWithDetails details = job.getLastBuild().details();
+            return details.getConsoleOutputHtml();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static void main(String[] args) {

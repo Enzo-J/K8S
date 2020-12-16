@@ -1,6 +1,8 @@
 package com.wenge.tbase.cicd.controller.service;
 
 import cn.hutool.json.JSONUtil;
+import com.offbytwo.jenkins.JenkinsServer;
+import com.offbytwo.jenkins.model.JobWithDetails;
 import com.wenge.tbase.cicd.entity.CicdPipelineStage;
 import com.wenge.tbase.cicd.entity.enums.PipelineStageTypeEnum;
 import com.wenge.tbase.cicd.entity.param.CreatePipelineStageParam;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 
 /**
  * @ClassName: PipelineStageControllerService
@@ -18,6 +21,9 @@ import javax.annotation.Resource;
  */
 @Component
 public class PipelineStageControllerService {
+
+    @Resource
+    private JenkinsServer jenkinsServer;
 
     @Resource
     private CicdPipelineStageService pipelineStageService;
@@ -83,5 +89,21 @@ public class PipelineStageControllerService {
         }
         // 6.部署步骤
         return true;
+    }
+
+
+    /**
+     * 获取流水线日志
+     *
+     * @return
+     */
+    public String getPipelineStageLog(String name) {
+        try {
+            JobWithDetails job = jenkinsServer.getJob(name);
+            return job.getLastBuild().details().getConsoleOutputText();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
