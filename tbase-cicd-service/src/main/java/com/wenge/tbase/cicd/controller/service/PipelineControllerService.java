@@ -4,30 +4,30 @@ package com.wenge.tbase.cicd.controller.service;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.json.JSONUtil;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.offbytwo.jenkins.JenkinsServer;
-import com.offbytwo.jenkins.model.QueueReference;
 import com.wenge.tbase.cicd.entity.*;
-import com.wenge.tbase.cicd.entity.dto.JenkinsTemplateDTO;
 import com.wenge.tbase.cicd.entity.enums.PipelineStageTypeEnum;
 import com.wenge.tbase.cicd.entity.param.*;
+import com.wenge.tbase.cicd.entity.vo.GetPipelineListVo;
 import com.wenge.tbase.cicd.entity.vo.LargeScreenPipelineVo;
 import com.wenge.tbase.cicd.entity.vo.OverviewVo;
+import com.wenge.tbase.cicd.entity.vo.StageStatusVo;
 import com.wenge.tbase.cicd.jenkins.template.JenkinsTemplate;
 import com.wenge.tbase.cicd.service.*;
+import com.wenge.tbase.cicd.utils.RedisUtils;
+import com.wenge.tbase.commons.result.ListVo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Component
 @Slf4j
@@ -113,6 +113,102 @@ public class PipelineControllerService {
         cicdPipeline.setDescription(description);
         pipelineService.insertPipeline(cicdPipeline);
         return cicdPipeline.getId();
+    }
+
+    /**
+     * 获取流水线列表
+     *
+     * @param name
+     * @param current
+     * @param size
+     * @return
+     */
+    public ListVo getPipelineList(String name, Integer current, Integer size) {
+        QueryWrapper<CicdPipeline> wrapper = new QueryWrapper();
+        if (StringUtils.isNotEmpty(name)) {
+            wrapper.like("name", name);
+        }
+        Page page = new Page(current, size);
+        IPage list = pipelineService.page(page, wrapper);
+        List<CicdPipeline> records = list.getRecords();
+        List<GetPipelineListVo> listVos = new ArrayList<>();
+        records.stream().forEach(o -> {
+            GetPipelineListVo vo = new GetPipelineListVo();
+            BeanUtil.copyProperties(o, vo);
+            // 根据pipeline id查询流水线阶段内容
+            vo.setStageStatusVoList(getStageStatusList(o.getId(), o.getName()));
+            listVos.add(vo);
+        });
+        ListVo listVo = new ListVo();
+        listVo.setTotal(list.getTotal());
+        listVo.setDataList(listVos);
+        return listVo;
+    }
+
+    /**
+     * 获取阶段状态信息
+     *
+     * @param pipelineId
+     * @param name
+     * @return
+     */
+    public List<StageStatusVo> getStageStatusList(Long pipelineId, String name) {
+        String key = pipelineId + name;
+        String statusJson = RedisUtils.StringOps.get(key);
+        List<StageStatusVo> stageStatusVoList = new ArrayList<>();
+        if (StringUtils.isNotEmpty(statusJson)) {
+            stageStatusVoList = JSONUtil.toList(JSONUtil.parseArray(statusJson), StageStatusVo.class);
+        } else {
+            QueryWrapper<CicdPipelineStage> wrapper = new QueryWrapper<>();
+            wrapper.eq("pipeline_id", pipelineId);
+            List<CicdPipelineStage> list = pipelineStageService.list(wrapper);
+            if (list != null) {
+                List<StageStatusVo> finalStageStatusVoList = stageStatusVoList;
+                list.stream().forEach(o -> {
+                    StageStatusVo vo = new StageStatusVo();
+                    vo.setStageId(o.getId());
+                    vo.setStageName(o.getName());
+                    vo.setStageType(o.getType());
+                    vo.setStageStatus(0);
+                    finalStageStatusVoList.add(vo);
+                });
+                return finalStageStatusVoList;
+            }
+        }
+        return stageStatusVoList;
+    }
+
+    /**
+     * 修改流水线内容
+     *
+     * @param param
+     * @return
+     */
+    public Boolean updatePipeline(UpdatePipelineParam param) {
+        CicdPipeline cicdPipeline = new CicdPipeline();
+        BeanUtil.copyProperties(param, cicdPipeline);
+        return pipelineService.updateById(cicdPipeline);
+    }
+
+    /**
+     * 删除流水线
+     *
+     * @param id
+     * @return
+     */
+    public Boolean deletePipeline(Long id) {
+        return pipelineService.removeById(id);
+    }
+
+    /**
+     * 获取运行状态
+     *
+     * @param id
+     * @return
+     */
+    public Integer getPipelineRunningStatus(Long id) {
+        CicdPipeline cicdPipeline = pipelineService.getById(id);
+        return cicdPipeline.getRunningStatus();
     }
 
     /**

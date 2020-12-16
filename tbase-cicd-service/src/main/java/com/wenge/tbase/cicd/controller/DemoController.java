@@ -7,6 +7,9 @@ import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpClient;
 import com.offbytwo.jenkins.model.JobWithDetails;
 import com.offbytwo.jenkins.model.QueueReference;
+import com.wenge.tbase.cicd.entity.vo.K8SDeployment;
+import com.wenge.tbase.cicd.feignService.FeignK8SService;
+import com.wenge.tbase.commons.result.ResultVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -44,6 +47,8 @@ public class DemoController {
     private JenkinsServer jenkinsServer;
     @Resource
     private JenkinsHttpClient jenkinsHttpClient;
+    @Resource
+    private FeignK8SService k8SService;
 
     @GetMapping(value = "/job")
     public void getJob() {
@@ -107,6 +112,33 @@ public class DemoController {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @GetMapping(value = "/createDeployment")
+    public void createDeployment(){
+        K8SDeployment deployment = new K8SDeployment();
+        deployment.setNamespace("dp");
+        deployment.setName("cicd-service");
+        deployment.setImageUrl("172.16.0.11/app-manage-platform/tbase-cicd-service:v1");
+        deployment.setPort(10010);
+        ResultVO resultVO = k8SService.createDeployment(deployment);
+        Object data = resultVO.getData();
+        if(data != null){
+            System.out.println(data);
+        }
+    }
+
+    @GetMapping(value = "/createService")
+    public void createService(){
+        K8SDeployment deployment = new K8SDeployment();
+        deployment.setNamespace("dp");
+        deployment.setName("cicd-service");
+        deployment.setPort(10010);
+        ResultVO resultVO = k8SService.createService(deployment);
+        Object data = resultVO.getData();
+        if(data != null){
+            System.out.println(data);
+        }
     }
 
     public static void main(String[] args) {
