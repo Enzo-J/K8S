@@ -90,7 +90,5 @@ public class CicdPipelineController {
         }
         return new ResultVO(ResultCode.SUCCESS, service.deletePipeline(id));
     }
-
-
 }
 

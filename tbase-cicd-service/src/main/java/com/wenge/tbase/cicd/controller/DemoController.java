@@ -10,7 +10,9 @@ import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpClient;
 import com.offbytwo.jenkins.helper.Range;
 import com.offbytwo.jenkins.model.*;
+import com.wenge.tbase.cicd.entity.vo.BuildStageVo;
 import com.wenge.tbase.cicd.entity.vo.K8SDeployment;
+import com.wenge.tbase.cicd.entity.vo.StageVo;
 import com.wenge.tbase.cicd.feignService.FeignK8SService;
 import com.wenge.tbase.commons.result.ResultCode;
 import com.wenge.tbase.commons.result.ResultVO;
@@ -179,7 +181,7 @@ public class DemoController {
 
     @GetMapping(value = "/getBuildStageView")
     public void getBuildStageView() {
-        String url = "/job/app-manage-platform-pipeline/wfapi/runs?since=%2368&fullStages=true&_=1608170491285";
+        String url = "/job/app-manage-platform-pipeline/wfapi/runs";
         List<NameValuePair> data = new ArrayList<>();
         try {
             HttpResponse httpResponse = jenkinsHttpClient.post_form_with_result(url, data, true);
@@ -187,10 +189,14 @@ public class DemoController {
             HttpEntity entity = httpResponse.getEntity();
             if (entity != null) {
                 String result = EntityUtils.toString(entity, "UTF-8");
-                List<Object> objects = JSONUtil.toList(JSONUtil.parseArray(result), Object.class);
-                if (objects != null) {
-                    Object o = objects.get(0);
-                    System.out.println(o);
+                List<BuildStageVo> buildStageVos = JSONUtil.toList(JSONUtil.parseArray(result), BuildStageVo.class);
+                if (buildStageVos != null) {
+                    BuildStageVo vo = buildStageVos.get(0);
+                    if (vo.getStages() != null) {
+                        for (StageVo stageVo : vo.getStages()) {
+                            System.out.println(stageVo.getName());
+                        }
+                    }
                 }
             }
         } catch (IOException e) {
