@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.offbytwo.jenkins.JenkinsServer;
+import com.offbytwo.jenkins.model.QueueReference;
 import com.wenge.tbase.cicd.entity.*;
 import com.wenge.tbase.cicd.entity.enums.PipelineStageTypeEnum;
 import com.wenge.tbase.cicd.entity.param.*;
@@ -212,11 +213,23 @@ public class PipelineControllerService {
     }
 
     /**
+     * 执行完成修改状态
+     *
+     * @param param
+     * @return
+     */
+    public Boolean executeFinishUpdateStatus(UpdatePipelineStatusParam param) {
+        CicdPipeline cicdPipeline = new CicdPipeline();
+        BeanUtil.copyProperties(param, cicdPipeline);
+        return pipelineService.updateById(cicdPipeline);
+    }
+
+    /**
      * 执行流水线
      *
      * @return
      */
-    public Boolean executePipeline(Long pipelineId, String name) {
+    public Integer executePipeline(Long pipelineId, String name) {
         // 1.根据id查询流水线阶段
         QueryWrapper<CicdPipelineStage> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("pipeline_id", pipelineId)
@@ -279,11 +292,13 @@ public class PipelineControllerService {
         try {
             String jenkinsTemplateXml = JenkinsTemplate.getJenkinsTemplateXml(script.toString(), jenkins.getToken());
             jenkinsServer.updateJob(name, jenkinsTemplateXml, true);
+            int nextBuildNumber = jenkinsServer.getJob(name).getNextBuildNumber();
             jenkinsServer.getJob(name).build(true);
+            return nextBuildNumber;
         } catch (IOException e) {
             log.error("执行流水线错误" + e.getMessage());
             e.printStackTrace();
         }
-        return true;
+        return null;
     }
 }

@@ -207,4 +207,29 @@ public class PipelineStageControllerService {
         }
         return null;
     }
+
+    /**
+     * 根据编号获取正在构建阶段视图
+     *
+     * @return
+     */
+    public BuildStageVo getRunningBuildStageView(String name, Integer id) {
+        String url = "/job/" + name + "/wfapi/runs?since=%23" + id + "&fullStages=true";
+        List<NameValuePair> data = new ArrayList<>();
+        try {
+            HttpResponse httpResponse = jenkinsHttpClient.post_form_with_result(url, data, true);
+            HttpEntity entity = httpResponse.getEntity();
+            if (entity != null) {
+                String result = EntityUtils.toString(entity, "UTF-8");
+                List<BuildStageVo> buildStageVos = JSONUtil.toList(JSONUtil.parseArray(result), BuildStageVo.class);
+                if (buildStageVos != null) {
+                    return buildStageVos.get(0);
+                }
+            }
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+        return null;
+    }
 }

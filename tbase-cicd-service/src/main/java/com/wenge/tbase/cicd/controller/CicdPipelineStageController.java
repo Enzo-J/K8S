@@ -71,5 +71,17 @@ public class CicdPipelineStageController {
         }
         return new ResultVO(ResultCode.SUCCESS, service.getBuildStageView(name));
     }
+
+    @ApiOperation(value = "获取正在运行中的构建阶段视图信息")
+    @GetMapping(value = "/getRunningBuildStageView")
+    public ResultVO getRunningBuildStageView(@RequestParam String name,
+                                             @RequestParam Integer id) {
+        if (name == null || id == null) {
+            return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        return new ResultVO(ResultCode.SUCCESS, service.getRunningBuildStageView(name, id));
+    }
+
+
 }
 

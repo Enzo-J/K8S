@@ -3,6 +3,7 @@ package com.wenge.tbase.cicd.controller;
 
 import com.wenge.tbase.cicd.controller.service.PipelineControllerService;
 import com.wenge.tbase.cicd.entity.param.UpdatePipelineParam;
+import com.wenge.tbase.cicd.entity.param.UpdatePipelineStatusParam;
 import com.wenge.tbase.commons.result.ResultCode;
 import com.wenge.tbase.commons.result.ResultVO;
 import io.swagger.annotations.Api;
@@ -89,6 +90,15 @@ public class CicdPipelineController {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
         return new ResultVO(ResultCode.SUCCESS, service.deletePipeline(id));
+    }
+
+    @ApiOperation(value = "执行完成修改状态")
+    @PutMapping(value = "/executeFinishUpdateStatus")
+    public ResultVO executeFinishUpdateStatus(@RequestBody UpdatePipelineStatusParam param){
+        if(param == null || param.getId() == null || param.getExecResult() == null || param.getRunningStatus() == null){
+            return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        return new ResultVO(ResultCode.SUCCESS, service.executeFinishUpdateStatus(param));
     }
 }
 
