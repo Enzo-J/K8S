@@ -100,7 +100,7 @@ public class PipelineControllerService {
      */
     public Long createPipeline(String name, String description) {
         // 插入到jenkins服务器中
-        String xml = JenkinsTemplate.getBulidJenkinsTemplateXml(description, jenkins.getToken());
+        String xml = JenkinsTemplate.getBuildJenkinsTemplateXml(description, jenkins.getToken());
         try {
             jenkinsServer.createJob(name, xml, true);
         } catch (IOException e) {

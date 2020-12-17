@@ -1,8 +1,11 @@
 package com.wenge.tbase.cicd.controller;
 
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
+import cn.hutool.json.JSONUtil;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpClient;
 import com.offbytwo.jenkins.helper.Range;
@@ -12,8 +15,12 @@ import com.wenge.tbase.cicd.feignService.FeignK8SService;
 import com.wenge.tbase.commons.result.ResultCode;
 import com.wenge.tbase.commons.result.ResultVO;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.json.JSONObject;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,10 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * <p>
@@ -160,7 +165,7 @@ public class DemoController {
             JobWithDetails job = jenkinsServer.getJob("test-101");
             Range range = Range.build().from(1).to(3);
             List<Build> allBuilds = job.getAllBuilds(range);
-            for (Build build: allBuilds) {
+            for (Build build : allBuilds) {
                 System.out.println(build.getNumber());
                 System.out.println(build.details().getTimestamp());
                 System.out.println(build.details().getResult());
@@ -172,12 +177,35 @@ public class DemoController {
         return null;
     }
 
+    @GetMapping(value = "/getBuildStageView")
+    public void getBuildStageView() {
+        String url = "/job/app-manage-platform-pipeline/wfapi/runs?since=%2368&fullStages=true&_=1608170491285";
+        List<NameValuePair> data = new ArrayList<>();
+        try {
+            HttpResponse httpResponse = jenkinsHttpClient.post_form_with_result(url, data, true);
+
+            HttpEntity entity = httpResponse.getEntity();
+            if (entity != null) {
+                String result = EntityUtils.toString(entity, "UTF-8");
+                List<Object> objects = JSONUtil.toList(JSONUtil.parseArray(result), Object.class);
+                if (objects != null) {
+                    Object o = objects.get(0);
+                    System.out.println(o);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
-        String property = System.getProperty("user.dir");
-        System.out.println(property);
-        FileReader fileReader = new FileReader(property + "/" + "tbase-cicd-service/src/main/sonar/sonar-project.properties");
-        String result = fileReader.readString();
-        System.out.println(result);
+//        String property = System.getProperty("user.dir");
+//        System.out.println(property);
+//        FileReader fileReader = new FileReader(property + "/" + "tbase-cicd-service/src/main/sonar/sonar-project.properties");
+//        String result = fileReader.readString();
+//        System.out.println(result);
+        final DateTime date = DateUtil.date(1608109920994L);
+        System.out.println(date);
     }
 }
 

@@ -5,6 +5,7 @@ import cn.hutool.json.JSONUtil;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.helper.Range;
 import com.offbytwo.jenkins.model.Build;
+import com.offbytwo.jenkins.model.BuildWithDetails;
 import com.offbytwo.jenkins.model.JobWithDetails;
 import com.wenge.tbase.cicd.entity.CicdPipelineStage;
 import com.wenge.tbase.cicd.entity.enums.BuildStatusEnum;
@@ -108,7 +109,9 @@ public class PipelineStageControllerService {
     public String getLastBuildLog(String name) {
         try {
             JobWithDetails job = jenkinsServer.getJob(name);
-            return job.getLastBuild().details().getConsoleOutputText();
+            if(job.getBuilds().size() != 0){
+                return job.getLastBuild().details().getConsoleOutputText();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
