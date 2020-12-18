@@ -59,7 +59,7 @@ public class JenkinsTemplate {
      * @param token
      * @return
      */
-    public static String getBulidJenkinsTemplateXml(String description, String token) {
+    public static String getBuildJenkinsTemplateXml(String description, String token) {
         String xml = "<flow-definition plugin=\"workflow-job@2.32\">\n" +
                 "<description>" + description + "</description>\n" +
                 "<definition class=\"org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition\" plugin=\"workflow-cps@2.85\">\n" +

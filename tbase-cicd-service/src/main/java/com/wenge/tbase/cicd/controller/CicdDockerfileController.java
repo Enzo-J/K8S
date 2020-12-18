@@ -19,7 +19,7 @@ import javax.annotation.Resource;
  * @author Wang XingPeng
  * @since 2020-11-30
  */
-@Api(description = "dockerfile管理API接口",tags = "dockerfile管理API接口")
+@Api(description = "dockerfile管理API接口", tags = "dockerfile管理API接口")
 @RestController
 public class CicdDockerfileController {
 
@@ -46,6 +46,9 @@ public class CicdDockerfileController {
         if (param == null || param.getName() == null || param.getContent() == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
+        if (!service.judgeDockerfileExist(param.getName())) {
+            return new ResultVO(1001, "名称已存在", false);
+        }
         return new ResultVO(ResultCode.SUCCESS, service.createDockerfile(param));
     }
 
@@ -54,6 +57,9 @@ public class CicdDockerfileController {
     public ResultVO updateDockerfile(@RequestBody CreateAndUpdateDockerfileParam param) {
         if (param == null || param.getName() == null || param.getContent() == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        if (service.judgeDockerfileExist(param.getName())) {
+            return new ResultVO(1001, "名称已存在", false);
         }
         return new ResultVO(ResultCode.SUCCESS, service.updateDockerfile(param));
     }
@@ -65,6 +71,15 @@ public class CicdDockerfileController {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
         return new ResultVO(ResultCode.SUCCESS, service.deleteDockerfile(id));
+    }
+
+    @ApiOperation(value = "根据名称判断dockerfile文件是否存在")
+    @GetMapping(value = "/judgeDockerfileExist")
+    public ResultVO judgeDockerfileExist(@RequestParam String name) {
+        if (name == null) {
+            return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        return new ResultVO(ResultCode.SUCCESS, service.judgeDockerfileExist(name));
     }
 }
 

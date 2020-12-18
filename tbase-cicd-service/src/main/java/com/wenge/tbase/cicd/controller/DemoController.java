@@ -1,15 +1,28 @@
 package com.wenge.tbase.cicd.controller;
 
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
+import cn.hutool.json.JSONUtil;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpClient;
-import com.offbytwo.jenkins.model.JobWithDetails;
-import com.offbytwo.jenkins.model.QueueReference;
+import com.offbytwo.jenkins.helper.Range;
+import com.offbytwo.jenkins.model.*;
+import com.wenge.tbase.cicd.entity.vo.BuildStageVo;
+import com.wenge.tbase.cicd.entity.vo.K8SDeployment;
+import com.wenge.tbase.cicd.entity.vo.StageVo;
+import com.wenge.tbase.cicd.feignService.FeignK8SService;
+import com.wenge.tbase.commons.result.ResultCode;
+import com.wenge.tbase.commons.result.ResultVO;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.json.JSONObject;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,10 +32,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * <p>
@@ -44,6 +55,8 @@ public class DemoController {
     private JenkinsServer jenkinsServer;
     @Resource
     private JenkinsHttpClient jenkinsHttpClient;
+    @Resource
+    private FeignK8SService k8SService;
 
     @GetMapping(value = "/job")
     public void getJob() {
@@ -109,12 +122,96 @@ public class DemoController {
         return null;
     }
 
+    @GetMapping(value = "/createDeployment")
+    public void createDeployment() {
+        K8SDeployment deployment = new K8SDeployment();
+        deployment.setNamespace("dp");
+        deployment.setName("cicd-service");
+        deployment.setImageUrl("172.16.0.11/app-manage-platform/tbase-cicd-service:v1");
+        deployment.setPort(10010);
+        ResultVO resultVO = k8SService.createDeployment(deployment);
+        Object data = resultVO.getData();
+        if (data != null) {
+            System.out.println(data);
+        }
+    }
+
+    @GetMapping(value = "/createService")
+    public void createService() {
+        K8SDeployment deployment = new K8SDeployment();
+        deployment.setNamespace("dp");
+        deployment.setName("cicd-service");
+        deployment.setPort(10010);
+        ResultVO resultVO = k8SService.createService(deployment);
+        Object data = resultVO.getData();
+        if (data != null) {
+            System.out.println(data);
+        }
+    }
+
+    @GetMapping(value = "/getJenkinsLog")
+    public String getJenkinsLog() {
+        try {
+            JobWithDetails job = jenkinsServer.getJob("test-101");
+            BuildWithDetails details = job.getLastBuild().details();
+            return details.getConsoleOutputHtml();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @GetMapping(value = "/getBuildList")
+    public ResultVO getBuildList() {
+        try {
+            JobWithDetails job = jenkinsServer.getJob("test-101");
+            Range range = Range.build().from(1).to(3);
+            List<Build> allBuilds = job.getAllBuilds(range);
+            for (Build build : allBuilds) {
+                System.out.println(build.getNumber());
+                System.out.println(build.details().getTimestamp());
+                System.out.println(build.details().getResult());
+            }
+            return new ResultVO(ResultCode.SUCCESS, allBuilds);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @GetMapping(value = "/getBuildStageView")
+    public void getBuildStageView() {
+        String url = "/job/app-manage-platform-pipeline/wfapi/runs";
+        List<NameValuePair> data = new ArrayList<>();
+        try {
+            HttpResponse httpResponse = jenkinsHttpClient.post_form_with_result(url, data, true);
+
+            HttpEntity entity = httpResponse.getEntity();
+            if (entity != null) {
+                String result = EntityUtils.toString(entity, "UTF-8");
+                List<BuildStageVo> buildStageVos = JSONUtil.toList(JSONUtil.parseArray(result), BuildStageVo.class);
+                if (buildStageVos != null) {
+                    BuildStageVo vo = buildStageVos.get(0);
+                    if (vo.getStages() != null) {
+                        for (StageVo stageVo : vo.getStages()) {
+                            System.out.println(stageVo.getName());
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
-        String property = System.getProperty("user.dir");
-        System.out.println(property);
-        FileReader fileReader = new FileReader(property + "/" + "tbase-cicd-service/src/main/sonar/sonar-project.properties");
-        String result = fileReader.readString();
-        System.out.println(result);
+//        String property = System.getProperty("user.dir");
+//        System.out.println(property);
+//        FileReader fileReader = new FileReader(property + "/" + "tbase-cicd-service/src/main/sonar/sonar-project.properties");
+//        String result = fileReader.readString();
+//        System.out.println(result);
+        final DateTime date = DateUtil.date(1608109920994L);
+        System.out.println(date);
     }
 }
 

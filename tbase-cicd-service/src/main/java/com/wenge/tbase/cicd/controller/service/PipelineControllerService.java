@@ -4,30 +4,26 @@ package com.wenge.tbase.cicd.controller.service;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.json.JSONUtil;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.offbytwo.jenkins.JenkinsServer;
-import com.offbytwo.jenkins.model.QueueReference;
 import com.wenge.tbase.cicd.entity.*;
-import com.wenge.tbase.cicd.entity.dto.JenkinsTemplateDTO;
 import com.wenge.tbase.cicd.entity.enums.PipelineStageTypeEnum;
 import com.wenge.tbase.cicd.entity.param.*;
-import com.wenge.tbase.cicd.entity.vo.LargeScreenPipelineVo;
-import com.wenge.tbase.cicd.entity.vo.OverviewVo;
+import com.wenge.tbase.cicd.entity.vo.*;
 import com.wenge.tbase.cicd.jenkins.template.JenkinsTemplate;
 import com.wenge.tbase.cicd.service.*;
+import com.wenge.tbase.commons.result.ListVo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Component
 @Slf4j
@@ -50,6 +46,9 @@ public class PipelineControllerService {
 
     @Resource
     private CicdSonarqubeService sonarqubeService;
+
+    @Resource
+    private PipelineStageControllerService pipelineStageControllerService;
 
     @Resource
     private Jenkins jenkins;
@@ -100,7 +99,7 @@ public class PipelineControllerService {
      */
     public Long createPipeline(String name, String description) {
         // 插入到jenkins服务器中
-        String xml = JenkinsTemplate.getBulidJenkinsTemplateXml(description, jenkins.getToken());
+        String xml = JenkinsTemplate.getBuildJenkinsTemplateXml(description, jenkins.getToken());
         try {
             jenkinsServer.createJob(name, xml, true);
         } catch (IOException e) {
@@ -116,11 +115,106 @@ public class PipelineControllerService {
     }
 
     /**
+     * 获取流水线列表
+     *
+     * @param name
+     * @param current
+     * @param size
+     * @return
+     */
+    public ListVo getPipelineList(String name, Integer current, Integer size) {
+        QueryWrapper<CicdPipeline> wrapper = new QueryWrapper();
+        if (StringUtils.isNotEmpty(name)) {
+            wrapper.like("name", name);
+        }
+        Page page = new Page(current, size);
+        IPage list = pipelineService.page(page, wrapper);
+        List<CicdPipeline> records = list.getRecords();
+        List<GetPipelineListVo> listVos = new ArrayList<>();
+        records.stream().forEach(o -> {
+            GetPipelineListVo vo = new GetPipelineListVo();
+            BeanUtil.copyProperties(o, vo);
+            // 根据pipeline id查询流水线阶段内容
+            if (o.getExecResult() != 2) {
+                vo.setBuildStageVo(getBuildStageStatusVo(o.getName()));
+            }
+            listVos.add(vo);
+        });
+        ListVo listVo = new ListVo();
+        listVo.setTotal(list.getTotal());
+        listVo.setDataList(listVos);
+        return listVo;
+    }
+
+    /**
+     * 获取阶段状态信息
+     * l
+     *
+     * @param name
+     * @return
+     */
+    public BuildStageVo getBuildStageStatusVo(String name) {
+        try {
+            int number = jenkinsServer.getJob(name).getLastBuild().getNumber();
+            BuildStageVo buildStageVo = pipelineStageControllerService.getRunningBuildStageView(name, number);
+            return buildStageVo;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 修改流水线内容
+     *
+     * @param param
+     * @return
+     */
+    public Boolean updatePipeline(UpdatePipelineParam param) {
+        CicdPipeline cicdPipeline = new CicdPipeline();
+        BeanUtil.copyProperties(param, cicdPipeline);
+        return pipelineService.updateById(cicdPipeline);
+    }
+
+    /**
+     * 删除流水线
+     *
+     * @param id
+     * @return
+     */
+    public Boolean deletePipeline(Long id) {
+        return pipelineService.removeById(id);
+    }
+
+    /**
+     * 获取运行状态
+     *
+     * @param id
+     * @return
+     */
+    public Integer getPipelineRunningStatus(Long id) {
+        CicdPipeline cicdPipeline = pipelineService.getById(id);
+        return cicdPipeline.getRunningStatus();
+    }
+
+    /**
+     * 执行完成修改状态
+     *
+     * @param param
+     * @return
+     */
+    public Boolean executeFinishUpdateStatus(UpdatePipelineStatusParam param) {
+        CicdPipeline cicdPipeline = new CicdPipeline();
+        BeanUtil.copyProperties(param, cicdPipeline);
+        return pipelineService.updateById(cicdPipeline);
+    }
+
+    /**
      * 执行流水线
      *
      * @return
      */
-    public Boolean executePipeline(Long pipelineId, String name) {
+    public Integer executePipeline(Long pipelineId, String name) {
         // 1.根据id查询流水线阶段
         QueryWrapper<CicdPipelineStage> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("pipeline_id", pipelineId)
@@ -183,11 +277,31 @@ public class PipelineControllerService {
         try {
             String jenkinsTemplateXml = JenkinsTemplate.getJenkinsTemplateXml(script.toString(), jenkins.getToken());
             jenkinsServer.updateJob(name, jenkinsTemplateXml, true);
+            int nextBuildNumber = jenkinsServer.getJob(name).getNextBuildNumber();
             jenkinsServer.getJob(name).build(true);
+            return nextBuildNumber;
         } catch (IOException e) {
             log.error("执行流水线错误" + e.getMessage());
             e.printStackTrace();
         }
-        return true;
+        return null;
     }
+
+    /**
+     * 根据名称判断流水线是否存在
+     *
+     * @param name
+     * @return
+     */
+    public Boolean judgePipelineExist(String name) {
+        QueryWrapper<CicdPipeline> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("name", name);
+        CicdPipeline pipeline = pipelineService.getOne(queryWrapper);
+        if (pipeline == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
 }

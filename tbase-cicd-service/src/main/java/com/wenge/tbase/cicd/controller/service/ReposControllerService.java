@@ -37,7 +37,7 @@ public class ReposControllerService {
      */
     public ListVo getReposList(String name, Integer current, Integer size) {
         QueryWrapper<CicdRepos> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like("name",name);
+        queryWrapper.like("name", name);
         Page page = new Page(current, size);
         IPage list = reposService.page(page, queryWrapper);
         ListVo listVo = new ListVo();
@@ -88,5 +88,22 @@ public class ReposControllerService {
      */
     public Boolean deleteRepos(Long id) {
         return reposService.removeById(id);
+    }
+
+    /**
+     * 根据名称判断代码仓库是否存在
+     *
+     * @param name
+     * @return
+     */
+    public Boolean judgeReposExist(String name) {
+        QueryWrapper<CicdRepos> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("name", name);
+        CicdRepos repos = reposService.getOne(queryWrapper);
+        if (repos == null) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }

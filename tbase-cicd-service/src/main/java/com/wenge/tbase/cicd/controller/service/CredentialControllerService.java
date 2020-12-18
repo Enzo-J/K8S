@@ -179,10 +179,27 @@ public class CredentialControllerService {
             jenkinsHttpClient.post_form_with_result(url, nameValuePairs, true);
             QueryWrapper<CicdCredential> wrapper = new QueryWrapper();
             wrapper.eq("credential_id", credentialId);
-           return credentialService.remove(wrapper);
+            return credentialService.remove(wrapper);
         } catch (IOException e) {
             log.error("删除凭证错误", e.toString());
             return false;
+        }
+    }
+
+    /**
+     * 判断名称是否存在
+     *
+     * @param username
+     * @return
+     */
+    public Boolean judgeCredentialExist(String username) {
+        QueryWrapper<CicdCredential> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", username);
+        CicdCredential credential = credentialService.getOne(queryWrapper);
+        if (credential == null) {
+            return false;
+        } else {
+            return true;
         }
     }
 }

@@ -2,16 +2,14 @@ package com.wenge.tbase.cicd.controller;
 
 
 import com.wenge.tbase.cicd.controller.service.PipelineControllerService;
+import com.wenge.tbase.cicd.entity.param.UpdatePipelineParam;
+import com.wenge.tbase.cicd.entity.param.UpdatePipelineStatusParam;
 import com.wenge.tbase.commons.result.ResultCode;
 import com.wenge.tbase.commons.result.ResultVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -43,7 +41,24 @@ public class CicdPipelineController {
         if (name == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
+        if (service.judgePipelineExist(name)) {
+            return new ResultVO(1001, "名称已存在", false);
+        }
         return new ResultVO(ResultCode.SUCCESS, service.createPipeline(name, description));
+    }
+
+    @ApiOperation("获取流水线列表数据")
+    @GetMapping(value = "/pipeline")
+    public ResultVO getPipelineList(@RequestParam(required = false) String name,
+                                    @RequestParam Integer current,
+                                    @RequestParam Integer size) {
+        if (current == null) {
+            current = 0;
+        }
+        if (size == null) {
+            size = 0;
+        }
+        return new ResultVO(ResultCode.SUCCESS, service.getPipelineList(name, current, size));
     }
 
     @ApiOperation("执行流水线数据")
@@ -56,5 +71,44 @@ public class CicdPipelineController {
         return new ResultVO(ResultCode.SUCCESS, service.executePipeline(pipelineId, name));
     }
 
+    @ApiOperation(value = "修改流水线内容")
+    @PutMapping(value = "/pipeline")
+    public ResultVO updatePipeline(@RequestBody UpdatePipelineParam param) {
+        if (param == null || param.getId() == null) {
+            return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        Integer runningStatus = service.getPipelineRunningStatus(param.getId());
+        if (runningStatus == 1) {
+            return new ResultVO(2000, "该流水线正在执行", false);
+        }
+        return new ResultVO(ResultCode.SUCCESS, service.updatePipeline(param));
+    }
+
+    @ApiOperation(value = "删除流水线")
+    @DeleteMapping(value = "/pipeline/{id}")
+    public ResultVO deletePipeline(@PathVariable Long id) {
+        if (id == null) {
+            return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        return new ResultVO(ResultCode.SUCCESS, service.deletePipeline(id));
+    }
+
+    @ApiOperation(value = "执行完成修改状态")
+    @PutMapping(value = "/executeFinishUpdateStatus")
+    public ResultVO executeFinishUpdateStatus(@RequestBody UpdatePipelineStatusParam param) {
+        if (param == null || param.getId() == null || param.getExecResult() == null || param.getRunningStatus() == null) {
+            return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        return new ResultVO(ResultCode.SUCCESS, service.executeFinishUpdateStatus(param));
+    }
+
+    @ApiOperation(value = "根据名称判断流水线是否存在")
+    @GetMapping(value = "/judgePipelineExist")
+    public ResultVO judgePipelineExist(@RequestParam String name) {
+        if (name == null) {
+            return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        return new ResultVO(ResultCode.SUCCESS, service.judgePipelineExist(name));
+    }
 }
 

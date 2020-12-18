@@ -43,12 +43,6 @@
         </dependency>
         <!-- 数据库 End-->
 
-        <!-- redis Begin-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
-
         <!-- Lombok Begin-->
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -93,4 +93,21 @@ public class DockerfileControllerService {
     public Boolean deleteDockerfile(Long id) {
         return dockerfileService.removeById(id);
     }
+
+    /**
+     * 根据name判断是否dockerfile存在
+     *
+     * @param name
+     * @return
+     */
+    public Boolean judgeDockerfileExist(String name) {
+        QueryWrapper<CicdDockerfile> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("name", name);
+        CicdDockerfile dockerfile = dockerfileService.getOne(queryWrapper);
+        if (dockerfile == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 }

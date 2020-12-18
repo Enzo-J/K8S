@@ -1,11 +1,13 @@
 package com.wenge.tbase.cicd.controller;
 
 
+import com.baomidou.mybatisplus.extension.api.R;
 import com.wenge.tbase.cicd.controller.service.CredentialControllerService;
 import com.wenge.tbase.cicd.entity.param.CreateAndUpdateCredentialParam;
 import com.wenge.tbase.commons.result.ResultCode;
 import com.wenge.tbase.commons.result.ResultVO;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +21,7 @@ import javax.annotation.Resource;
  * @author Wang XingPeng
  * @since 2020-11-27
  */
-@Api(description = "凭证管理API接口",tags = "凭证管理API接口")
+@Api(description = "凭证管理API接口", tags = "凭证管理API接口")
 @RestController
 public class CicdCredentialController {
 
@@ -46,6 +48,9 @@ public class CicdCredentialController {
         if (param == null || param.getType() == null || param.getUsername() == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
+        if (!credentialService.judgeCredentialExist(param.getUsername())) {
+            return new ResultVO(1001, "用户名已存在", false);
+        }
         return new ResultVO(ResultCode.SUCCESS, credentialService.createCredential(param));
     }
 
@@ -54,6 +59,9 @@ public class CicdCredentialController {
     public ResultVO updateCredential(@RequestBody CreateAndUpdateCredentialParam param) {
         if (param == null || param.getId() == null || param.getCredentialId() == null || param.getType() == null || param.getUsername() == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        if (credentialService.judgeCredentialExist(param.getUsername())) {
+            return new ResultVO(1001, "用户名已存在", false);
         }
         return new ResultVO(ResultCode.SUCCESS, credentialService.updateCredential(param));
     }
@@ -65,6 +73,15 @@ public class CicdCredentialController {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
         return new ResultVO(ResultCode.SUCCESS, credentialService.deleteCredential(credentialId));
+    }
+
+    @ApiOperation(value = "根据用户名判断是否存在数据")
+    @GetMapping(value = "/judgeCredentialExist")
+    public ResultVO judgeCredentialExist(@RequestParam String username) {
+        if (username == null) {
+            return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        return new ResultVO(ResultCode.SUCCESS, credentialService.judgeCredentialExist(username));
     }
 }
 
