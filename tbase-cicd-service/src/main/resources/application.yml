@@ -1,7 +1,5 @@
 server:
   port: 10010
-  servlet:
-    context-path: /cicd/api/v1
 spring:
   application:
     name: tbase-cicd-service
