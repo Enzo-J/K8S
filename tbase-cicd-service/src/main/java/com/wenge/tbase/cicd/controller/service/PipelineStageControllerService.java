@@ -141,12 +141,7 @@ public class PipelineStageControllerService {
     public ListVo getBuildHistoryList(String name, Integer current, Integer size) {
         try {
             JobWithDetails job = jenkinsServer.getJob(name);
-            int f;
-            if (current == 0 || current == 1) {
-                f = 0;
-            } else {
-                f = current * size;
-            }
+            int f = (current - 1 < 0 ? 0 : current - 1) * size;
             int t = f + size;
             Range range = Range.build().from(f).to(t);
             List<Build> buildList = job.getAllBuilds(range);

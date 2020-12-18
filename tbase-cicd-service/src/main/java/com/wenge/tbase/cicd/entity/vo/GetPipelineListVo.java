@@ -31,7 +31,7 @@ public class GetPipelineListVo {
     private Integer runningStatus;
 
     @ApiModelProperty(value = "阶段状态")
-    private List<StageVo> stageVoList;
+    private BuildStageVo buildStageVo;
 
     @ApiModelProperty(value = "禁用标志 0.未禁用 1.已禁用")
     private Integer disabled;

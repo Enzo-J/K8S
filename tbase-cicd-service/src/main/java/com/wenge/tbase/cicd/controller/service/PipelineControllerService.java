@@ -8,14 +8,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.offbytwo.jenkins.JenkinsServer;
-import com.offbytwo.jenkins.model.QueueReference;
 import com.wenge.tbase.cicd.entity.*;
 import com.wenge.tbase.cicd.entity.enums.PipelineStageTypeEnum;
 import com.wenge.tbase.cicd.entity.param.*;
 import com.wenge.tbase.cicd.entity.vo.*;
 import com.wenge.tbase.cicd.jenkins.template.JenkinsTemplate;
 import com.wenge.tbase.cicd.service.*;
-import com.wenge.tbase.cicd.utils.RedisUtils;
 import com.wenge.tbase.commons.result.ListVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -48,6 +46,9 @@ public class PipelineControllerService {
 
     @Resource
     private CicdSonarqubeService sonarqubeService;
+
+    @Resource
+    private PipelineStageControllerService pipelineStageControllerService;
 
     @Resource
     private Jenkins jenkins;
@@ -134,7 +135,9 @@ public class PipelineControllerService {
             GetPipelineListVo vo = new GetPipelineListVo();
             BeanUtil.copyProperties(o, vo);
             // 根据pipeline id查询流水线阶段内容
-//            vo.setStageVoList(getStageVoList(o.getId(), o.getName()));
+            if (o.getExecResult() != 2) {
+                vo.setBuildStageVo(getBuildStageStatusVo(o.getName()));
+            }
             listVos.add(vo);
         });
         ListVo listVo = new ListVo();
@@ -145,11 +148,19 @@ public class PipelineControllerService {
 
     /**
      * 获取阶段状态信息
-     *l
+     * l
+     *
      * @param name
      * @return
      */
-    public List<StageVo> getStageVoList(String name) {
+    public BuildStageVo getBuildStageStatusVo(String name) {
+        try {
+            int number = jenkinsServer.getJob(name).getLastBuild().getNumber();
+            BuildStageVo buildStageVo = pipelineStageControllerService.getRunningBuildStageView(name, number);
+            return buildStageVo;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
