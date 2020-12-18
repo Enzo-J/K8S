@@ -6,4 +6,4 @@ ADD ./skywalking-agent/ /skywalking-agent/
 EXPOSE 10063
 EXPOSE 8720
 #ENTRYPOINT ["java","-jar","/app.jar"]
-ENTRYPOINT ["java", "-Denv=uat", "-Dskywalking.agent.service_name=tbase-microservice-service","-Dskywalking.collector.backend_service=172.16.0.10:11800","-Dskywalking.plugin.mysql.trace_sql_parameters=true","-javaagent:/skywalking-agent/agent/skywalking-agent.jar","-jar","/app.jar"]
+ENTRYPOINT ["java", "-Denv=uat", "-Dskywalking.agent.service_name=tbase-sysadmin-service","-Dskywalking.collector.backend_service=172.16.0.10:11800","-Dskywalking.plugin.mysql.trace_sql_parameters=true","-javaagent:/skywalking-agent/agent/skywalking-agent.jar","-jar","/app.jar"]
