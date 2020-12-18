@@ -60,7 +60,7 @@ public class CicdCredentialController {
         if (param == null || param.getId() == null || param.getCredentialId() == null || param.getType() == null || param.getUsername() == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
-        if (!credentialService.judgeCredentialExist(param.getUsername())) {
+        if (credentialService.judgeCredentialExist(param.getUsername())) {
             return new ResultVO(1001, "用户名已存在", false);
         }
         return new ResultVO(ResultCode.SUCCESS, credentialService.updateCredential(param));

@@ -41,7 +41,7 @@ public class CicdPipelineController {
         if (name == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
-        if (!service.judgePipelineExist(name)) {
+        if (service.judgePipelineExist(name)) {
             return new ResultVO(1001, "名称已存在", false);
         }
         return new ResultVO(ResultCode.SUCCESS, service.createPipeline(name, description));

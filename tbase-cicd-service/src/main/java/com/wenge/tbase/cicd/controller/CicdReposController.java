@@ -58,7 +58,7 @@ public class CicdReposController {
         if (param == null || param.getName() == null || param.getProjectName() == null || param.getCredentialId() == null || param.getId() == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
-        if (!service.judgeReposExist(param.getName())) {
+        if (service.judgeReposExist(param.getName())) {
             return new ResultVO(1001, "名称已存在", false);
         }
         return new ResultVO(ResultCode.SUCCESS, service.updateRepos(param));
