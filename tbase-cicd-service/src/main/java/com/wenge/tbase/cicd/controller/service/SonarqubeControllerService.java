@@ -97,5 +97,21 @@ public class SonarqubeControllerService {
         return sonarqubeService.removeById(id);
     }
 
+    /**
+     * 根据名称判断sonarqube是否存在
+     *
+     * @param name
+     * @return
+     */
+    public Boolean judgeSonarqubeExist(String name) {
+        QueryWrapper<CicdSonarqube> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("name", name);
+        CicdSonarqube sonarqube = sonarqubeService.getOne(queryWrapper);
+        if (sonarqube == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
 }

@@ -46,6 +46,9 @@ public class CicdReposController {
         if (param == null || param.getName() == null || param.getProjectName() == null || param.getCredentialId() == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
+        if (!service.judgeReposExist(param.getName())) {
+            return new ResultVO(1001, "名称已存在", false);
+        }
         return new ResultVO(ResultCode.SUCCESS, service.createRepos(param));
     }
 
@@ -54,6 +57,9 @@ public class CicdReposController {
     public ResultVO updateRepos(@RequestBody CreateAndUpdateReposParam param) {
         if (param == null || param.getName() == null || param.getProjectName() == null || param.getCredentialId() == null || param.getId() == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        if (!service.judgeReposExist(param.getName())) {
+            return new ResultVO(1001, "名称已存在", false);
         }
         return new ResultVO(ResultCode.SUCCESS, service.updateRepos(param));
     }
@@ -65,6 +71,15 @@ public class CicdReposController {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
         return new ResultVO(ResultCode.SUCCESS, service.deleteRepos(id));
+    }
+
+    @ApiOperation(value = "根据名称判断是否存在代码仓库")
+    @GetMapping(value = "/judgeReposExist")
+    public ResultVO judgeReposExist(@RequestParam String name) {
+        if (name == null) {
+            return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        return new ResultVO(ResultCode.SUCCESS, service.judgeReposExist(name));
     }
 }
 

@@ -19,7 +19,7 @@ import javax.annotation.Resource;
  * @author Wang XingPeng
  * @since 2020-11-30
  */
-@Api(description = "sonarqube文件管理API接口",tags = "sonarqube文件管理API接口")
+@Api(description = "sonarqube文件管理API接口", tags = "sonarqube文件管理API接口")
 @RestController
 public class CicdSonarqubeController {
 
@@ -46,6 +46,9 @@ public class CicdSonarqubeController {
         if (param == null || param.getName() == null || param.getContent() == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
+        if (!service.judgeSonarqubeExist(param.getName())) {
+            return new ResultVO(1001, "名称已存在", false);
+        }
         return new ResultVO(ResultCode.SUCCESS, service.createSonarqube(param));
     }
 
@@ -54,6 +57,9 @@ public class CicdSonarqubeController {
     public ResultVO updateSonarqube(@RequestBody CreateAndUpdateSonarqubeParam param) {
         if (param == null || param.getId() == null || param.getName() == null || param.getContent() == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        if (!service.judgeSonarqubeExist(param.getName())) {
+            return new ResultVO(1001, "名称已存在", false);
         }
         return new ResultVO(ResultCode.SUCCESS, service.updateSonarqube(param));
     }
@@ -65,6 +71,15 @@ public class CicdSonarqubeController {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
         return new ResultVO(ResultCode.SUCCESS, service.deleteSonarqube(id));
+    }
+
+    @ApiOperation(value = "根据名称判断是否存在sonarqube文件")
+    @GetMapping(value = "/judgeSonarqubeExist")
+    public ResultVO judgeSonarqubeExist(@RequestParam String name) {
+        if (name == null) {
+            return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        return new ResultVO(ResultCode.SUCCESS, service.judgeSonarqubeExist(name));
     }
 }
 

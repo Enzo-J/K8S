@@ -41,8 +41,9 @@ public class CicdPipelineController {
         if (name == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
-        //判断名称是否重复
-
+        if (!service.judgePipelineExist(name)) {
+            return new ResultVO(1001, "名称已存在", false);
+        }
         return new ResultVO(ResultCode.SUCCESS, service.createPipeline(name, description));
     }
 
@@ -94,11 +95,20 @@ public class CicdPipelineController {
 
     @ApiOperation(value = "执行完成修改状态")
     @PutMapping(value = "/executeFinishUpdateStatus")
-    public ResultVO executeFinishUpdateStatus(@RequestBody UpdatePipelineStatusParam param){
-        if(param == null || param.getId() == null || param.getExecResult() == null || param.getRunningStatus() == null){
+    public ResultVO executeFinishUpdateStatus(@RequestBody UpdatePipelineStatusParam param) {
+        if (param == null || param.getId() == null || param.getExecResult() == null || param.getRunningStatus() == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
         return new ResultVO(ResultCode.SUCCESS, service.executeFinishUpdateStatus(param));
+    }
+
+    @ApiOperation(value = "根据名称判断流水线是否存在")
+    @GetMapping(value = "/judgePipelineExist")
+    public ResultVO judgePipelineExist(@RequestParam String name) {
+        if (name == null) {
+            return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        return new ResultVO(ResultCode.SUCCESS, service.judgePipelineExist(name));
     }
 }
 

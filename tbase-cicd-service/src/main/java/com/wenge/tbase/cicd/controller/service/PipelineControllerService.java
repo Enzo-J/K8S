@@ -286,4 +286,22 @@ public class PipelineControllerService {
         }
         return null;
     }
+
+    /**
+     * 根据名称判断流水线是否存在
+     *
+     * @param name
+     * @return
+     */
+    public Boolean judgePipelineExist(String name) {
+        QueryWrapper<CicdPipeline> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("name", name);
+        CicdPipeline pipeline = pipelineService.getOne(queryWrapper);
+        if (pipeline == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
 }
