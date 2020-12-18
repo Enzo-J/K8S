@@ -1,6 +1,5 @@
 package com.wenge.tbase.cicd.entity.vo;
 
-import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -32,7 +31,7 @@ public class GetPipelineListVo {
     private Integer runningStatus;
 
     @ApiModelProperty(value = "阶段状态")
-    private List<StageStatusVo> stageStatusVoList;
+    private List<StageVo> stageVoList;
 
     @ApiModelProperty(value = "禁用标志 0.未禁用 1.已禁用")
     private Integer disabled;

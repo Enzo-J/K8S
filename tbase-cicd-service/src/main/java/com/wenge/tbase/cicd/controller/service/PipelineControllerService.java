@@ -12,10 +12,7 @@ import com.offbytwo.jenkins.model.QueueReference;
 import com.wenge.tbase.cicd.entity.*;
 import com.wenge.tbase.cicd.entity.enums.PipelineStageTypeEnum;
 import com.wenge.tbase.cicd.entity.param.*;
-import com.wenge.tbase.cicd.entity.vo.GetPipelineListVo;
-import com.wenge.tbase.cicd.entity.vo.LargeScreenPipelineVo;
-import com.wenge.tbase.cicd.entity.vo.OverviewVo;
-import com.wenge.tbase.cicd.entity.vo.StageStatusVo;
+import com.wenge.tbase.cicd.entity.vo.*;
 import com.wenge.tbase.cicd.jenkins.template.JenkinsTemplate;
 import com.wenge.tbase.cicd.service.*;
 import com.wenge.tbase.cicd.utils.RedisUtils;
@@ -137,7 +134,7 @@ public class PipelineControllerService {
             GetPipelineListVo vo = new GetPipelineListVo();
             BeanUtil.copyProperties(o, vo);
             // 根据pipeline id查询流水线阶段内容
-            vo.setStageStatusVoList(getStageStatusList(o.getId(), o.getName()));
+//            vo.setStageVoList(getStageVoList(o.getId(), o.getName()));
             listVos.add(vo);
         });
         ListVo listVo = new ListVo();
@@ -148,35 +145,12 @@ public class PipelineControllerService {
 
     /**
      * 获取阶段状态信息
-     *
-     * @param pipelineId
+     *l
      * @param name
      * @return
      */
-    public List<StageStatusVo> getStageStatusList(Long pipelineId, String name) {
-        String key = pipelineId + name;
-        String statusJson = RedisUtils.StringOps.get(key);
-        List<StageStatusVo> stageStatusVoList = new ArrayList<>();
-        if (StringUtils.isNotEmpty(statusJson)) {
-            stageStatusVoList = JSONUtil.toList(JSONUtil.parseArray(statusJson), StageStatusVo.class);
-        } else {
-            QueryWrapper<CicdPipelineStage> wrapper = new QueryWrapper<>();
-            wrapper.eq("pipeline_id", pipelineId);
-            List<CicdPipelineStage> list = pipelineStageService.list(wrapper);
-            if (list != null) {
-                List<StageStatusVo> finalStageStatusVoList = stageStatusVoList;
-                list.stream().forEach(o -> {
-                    StageStatusVo vo = new StageStatusVo();
-                    vo.setStageId(o.getId());
-                    vo.setStageName(o.getName());
-                    vo.setStageType(o.getType());
-                    vo.setStageStatus(0);
-                    finalStageStatusVoList.add(vo);
-                });
-                return finalStageStatusVoList;
-            }
-        }
-        return stageStatusVoList;
+    public List<StageVo> getStageVoList(String name) {
+        return null;
     }
 
     /**

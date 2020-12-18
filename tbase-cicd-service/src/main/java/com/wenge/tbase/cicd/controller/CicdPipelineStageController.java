@@ -60,7 +60,7 @@ public class CicdPipelineStageController {
         if (name == null || buildNumber == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
-        return new ResultVO(ResultCode.SUCCESS, service.getBuildHistroyLog(name, buildNumber));
+        return new ResultVO(ResultCode.SUCCESS, service.getBuildHistoryLog(name, buildNumber));
     }
 
     @ApiOperation(value = "获取构建阶段视图信息列表")
