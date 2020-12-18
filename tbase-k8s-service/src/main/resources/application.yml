@@ -6,7 +6,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 127.0.0.1:8848  #172.16.0.6:30000
+        server-addr: 172.16.0.6:30000
     sentinel:
       transport:
         dashboard: 172.16.0.8:32076
