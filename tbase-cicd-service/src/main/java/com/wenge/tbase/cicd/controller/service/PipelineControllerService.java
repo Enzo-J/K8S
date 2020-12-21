@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.offbytwo.jenkins.JenkinsServer;
+import com.offbytwo.jenkins.model.*;
 import com.wenge.tbase.cicd.entity.*;
 import com.wenge.tbase.cicd.entity.enums.BuildStatusEnum;
 import com.wenge.tbase.cicd.entity.enums.PipelineStageTypeEnum;
@@ -287,11 +288,13 @@ public class PipelineControllerService {
             CicdPipeline cicdPipeline = new CicdPipeline();
             cicdPipeline.setRunningStatus(1);
             cicdPipeline.setId(pipelineId);
-            pipelineService.updateById(cicdPipeline);
+            boolean b = pipelineService.updateById(cicdPipeline);
             // 开启监控是否完成修改状态线程
-            new Thread(() -> {
-                monitorRunningStatus(pipelineId, name, nextBuildNumber);
-            }).start();
+            if (b) {
+                new Thread(() -> {
+                    monitorRunningStatus(pipelineId, name, nextBuildNumber, list.size());
+                }).start();
+            }
             return nextBuildNumber;
         } catch (IOException e) {
             log.error("执行流水线错误" + e.getMessage());
@@ -305,28 +308,43 @@ public class PipelineControllerService {
      *
      * @param pipelineId
      * @param name
-     * @param number
      */
-    public void monitorRunningStatus(Long pipelineId, String name, Integer number) {
+    public void monitorRunningStatus(Long pipelineId, String name, Integer number, Integer size) {
         Boolean flag = true;
-        MyThreadUtils.sleep(3);
+        CicdPipeline cicdPipeline = new CicdPipeline();
+        cicdPipeline.setRunningStatus(0);
+        cicdPipeline.setId(pipelineId);
         while (flag) {
             MyThreadUtils.sleep(1);
             BuildStageVo buildStageView = pipelineStageControllerService.getRunningBuildStageView(name, number);
             if (buildStageView != null) {
-                String status = buildStageView.getStatus();
-                if (status.equals("SUCCESS") || status.equals("FAILURE")) {
-                    CicdPipeline cicdPipeline = new CicdPipeline();
-                    cicdPipeline.setId(pipelineId);
-                    cicdPipeline.setRunningStatus(0);
-                    cicdPipeline.setExecResult(BuildStatusEnum.getBuildStatus(status));
-                    pipelineService.updateById(cicdPipeline);
-                    flag = false;
+                if (buildStageView.getId().intValue() == number) {
+                    if (BuildStatusEnum.FAILURE.getResult().equals(buildStageView.getStatus())) {
+                        cicdPipeline.setExecResult(0);
+                        pipelineService.updateById(cicdPipeline);
+                        flag = false;
+                    }
+                    List<StageVo> stages = buildStageView.getStages();
+                    if (stages.size() == size) {
+                        if (BuildStatusEnum.FAILURE.getResult().equals(stages.get(stages.size() - 1).getStatus())) {
+                            cicdPipeline.setExecResult(0);
+                            pipelineService.updateById(cicdPipeline);
+                            flag = false;
+                        } else if (BuildStatusEnum.SUCCESS.getResult().equals(stages.get(stages.size() - 1).getStatus())) {
+                            cicdPipeline.setExecResult(1);
+                            pipelineService.updateById(cicdPipeline);
+                            flag = false;
+                        }
+                    }
                 }
             } else {
                 flag = false;
             }
         }
+    }
+
+    public void updatePipelineRunningStatus() {
+
     }
 
 
