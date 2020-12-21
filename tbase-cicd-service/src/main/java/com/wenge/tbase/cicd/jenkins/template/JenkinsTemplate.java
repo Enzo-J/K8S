@@ -162,12 +162,11 @@ public class JenkinsTemplate {
         if (param.getBuildType() == 2) {
             stage.append("\tstage('" + param.getStageName() + "') {\n")
                     .append("\t\tsh \"docker build ")
-                    .append(param.getProjectName())
                     .append(" -t ").append(param.getImageName()).append(":").append(param.getImageTag());
             if (StringUtils.isNotEmpty(param.getDockerfileAddress())) {
                 stage.append(" -f ").append(param.getDockerfileAddress());
             } else {
-                stage.append(" -f ").append("${env.WORKSPACE}/").append(param.getProjectName()).append("/Dockerfile");
+                stage.append(" -f ").append("${env.WORKSPACE}").append("/Dockerfile");
             }
             stage.append(" .\"\n");
             stage.append("\t}\n");
