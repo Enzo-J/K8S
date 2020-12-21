@@ -9,14 +9,18 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.wenge.tbase.cicd.entity.*;
+import com.wenge.tbase.cicd.entity.enums.BuildStatusEnum;
 import com.wenge.tbase.cicd.entity.enums.PipelineStageTypeEnum;
 import com.wenge.tbase.cicd.entity.param.*;
 import com.wenge.tbase.cicd.entity.vo.*;
 import com.wenge.tbase.cicd.jenkins.template.JenkinsTemplate;
 import com.wenge.tbase.cicd.service.*;
+import com.wenge.tbase.cicd.utils.MyThreadUtils;
 import com.wenge.tbase.commons.result.ListVo;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.ThreadUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -284,6 +288,10 @@ public class PipelineControllerService {
             cicdPipeline.setRunningStatus(1);
             cicdPipeline.setId(pipelineId);
             pipelineService.updateById(cicdPipeline);
+            // 开启监控是否完成修改状态线程
+            new Thread(() -> {
+                monitorRunningStatus(pipelineId, name, nextBuildNumber);
+            }).start();
             return nextBuildNumber;
         } catch (IOException e) {
             log.error("执行流水线错误" + e.getMessage());
@@ -291,6 +299,36 @@ public class PipelineControllerService {
         }
         return null;
     }
+
+    /**
+     * 开启监控是否完成修改状态线程
+     *
+     * @param pipelineId
+     * @param name
+     * @param number
+     */
+    public void monitorRunningStatus(Long pipelineId, String name, Integer number) {
+        Boolean flag = true;
+        MyThreadUtils.sleep(3);
+        while (flag) {
+            MyThreadUtils.sleep(1);
+            BuildStageVo buildStageView = pipelineStageControllerService.getRunningBuildStageView(name, number);
+            if (buildStageView != null) {
+                String status = buildStageView.getStatus();
+                if (status.equals("SUCCESS") || status.equals("FAILURE")) {
+                    CicdPipeline cicdPipeline = new CicdPipeline();
+                    cicdPipeline.setId(pipelineId);
+                    cicdPipeline.setRunningStatus(0);
+                    cicdPipeline.setExecResult(BuildStatusEnum.getBuildStatus(status));
+                    pipelineService.updateById(cicdPipeline);
+                    flag = false;
+                }
+            } else {
+                flag = false;
+            }
+        }
+    }
+
 
     /**
      * 根据名称判断流水线是否存在
