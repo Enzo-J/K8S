@@ -17,7 +17,7 @@ public class CodePullParam {
     @ApiModelProperty(value = "阶段名称")
     private String stageName;
 
-    @ApiModelProperty(value = "仓库类型 1.git 2.svn")
+    @ApiModelProperty(value = "仓库类型 1.git")
     private Integer codeType;
 
     @ApiModelProperty(value = "仓库地址")

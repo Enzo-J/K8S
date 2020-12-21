@@ -229,7 +229,7 @@ public class PipelineControllerService {
             //代码拉取
             if (pipelineStage.getType() == PipelineStageTypeEnum.CODE_PULL.getType()) {
                 CodePullParam codePullParam = JSONUtil.toBean(pipelineStage.getParameter(), CodePullParam.class);
-                String codePullStage = JenkinsTemplate.getCodePullStage(codePullParam.getBranch(), codePullParam.getCodeUrl(), codePullParam.getCredentialId());
+                String codePullStage = JenkinsTemplate.getCodePullStage(codePullParam);
                 script.append(codePullStage);
             }
             //代码检测
@@ -242,7 +242,7 @@ public class PipelineControllerService {
                     FileWriter writer = new FileWriter(property + "/" + codeCheckParam.getSonarFileAddress() + "/" + "sonar-project.properties");
                     writer.write(sonarqube.getContent());
                 }
-                script.append(JenkinsTemplate.getCodeCheckStage(codeCheckParam.getSonarFileAddress()));
+                script.append(JenkinsTemplate.getCodeCheckStage(codeCheckParam));
             }
             //编译打包公共子工程
             if (pipelineStage.getType() == PipelineStageTypeEnum.PACKAGE_COMMON.getType()) {
