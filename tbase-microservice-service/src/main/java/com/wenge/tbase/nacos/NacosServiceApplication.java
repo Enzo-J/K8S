@@ -1,14 +1,16 @@
 package com.wenge.tbase.nacos;
 
-import java.time.LocalDateTime;
+
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-
 import lombok.extern.slf4j.Slf4j;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.time.LocalDateTime;
+
 
 @Slf4j
 @MapperScan("com.wenge.tbase.nacos.mapper")
