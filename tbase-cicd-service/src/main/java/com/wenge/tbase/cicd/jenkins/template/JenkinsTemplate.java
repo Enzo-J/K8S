@@ -2,10 +2,7 @@ package com.wenge.tbase.cicd.jenkins.template;
 
 
 import com.wenge.tbase.cicd.entity.CicdRepos;
-import com.wenge.tbase.cicd.entity.param.ImageBuildParam;
-import com.wenge.tbase.cicd.entity.param.ImageUploadParam;
-import com.wenge.tbase.cicd.entity.param.PackageCommonParam;
-import com.wenge.tbase.cicd.entity.param.PackageParam;
+import com.wenge.tbase.cicd.entity.param.*;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -74,14 +71,12 @@ public class JenkinsTemplate {
     /**
      * 获取代码检出阶段内容
      *
-     * @param branch
-     * @param url
-     * @param auth
+     * @param param
      * @return
      */
-    public static String getCodePullStage(String branch, String url, String auth) {
-        String stage = "\tstage('拉取代码') {\n" +
-                "\t\tcheckout([$class: 'GitSCM', branches: [[name: '*/" + branch + "']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '" + auth + "', url: '" + url + "']]])\n" +
+    public static String getCodePullStage(CodePullParam param) {
+        String stage = "\tstage('" + param.getStageName() + "') {\n" +
+                "\t\tcheckout([$class: 'GitSCM', branches: [[name: '*/" + param.getBranch() + "']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '" + param.getCredentialId() + "', url: '" + param.getCodeUrl() + "']]])\n" +
                 "\t} \n";
         return stage;
     }
@@ -89,15 +84,15 @@ public class JenkinsTemplate {
     /**
      * 获取代码检测阶段内容
      *
-     * @param address
+     * @param param
      * @return
      */
-    public static String getCodeCheckStage(String address) {
-        String stage = "\tstage('检查代码') {\n" +
+    public static String getCodeCheckStage(CodeCheckParam param) {
+        String stage = "\tstage('" + param.getStageName() + "') {\n" +
                 "\t\tdef scannerHome = tool 'sonar-scanner'\n" +
                 "\t\twithSonarQubeEnv('sonar') {\n" +
                 "\t\t\tsh \"\"\"\n" +
-                "\t\t\t\tcd " + address + "\n" +
+                "\t\t\t\tcd " + param.getSonarFileAddress() + "\n" +
                 "\t\t\t\t${scannerHome}/bin/sonar-scanner\n" +
                 "\t\t\t\t\"\"\"\n" +
                 "\t\t\t\techo \"完成代码审查\"\n" +
@@ -107,17 +102,15 @@ public class JenkinsTemplate {
     }
 
     /**
-     * 获取编译打包阶段内容
+     * 获取后端编译打包子工程阶段内容
      *
      * @param param
      * @return
      */
     public static String getPackageCommonStage(PackageCommonParam param) {
-        //后端
         String stage = "\tstage('" + param.getStageName() + "') {\n" +
                 "\t\tsh \"mvn -f " + param.getProjectName() + " clean install\"\n" +
                 "\t}\n";
-        //前端
         return stage;
     }
 
@@ -136,6 +129,12 @@ public class JenkinsTemplate {
                     "\t}\n";
         }
         //前端
+        if (param.getPackageType() == 2) {
+            stage = "\tstage('" + param.getStageName() + "') {\n" +
+                    "\t\tsh \"npm install --unsafe-perm --registry=https://registry.npm.taobao.org\"\n" +
+                    "\t\tsh \"npm run build:prod\"\n" +
+                    "\t}\n";
+        }
         return stage;
     }
 
@@ -147,17 +146,32 @@ public class JenkinsTemplate {
      */
     public static String getImageBuildStage(ImageBuildParam param) {
         StringBuffer stage = new StringBuffer();
-        stage.append("\tstage('" + param.getStageName() + "') {\n")
-                .append("\t\tsh \"docker build --build-arg JAR_FILE=")
-                .append(param.getProjectName())
-                .append(" -t ").append(param.getImageName()).append(":").append(param.getImageTag());
-        if (StringUtils.isNotEmpty(param.getDockerfileAddress())) {
-            stage.append(" -f ").append(param.getDockerfileAddress());
-        } else {
-            stage.append(" -f ").append("${env.WORKSPACE}/").append(param.getProjectName()).append("/Dockerfile");
+        if (param.getBuildType() == 1) {
+            stage.append("\tstage('" + param.getStageName() + "') {\n")
+                    .append("\t\tsh \"docker build --build-arg JAR_FILE=")
+                    .append(param.getProjectName())
+                    .append(" -t ").append(param.getImageName()).append(":").append(param.getImageTag());
+            if (StringUtils.isNotEmpty(param.getDockerfileAddress())) {
+                stage.append(" -f ").append(param.getDockerfileAddress());
+            } else {
+                stage.append(" -f ").append("${env.WORKSPACE}/").append(param.getProjectName()).append("/Dockerfile");
+            }
+            stage.append(" .\"\n");
+            stage.append("\t}\n");
         }
-        stage.append(" .\"\n");
-        stage.append("\t}\n");
+        if (param.getBuildType() == 2) {
+            stage.append("\tstage('" + param.getStageName() + "') {\n")
+                    .append("\t\tsh \"docker build ")
+                    .append(param.getProjectName())
+                    .append(" -t ").append(param.getImageName()).append(":").append(param.getImageTag());
+            if (StringUtils.isNotEmpty(param.getDockerfileAddress())) {
+                stage.append(" -f ").append(param.getDockerfileAddress());
+            } else {
+                stage.append(" -f ").append("${env.WORKSPACE}/").append(param.getProjectName()).append("/Dockerfile");
+            }
+            stage.append(" .\"\n");
+            stage.append("\t}\n");
+        }
         return stage.toString();
     }
 

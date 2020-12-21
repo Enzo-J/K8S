@@ -17,6 +17,9 @@ public class ImageBuildParam {
     @ApiModelProperty(value = "阶段名称")
     private String stageName;
 
+    @ApiModelProperty(value = "构建类型 1.java 2.nodeJS")
+    private Integer buildType;
+
     @ApiModelProperty(value = "Dockerfile文件来源 1.代码库 2.来自平台配置")
     private Integer dockerfileSource;
 
