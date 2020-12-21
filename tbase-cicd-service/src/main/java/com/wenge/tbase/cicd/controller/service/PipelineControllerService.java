@@ -279,6 +279,11 @@ public class PipelineControllerService {
             jenkinsServer.updateJob(name, jenkinsTemplateXml, true);
             int nextBuildNumber = jenkinsServer.getJob(name).getNextBuildNumber();
             jenkinsServer.getJob(name).build(true);
+            // 修改执行状态
+            CicdPipeline cicdPipeline = new CicdPipeline();
+            cicdPipeline.setRunningStatus(1);
+            cicdPipeline.setId(pipelineId);
+            pipelineService.updateById(cicdPipeline);
             return nextBuildNumber;
         } catch (IOException e) {
             log.error("执行流水线错误" + e.getMessage());
