@@ -93,15 +93,6 @@ public class CicdPipelineController {
         return new ResultVO(ResultCode.SUCCESS, service.deletePipeline(id));
     }
 
-    @ApiOperation(value = "执行完成修改状态")
-    @PutMapping(value = "/executeFinishUpdateStatus")
-    public ResultVO executeFinishUpdateStatus(@RequestBody UpdatePipelineStatusParam param) {
-        if (param == null || param.getId() == null || param.getExecResult() == null || param.getRunningStatus() == null) {
-            return new ResultVO(ResultCode.PARAM_IS_EMPTY);
-        }
-        return new ResultVO(ResultCode.SUCCESS, service.executeFinishUpdateStatus(param));
-    }
-
     @ApiOperation(value = "根据名称判断流水线是否存在")
     @GetMapping(value = "/judgePipelineExist")
     public ResultVO judgePipelineExist(@RequestParam String name) {

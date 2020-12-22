@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.offbytwo.jenkins.JenkinsServer;
-import com.offbytwo.jenkins.model.*;
 import com.wenge.tbase.cicd.entity.*;
 import com.wenge.tbase.cicd.entity.enums.BuildStatusEnum;
 import com.wenge.tbase.cicd.entity.enums.PipelineStageTypeEnum;
@@ -18,10 +17,8 @@ import com.wenge.tbase.cicd.jenkins.template.JenkinsTemplate;
 import com.wenge.tbase.cicd.service.*;
 import com.wenge.tbase.cicd.utils.MyThreadUtils;
 import com.wenge.tbase.commons.result.ListVo;
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.ThreadUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -343,9 +340,6 @@ public class PipelineControllerService {
         }
     }
 
-    public void updatePipelineRunningStatus() {
-
-    }
 
 
     /**
