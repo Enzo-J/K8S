@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.offbytwo.jenkins.JenkinsServer;
+import com.offbytwo.jenkins.model.Build;
 import com.wenge.tbase.cicd.entity.*;
 import com.wenge.tbase.cicd.entity.enums.BuildStatusEnum;
 import com.wenge.tbase.cicd.entity.enums.PipelineStageTypeEnum;
@@ -318,35 +319,34 @@ public class PipelineControllerService {
      * @param name
      */
     public void monitorRunningStatus(Long pipelineId, String name, Integer number, Integer size) {
-        Boolean flag = true;
         CicdPipeline cicdPipeline = new CicdPipeline();
         cicdPipeline.setRunningStatus(0);
         cicdPipeline.setId(pipelineId);
-        while (flag) {
+        while (true) {
             MyThreadUtils.sleep(1);
             BuildStageVo buildStageView = pipelineStageControllerService.getRunningBuildStageView(name, number);
             if (buildStageView != null) {
                 if (buildStageView.getId().intValue() == number) {
-                    if (BuildStatusEnum.FAILURE.getResult().equals(buildStageView.getStatus())) {
+                    if ("FAILED".equals(buildStageView.getStatus())) {
                         cicdPipeline.setExecResult(0);
                         pipelineService.updateById(cicdPipeline);
-                        flag = false;
+                        break;
                     }
                     List<StageVo> stages = buildStageView.getStages();
                     if (stages.size() == size) {
-                        if (BuildStatusEnum.FAILURE.getResult().equals(stages.get(stages.size() - 1).getStatus())) {
+                        if ("FAILED".equals(stages.get(stages.size() - 1).getStatus())) {
                             cicdPipeline.setExecResult(0);
                             pipelineService.updateById(cicdPipeline);
-                            flag = false;
+                            break;
                         } else if (BuildStatusEnum.SUCCESS.getResult().equals(stages.get(stages.size() - 1).getStatus())) {
                             cicdPipeline.setExecResult(1);
                             pipelineService.updateById(cicdPipeline);
-                            flag = false;
+                            break;
                         }
                     }
                 }
             } else {
-                flag = false;
+               break;
             }
         }
     }
