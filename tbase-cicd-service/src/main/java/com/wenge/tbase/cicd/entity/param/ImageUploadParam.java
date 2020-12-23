@@ -15,6 +15,9 @@ import lombok.Data;
 @Data
 public class ImageUploadParam {
 
+    @ApiModelProperty(value = "编号")
+    private Long id;
+
     @ApiModelProperty(value = "阶段名称")
     private String stageName;
 

@@ -129,6 +129,7 @@ public class PipelineControllerService {
         if (StringUtils.isNotEmpty(name)) {
             wrapper.like("name", name);
         }
+        wrapper.orderByDesc("gmt_modified");
         Page page = new Page(current, size);
         IPage list = pipelineService.page(page, wrapper);
         List<CicdPipeline> records = list.getRecords();
@@ -197,18 +198,6 @@ public class PipelineControllerService {
     public Integer getPipelineRunningStatus(Long id) {
         CicdPipeline cicdPipeline = pipelineService.getById(id);
         return cicdPipeline.getRunningStatus();
-    }
-
-    /**
-     * 执行完成修改状态
-     *
-     * @param param
-     * @return
-     */
-    public Boolean executeFinishUpdateStatus(UpdatePipelineStatusParam param) {
-        CicdPipeline cicdPipeline = new CicdPipeline();
-        BeanUtil.copyProperties(param, cicdPipeline);
-        return pipelineService.updateById(cicdPipeline);
     }
 
     /**
@@ -339,7 +328,6 @@ public class PipelineControllerService {
             }
         }
     }
-
 
 
     /**
