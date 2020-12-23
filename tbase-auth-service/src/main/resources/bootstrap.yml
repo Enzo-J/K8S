@@ -3,7 +3,7 @@ server:
   port: 16210
 spring:
   application:
-    name: data-center-auth
+    name: tbase-auth-service
   cloud:
     nacos:
       discovery:
