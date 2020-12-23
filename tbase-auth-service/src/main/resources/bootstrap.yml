@@ -1,6 +1,6 @@
 server:
   # 服务端口号
-  port: 16210
+  port: 10068
 spring:
   application:
     name: tbase-auth-service
