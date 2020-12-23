@@ -1,0 +1,46 @@
+spring:
+  profiles:
+    active: dev
+  jackson:
+    time-zone: GMT+8
+    #日期格式化
+    date-format: yyyy-MM-dd HH:mm:ss
+    serialization:
+      #格式化输出
+      indent_output: true
+      #忽略无法转换的对象
+      fail_on_empty_beans: false
+    #设置空如何序列化
+    defaultPropertyInclusion: NON_EMPTY
+    deserialization:
+      #允许对象忽略json中不存在的属性
+      fail_on_unknown_properties: false
+    parser:
+      #允许出现特殊字符和转义符
+      allow_unquoted_control_chars: true
+      #允许出现单引号
+      allow_single_quotes: true
+swagger:
+  enabled: true
+logging:
+  #日志配置文件位置
+  config: classpath:logback-spring.xml
+  #日志打印位置，这里是默认在项目根路径下
+  file:
+    path: /u01/SZRW/data-center-auth/log
+  level:
+    com.springboot.cloud.auth.mapper: debug
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+
+sso:
+  client-id: app_manage00000000000000000000003f537b2c88f82b823c5b3fb4706126c7
+  client-secret: 应用管理平台
+#  redirect_uri: http://192.168.1.68:8080
+#  TODO:redirect_uri 待填,这里要改为应用管理平台的跳转地址
+  redirect_uri: http://172.16.0.12:32645
+  sso_uri: http://172.16.0.13:30713

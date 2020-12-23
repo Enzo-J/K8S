@@ -1,0 +1,22 @@
+server:
+  # 服务端口号
+  port: 16210
+spring:
+  application:
+    name: data-center-auth
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${REGISTER_HOST:172.16.0.6}:${REGISTER_PORT:30000}
+#        server-addr: ${REGISTER_HOST:10.148.25.12}:${REGISTER_PORT:30000}
+      config:
+        server-addr: ${REGISTER_HOST:172.16.0.6}:${REGISTER_PORT:30000}
+#        server-addr: ${REGISTER_HOST:10.148.25.12}:${REGISTER_PORT:30000}
+        file-extension: yml
+        group: data-center
+#    sentinel:
+#      transport:
+#        dashboard: ${SENTINEL_DASHBOARD_HOST:192.168.160.129}:${SENTINEL_DASHBOARD_PORT:8021}
+    bus:
+      trace:
+        enabled: true
