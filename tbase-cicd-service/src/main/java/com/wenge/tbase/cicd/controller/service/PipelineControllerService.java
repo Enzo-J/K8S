@@ -137,6 +137,11 @@ public class PipelineControllerService {
         records.stream().forEach(o -> {
             GetPipelineListVo vo = new GetPipelineListVo();
             BeanUtil.copyProperties(o, vo);
+            if (judgePipelineStageExist(o.getId())) {
+                vo.setIfExec(1);
+            } else {
+                vo.setIfExec(0);
+            }
             // 根据pipeline id查询流水线阶段内容
             if (o.getExecResult() != 2) {
                 vo.setBuildStageVo(getBuildStageStatusVo(o.getName()));
@@ -147,6 +152,23 @@ public class PipelineControllerService {
         listVo.setTotal(list.getTotal());
         listVo.setDataList(listVos);
         return listVo;
+    }
+
+    /**
+     * 判断是否存在流水线阶段
+     *
+     * @param pipelineId
+     * @return
+     */
+    public Boolean judgePipelineStageExist(Long pipelineId) {
+        QueryWrapper<CicdPipelineStage> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("pipeline_id", pipelineId);
+        List<CicdPipelineStage> list = pipelineStageService.list(queryWrapper);
+        if (list != null && list.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

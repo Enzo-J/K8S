@@ -69,7 +69,10 @@ public class PipelineStageControllerService {
             pipelineStage.setType(PipelineStageTypeEnum.CODE_PULL.getType());
             pipelineStage.setName(param.getCodePullParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getCodePullParam()));
-            pipelineStageService.saveOrUpdate(pipelineStage);
+            if (param.getCodePullParam().getId() != null) {
+                pipelineStageService.updateById(pipelineStage);
+            }
+            pipelineStageService.save(pipelineStage);
         }
         // 2.代码检测步骤
         if (param.getCodeCheckParam() != null) {
@@ -78,7 +81,10 @@ public class PipelineStageControllerService {
             pipelineStage.setType(PipelineStageTypeEnum.CODE_CHECK.getType());
             pipelineStage.setName(param.getCodeCheckParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getCodeCheckParam()));
-            pipelineStageService.saveOrUpdate(pipelineStage);
+            if (param.getCodeCheckParam().getId() != null) {
+                pipelineStageService.updateById(pipelineStage);
+            }
+            pipelineStageService.save(pipelineStage);
         }
         if (param.getPackageCommonParam() != null) {
             pipelineStage = new CicdPipelineStage();
@@ -86,7 +92,10 @@ public class PipelineStageControllerService {
             pipelineStage.setType(PipelineStageTypeEnum.PACKAGE_COMMON.getType());
             pipelineStage.setName(param.getPackageCommonParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getPackageCommonParam()));
-            pipelineStageService.saveOrUpdate(pipelineStage);
+            if (param.getPackageCommonParam().getId() != null) {
+                pipelineStageService.updateById(pipelineStage);
+            }
+            pipelineStageService.save(pipelineStage);
         }
         // 3.编译打包步骤
         if (param.getPackageParam() != null) {
@@ -95,7 +104,10 @@ public class PipelineStageControllerService {
             pipelineStage.setType(PipelineStageTypeEnum.PACKAGE.getType());
             pipelineStage.setName(param.getPackageParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getPackageParam()));
-            pipelineStageService.saveOrUpdate(pipelineStage);
+            if (param.getPackageParam().getId() != null) {
+                pipelineStageService.updateById(pipelineStage);
+            }
+            pipelineStageService.save(pipelineStage);
         }
         // 4.镜像构建步骤
         if (param.getImageBuildParam() != null) {
@@ -104,7 +116,10 @@ public class PipelineStageControllerService {
             pipelineStage.setType(PipelineStageTypeEnum.IMAGE_BUILD.getType());
             pipelineStage.setName(param.getImageBuildParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getImageBuildParam()));
-            pipelineStageService.saveOrUpdate(pipelineStage);
+            if (param.getImageBuildParam().getId() != null) {
+                pipelineStageService.updateById(pipelineStage);
+            }
+            pipelineStageService.save(pipelineStage);
         }
         // 5.镜像上传步骤
         if (param.getImageUploadParam() != null) {
@@ -113,7 +128,10 @@ public class PipelineStageControllerService {
             pipelineStage.setType(PipelineStageTypeEnum.IMAGE_UPLOAD.getType());
             pipelineStage.setName(param.getImageUploadParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getImageUploadParam()));
-            pipelineStageService.saveOrUpdate(pipelineStage);
+            if (param.getImageUploadParam().getId() != null) {
+                pipelineStageService.updateById(pipelineStage);
+            }
+            pipelineStageService.save(pipelineStage);
         }
         // 6.部署步骤
         return true;
