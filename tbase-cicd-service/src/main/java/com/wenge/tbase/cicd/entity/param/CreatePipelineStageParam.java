@@ -19,8 +19,8 @@ public class CreatePipelineStageParam {
     @ApiModelProperty(value = "流水线编号")
     private Long pipelineId;
 
-    @ApiModelProperty(value = "全局变量")
-    private Map<String, String> globalVariable;
+//    @ApiModelProperty(value = "全局变量")
+//    private Map<String, String> globalVariable;
 
     @ApiModelProperty(value = "代码检出参数类")
     private CodePullParam codePullParam;

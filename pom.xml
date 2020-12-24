@@ -17,7 +17,7 @@
 		<module>tbase-microservice-service</module>
 		<module>tbase-sysadmin-service</module>
         <module>tbase-harbor-service</module>
-		<module>tbase-auth</module>
+		<module>tbase-auth-service</module>
 		<module>tbase-gateway-service</module>
 	</modules>
 

@@ -46,7 +46,7 @@ public class CicdSonarqubeController {
         if (param == null || param.getName() == null || param.getContent() == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
-        if (!service.judgeSonarqubeExist(param.getName())) {
+        if (service.judgeSonarqubeExist(param.getName())) {
             return new ResultVO(1001, "名称已存在", false);
         }
         return new ResultVO(ResultCode.SUCCESS, service.createSonarqube(param));

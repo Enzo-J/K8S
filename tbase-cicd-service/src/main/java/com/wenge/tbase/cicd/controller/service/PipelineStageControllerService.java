@@ -1,20 +1,27 @@
 package com.wenge.tbase.cicd.controller.service;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpClient;
 import com.offbytwo.jenkins.helper.Range;
 import com.offbytwo.jenkins.model.Build;
 import com.offbytwo.jenkins.model.BuildWithDetails;
 import com.offbytwo.jenkins.model.JobWithDetails;
+import com.wenge.tbase.cicd.entity.CicdDockerfile;
 import com.wenge.tbase.cicd.entity.CicdPipelineStage;
+import com.wenge.tbase.cicd.entity.CicdRepos;
+import com.wenge.tbase.cicd.entity.CicdSonarqube;
 import com.wenge.tbase.cicd.entity.enums.BuildStatusEnum;
 import com.wenge.tbase.cicd.entity.enums.PipelineStageTypeEnum;
-import com.wenge.tbase.cicd.entity.param.CreatePipelineStageParam;
+import com.wenge.tbase.cicd.entity.param.*;
 import com.wenge.tbase.cicd.entity.vo.BuildHistoryVo;
 import com.wenge.tbase.cicd.entity.vo.BuildStageVo;
+import com.wenge.tbase.cicd.entity.vo.GetPipelineStageVo;
 import com.wenge.tbase.cicd.entity.vo.StageVo;
+import com.wenge.tbase.cicd.jenkins.template.JenkinsTemplate;
 import com.wenge.tbase.cicd.service.CicdPipelineStageService;
 import com.wenge.tbase.commons.result.ListVo;
 import lombok.extern.slf4j.Slf4j;
@@ -50,10 +57,10 @@ public class PipelineStageControllerService {
     private JenkinsHttpClient jenkinsHttpClient;
 
     /**
-     * 创建流水线阶段
+     * 创建或修改流水线阶段
      */
     @Transactional(rollbackFor = {RuntimeException.class, Error.class})
-    public Boolean createPipelineStage(CreatePipelineStageParam param) {
+    public Boolean createOrUpdatePipelineStage(CreatePipelineStageParam param) {
         CicdPipelineStage pipelineStage;
         // 1.代码拉取步骤
         if (param.getCodePullParam() != null) {
@@ -62,6 +69,9 @@ public class PipelineStageControllerService {
             pipelineStage.setType(PipelineStageTypeEnum.CODE_PULL.getType());
             pipelineStage.setName(param.getCodePullParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getCodePullParam()));
+            if (param.getCodePullParam().getId() != null) {
+                pipelineStageService.updateById(pipelineStage);
+            }
             pipelineStageService.save(pipelineStage);
         }
         // 2.代码检测步骤
@@ -71,6 +81,9 @@ public class PipelineStageControllerService {
             pipelineStage.setType(PipelineStageTypeEnum.CODE_CHECK.getType());
             pipelineStage.setName(param.getCodeCheckParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getCodeCheckParam()));
+            if (param.getCodeCheckParam().getId() != null) {
+                pipelineStageService.updateById(pipelineStage);
+            }
             pipelineStageService.save(pipelineStage);
         }
         if (param.getPackageCommonParam() != null) {
@@ -79,6 +92,9 @@ public class PipelineStageControllerService {
             pipelineStage.setType(PipelineStageTypeEnum.PACKAGE_COMMON.getType());
             pipelineStage.setName(param.getPackageCommonParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getPackageCommonParam()));
+            if (param.getPackageCommonParam().getId() != null) {
+                pipelineStageService.updateById(pipelineStage);
+            }
             pipelineStageService.save(pipelineStage);
         }
         // 3.编译打包步骤
@@ -88,6 +104,9 @@ public class PipelineStageControllerService {
             pipelineStage.setType(PipelineStageTypeEnum.PACKAGE.getType());
             pipelineStage.setName(param.getPackageParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getPackageParam()));
+            if (param.getPackageParam().getId() != null) {
+                pipelineStageService.updateById(pipelineStage);
+            }
             pipelineStageService.save(pipelineStage);
         }
         // 4.镜像构建步骤
@@ -97,6 +116,9 @@ public class PipelineStageControllerService {
             pipelineStage.setType(PipelineStageTypeEnum.IMAGE_BUILD.getType());
             pipelineStage.setName(param.getImageBuildParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getImageBuildParam()));
+            if (param.getImageBuildParam().getId() != null) {
+                pipelineStageService.updateById(pipelineStage);
+            }
             pipelineStageService.save(pipelineStage);
         }
         // 5.镜像上传步骤
@@ -106,10 +128,69 @@ public class PipelineStageControllerService {
             pipelineStage.setType(PipelineStageTypeEnum.IMAGE_UPLOAD.getType());
             pipelineStage.setName(param.getImageUploadParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getImageUploadParam()));
+            if (param.getImageUploadParam().getId() != null) {
+                pipelineStageService.updateById(pipelineStage);
+            }
             pipelineStageService.save(pipelineStage);
         }
         // 6.部署步骤
         return true;
+    }
+
+    /**
+     * 获取流水线阶段内容
+     *
+     * @param pipelineId
+     * @return
+     */
+    public GetPipelineStageVo getPipelineStage(Long pipelineId) {
+        QueryWrapper<CicdPipelineStage> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("pipeline_id", pipelineId)
+                .orderByAsc("type");
+        List<CicdPipelineStage> list = pipelineStageService.list(queryWrapper);
+        if (list == null || list.size() == 0) {
+            return null;
+        }
+        GetPipelineStageVo pipelineStageVo = new GetPipelineStageVo();
+        for (CicdPipelineStage pipelineStage : list) {
+            //代码拉取
+            if (pipelineStage.getType() == PipelineStageTypeEnum.CODE_PULL.getType()) {
+                CodePullParam codePullParam = JSONUtil.toBean(pipelineStage.getParameter(), CodePullParam.class);
+                codePullParam.setId(pipelineStage.getId());
+                pipelineStageVo.setCodePullParam(codePullParam);
+            }
+            //代码检测
+            if (pipelineStage.getType() == PipelineStageTypeEnum.CODE_CHECK.getType()) {
+                CodeCheckParam codeCheckParam = JSONUtil.toBean(pipelineStage.getParameter(), CodeCheckParam.class);
+                codeCheckParam.setId(pipelineStage.getId());
+                pipelineStageVo.setCodeCheckParam(codeCheckParam);
+            }
+            //编译打包公共子工程
+            if (pipelineStage.getType() == PipelineStageTypeEnum.PACKAGE_COMMON.getType()) {
+                PackageCommonParam packageCommonParam = JSONUtil.toBean(pipelineStage.getParameter(), PackageCommonParam.class);
+                packageCommonParam.setId(pipelineStage.getId());
+                pipelineStageVo.setPackageCommonParam(packageCommonParam);
+            }
+            //编译打包工程
+            if (pipelineStage.getType() == PipelineStageTypeEnum.PACKAGE.getType()) {
+                PackageParam packageParam = JSONUtil.toBean(pipelineStage.getParameter(), PackageParam.class);
+                packageParam.setId(pipelineStage.getId());
+                pipelineStageVo.setPackageParam(packageParam);
+            }
+            //镜像构建
+            if (pipelineStage.getType() == PipelineStageTypeEnum.IMAGE_BUILD.getType()) {
+                ImageBuildParam imageBuildParam = JSONUtil.toBean(pipelineStage.getParameter(), ImageBuildParam.class);
+                imageBuildParam.setId(pipelineStage.getId());
+                pipelineStageVo.setImageBuildParam(imageBuildParam);
+            }
+            //镜像上传
+            if (pipelineStage.getType() == PipelineStageTypeEnum.IMAGE_UPLOAD.getType()) {
+                ImageUploadParam imageUploadParam = JSONUtil.toBean(pipelineStage.getParameter(), ImageUploadParam.class);
+                imageUploadParam.setId(pipelineStage.getId());
+                pipelineStageVo.setImageUploadParam(imageUploadParam);
+            }
+        }
+        return pipelineStageVo;
     }
 
 
