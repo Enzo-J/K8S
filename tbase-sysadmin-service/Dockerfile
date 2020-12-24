@@ -2,8 +2,8 @@
 FROM openjdk:8-jdk-alpine
 ARG JAR_FILE
 COPY ${JAR_FILE} app.jar
-RUN echo $PWD
-ADD $PWD/src/main/resources/agent /skywalking-agent/
+
+ADD ${currentProjectName}/src/main/resources/agent /skywalking-agent/
 EXPOSE 10063
 EXPOSE 8720
 #ENTRYPOINT ["java","-jar","/app.jar"]
