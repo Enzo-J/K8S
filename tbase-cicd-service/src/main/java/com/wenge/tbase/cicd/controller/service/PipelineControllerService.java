@@ -287,6 +287,8 @@ public class PipelineControllerService {
                 if (imageBuildParam.getDockerfileSource() == 2) {
                     CicdDockerfile dockerfile = dockerfileService.getById(imageBuildParam.getDockerfileId());
                     String property = System.getProperty("user.dir");
+                    log.info(property);
+                    log.info(property + "/" + imageBuildParam.getProjectName() + "/" + "Dockerfile");
                     FileWriter writer = new FileWriter(property + "/" + imageBuildParam.getProjectName() + "/" + "Dockerfile");
                     writer.write(dockerfile.getContent());
                 }
