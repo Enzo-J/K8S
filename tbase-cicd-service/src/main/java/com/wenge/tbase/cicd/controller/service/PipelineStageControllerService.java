@@ -70,6 +70,7 @@ public class PipelineStageControllerService {
             pipelineStage.setName(param.getCodePullParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getCodePullParam()));
             if (param.getCodePullParam().getId() != null) {
+                pipelineStage.setId(param.getCodePullParam().getId());
                 pipelineStageService.updateById(pipelineStage);
             } else {
                 pipelineStageService.save(pipelineStage);
@@ -83,6 +84,7 @@ public class PipelineStageControllerService {
             pipelineStage.setName(param.getCodeCheckParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getCodeCheckParam()));
             if (param.getCodeCheckParam().getId() != null) {
+                pipelineStage.setId(param.getCodeCheckParam().getId());
                 pipelineStageService.updateById(pipelineStage);
             } else {
                 pipelineStageService.save(pipelineStage);
@@ -95,6 +97,7 @@ public class PipelineStageControllerService {
             pipelineStage.setName(param.getPackageCommonParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getPackageCommonParam()));
             if (param.getPackageCommonParam().getId() != null) {
+                pipelineStage.setId(param.getPackageCommonParam().getId());
                 pipelineStageService.updateById(pipelineStage);
             } else {
                 pipelineStageService.save(pipelineStage);
@@ -108,6 +111,7 @@ public class PipelineStageControllerService {
             pipelineStage.setName(param.getPackageParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getPackageParam()));
             if (param.getPackageParam().getId() != null) {
+                pipelineStage.setId(param.getPackageParam().getId());
                 pipelineStageService.updateById(pipelineStage);
             } else {
                 pipelineStageService.save(pipelineStage);
@@ -121,6 +125,7 @@ public class PipelineStageControllerService {
             pipelineStage.setName(param.getImageBuildParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getImageBuildParam()));
             if (param.getImageBuildParam().getId() != null) {
+                pipelineStage.setId(param.getImageBuildParam().getId());
                 pipelineStageService.updateById(pipelineStage);
             } else {
                 pipelineStageService.save(pipelineStage);
@@ -134,6 +139,7 @@ public class PipelineStageControllerService {
             pipelineStage.setName(param.getImageUploadParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getImageUploadParam()));
             if (param.getImageUploadParam().getId() != null) {
+                pipelineStage.setId(param.getImageUploadParam().getId());
                 pipelineStageService.updateById(pipelineStage);
             } else {
                 pipelineStageService.save(pipelineStage);
