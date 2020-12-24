@@ -70,9 +70,11 @@ public class PipelineStageControllerService {
             pipelineStage.setName(param.getCodePullParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getCodePullParam()));
             if (param.getCodePullParam().getId() != null) {
+                pipelineStage.setId(param.getCodePullParam().getId());
                 pipelineStageService.updateById(pipelineStage);
+            } else {
+                pipelineStageService.save(pipelineStage);
             }
-            pipelineStageService.save(pipelineStage);
         }
         // 2.代码检测步骤
         if (param.getCodeCheckParam() != null) {
@@ -82,9 +84,11 @@ public class PipelineStageControllerService {
             pipelineStage.setName(param.getCodeCheckParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getCodeCheckParam()));
             if (param.getCodeCheckParam().getId() != null) {
+                pipelineStage.setId(param.getCodeCheckParam().getId());
                 pipelineStageService.updateById(pipelineStage);
+            } else {
+                pipelineStageService.save(pipelineStage);
             }
-            pipelineStageService.save(pipelineStage);
         }
         if (param.getPackageCommonParam() != null) {
             pipelineStage = new CicdPipelineStage();
@@ -93,9 +97,11 @@ public class PipelineStageControllerService {
             pipelineStage.setName(param.getPackageCommonParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getPackageCommonParam()));
             if (param.getPackageCommonParam().getId() != null) {
+                pipelineStage.setId(param.getPackageCommonParam().getId());
                 pipelineStageService.updateById(pipelineStage);
+            } else {
+                pipelineStageService.save(pipelineStage);
             }
-            pipelineStageService.save(pipelineStage);
         }
         // 3.编译打包步骤
         if (param.getPackageParam() != null) {
@@ -105,9 +111,11 @@ public class PipelineStageControllerService {
             pipelineStage.setName(param.getPackageParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getPackageParam()));
             if (param.getPackageParam().getId() != null) {
+                pipelineStage.setId(param.getPackageParam().getId());
                 pipelineStageService.updateById(pipelineStage);
+            } else {
+                pipelineStageService.save(pipelineStage);
             }
-            pipelineStageService.save(pipelineStage);
         }
         // 4.镜像构建步骤
         if (param.getImageBuildParam() != null) {
@@ -117,9 +125,11 @@ public class PipelineStageControllerService {
             pipelineStage.setName(param.getImageBuildParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getImageBuildParam()));
             if (param.getImageBuildParam().getId() != null) {
+                pipelineStage.setId(param.getImageBuildParam().getId());
                 pipelineStageService.updateById(pipelineStage);
+            } else {
+                pipelineStageService.save(pipelineStage);
             }
-            pipelineStageService.save(pipelineStage);
         }
         // 5.镜像上传步骤
         if (param.getImageUploadParam() != null) {
@@ -129,9 +139,11 @@ public class PipelineStageControllerService {
             pipelineStage.setName(param.getImageUploadParam().getStageName());
             pipelineStage.setParameter(JSONUtil.toJsonStr(param.getImageUploadParam()));
             if (param.getImageUploadParam().getId() != null) {
+                pipelineStage.setId(param.getImageUploadParam().getId());
                 pipelineStageService.updateById(pipelineStage);
+            } else {
+                pipelineStageService.save(pipelineStage);
             }
-            pipelineStageService.save(pipelineStage);
         }
         // 6.部署步骤
         return true;
@@ -303,7 +315,7 @@ public class PipelineStageControllerService {
             if (entity != null) {
                 String result = EntityUtils.toString(entity, "UTF-8");
                 List<BuildStageVo> buildStageVos = JSONUtil.toList(JSONUtil.parseArray(result), BuildStageVo.class);
-                if (buildStageVos != null) {
+                if (buildStageVos != null && buildStageVos.size() >= 0) {
                     return buildStageVos.get(0);
                 }
             }

@@ -150,26 +150,18 @@ public class JenkinsTemplate {
             stage.append("\tstage('" + param.getStageName() + "') {\n")
                     .append("\t\tsh \"docker build --build-arg JAR_FILE=")
                     .append(param.getProjectName())
-                    .append(" -t ").append(param.getImageName()).append(":").append(param.getImageTag());
-            if (StringUtils.isNotEmpty(param.getDockerfileAddress())) {
-                stage.append(" -f ").append(param.getDockerfileAddress());
-            } else {
-                stage.append(" -f ").append("${env.WORKSPACE}/").append(param.getProjectName()).append("/Dockerfile");
-            }
-            stage.append(" .\"\n");
-            stage.append("\t}\n");
+                    .append(" -t ").append(param.getImageName()).append(":").append(param.getImageTag())
+                    .append(" -f ").append("${env.WORKSPACE}/").append(param.getProjectName()).append("/Dockerfile")
+                    .append(" .\"\n")
+                    .append("\t}\n");
         }
         if (param.getBuildType() == 2) {
             stage.append("\tstage('" + param.getStageName() + "') {\n")
                     .append("\t\tsh \"docker build ")
-                    .append(" -t ").append(param.getImageName()).append(":").append(param.getImageTag());
-            if (StringUtils.isNotEmpty(param.getDockerfileAddress())) {
-                stage.append(" -f ").append(param.getDockerfileAddress());
-            } else {
-                stage.append(" -f ").append("${env.WORKSPACE}").append("/Dockerfile");
-            }
-            stage.append(" .\"\n");
-            stage.append("\t}\n");
+                    .append(" -t ").append(param.getImageName()).append(":").append(param.getImageTag())
+                    .append(" -f ").append("${env.WORKSPACE}").append("/Dockerfile")
+                    .append(" .\"\n")
+                    .append("\t}\n");
         }
         return stage.toString();
     }
