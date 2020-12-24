@@ -6,5 +6,5 @@ COPY ${JAR_FILE} app.jar
 EXPOSE 10063
 EXPOSE 8720
 #ENTRYPOINT ["java","-jar","/app.jar"]
-#ENTRYPOINT ["java","-javaagent:/usr/local/agent/skywalking-agent.jar","-jar","/app.jar"]
-ENTRYPOINT ["java", "-Dskywalking.agent.service_name=tbase-sysadmin-service","-Dskywalking.collector.backend_service=172.16.0.10:11800","-Dskywalking.plugin.mysql.trace_sql_parameters=true","-javaagent:/usr/local/agent/skywalking-agent.jar","-jar","/app.jar"]
+ENTRYPOINT ["java","-javaagent:/usr/local/agent/skywalking-agent.jar","-jar","/app.jar"]
+#ENTRYPOINT ["java", "-Dskywalking.agent.service_name=tbase-sysadmin-service","-Dskywalking.collector.backend_service=172.16.0.10:11800","-Dskywalking.plugin.mysql.trace_sql_parameters=true","-javaagent:/usr/local/agent/skywalking-agent.jar","-jar","/app.jar"]
