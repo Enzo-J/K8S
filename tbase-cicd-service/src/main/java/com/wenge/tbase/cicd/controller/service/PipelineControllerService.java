@@ -256,12 +256,12 @@ public class PipelineControllerService {
                     break;
                 }
                 //来源于平台
-                if (codeCheckParam.getSonarFileSource() == 2) {
-                    CicdSonarqube sonarqube = sonarqubeService.getById(codeCheckParam.getSonarId());
-                    String property = System.getProperty("user.dir");
-                    FileWriter writer = new FileWriter(property + "/" + codeCheckParam.getSonarFileAddress() + "/" + "sonar-project.properties");
-                    writer.write(sonarqube.getContent());
-                }
+//                if (codeCheckParam.getSonarFileSource() == 2) {
+//                    CicdSonarqube sonarqube = sonarqubeService.getById(codeCheckParam.getSonarId());
+//                    String property = System.getProperty("user.dir");
+//                    FileWriter writer = new FileWriter(property + "/" + codeCheckParam.getSonarFileAddress() + "/" + "sonar-project.properties");
+//                    writer.write(sonarqube.getContent());
+//                }
                 script.append(JenkinsTemplate.getCodeCheckStage(codeCheckParam));
             }
             //编译打包公共子工程
@@ -284,14 +284,12 @@ public class PipelineControllerService {
                     break;
                 }
                 //来源于平台
-                if (imageBuildParam.getDockerfileSource() == 2) {
-                    CicdDockerfile dockerfile = dockerfileService.getById(imageBuildParam.getDockerfileId());
-                    String property = System.getProperty("user.dir");
-                    log.info(property);
-                    log.info(property + "/" + imageBuildParam.getProjectName() + "/" + "Dockerfile");
-                    FileWriter writer = new FileWriter(property + "/" + imageBuildParam.getProjectName() + "/" + "Dockerfile");
-                    writer.write(dockerfile.getContent());
-                }
+//                if (imageBuildParam.getDockerfileSource() == 2) {
+//                    CicdDockerfile dockerfile = dockerfileService.getById(imageBuildParam.getDockerfileId());
+//                    String property = System.getProperty("user.dir");
+//                    FileWriter writer = new FileWriter(property + "/" + imageBuildParam.getProjectName() + "/" + "Dockerfile");
+//                    writer.write(dockerfile.getContent());
+//                }
                 script.append(JenkinsTemplate.getImageBuildStage(imageBuildParam));
             }
             //镜像上传
