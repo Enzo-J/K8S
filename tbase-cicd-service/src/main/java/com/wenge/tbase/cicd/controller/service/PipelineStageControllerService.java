@@ -315,7 +315,7 @@ public class PipelineStageControllerService {
             if (entity != null) {
                 String result = EntityUtils.toString(entity, "UTF-8");
                 List<BuildStageVo> buildStageVos = JSONUtil.toList(JSONUtil.parseArray(result), BuildStageVo.class);
-                if (buildStageVos != null) {
+                if (buildStageVos != null && buildStageVos.size() >= 0) {
                     return buildStageVos.get(0);
                 }
             }
