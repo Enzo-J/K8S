@@ -243,12 +243,18 @@ public class PipelineControllerService {
             //代码拉取
             if (pipelineStage.getType() == PipelineStageTypeEnum.CODE_PULL.getType()) {
                 CodePullParam codePullParam = JSONUtil.toBean(pipelineStage.getParameter(), CodePullParam.class);
+                if(codePullParam == null){
+                    break;
+                }
                 String codePullStage = JenkinsTemplate.getCodePullStage(codePullParam);
                 script.append(codePullStage);
             }
             //代码检测
             if (pipelineStage.getType() == PipelineStageTypeEnum.CODE_CHECK.getType()) {
                 CodeCheckParam codeCheckParam = JSONUtil.toBean(pipelineStage.getParameter(), CodeCheckParam.class);
+                if(codeCheckParam == null){
+                    break;
+                }
                 //来源于平台
                 if (codeCheckParam.getSonarFileSource() == 2) {
                     CicdSonarqube sonarqube = sonarqubeService.getById(codeCheckParam.getSonarId());
@@ -261,6 +267,9 @@ public class PipelineControllerService {
             //编译打包公共子工程
             if (pipelineStage.getType() == PipelineStageTypeEnum.PACKAGE_COMMON.getType()) {
                 PackageCommonParam packageCommonParam = JSONUtil.toBean(pipelineStage.getParameter(), PackageCommonParam.class);
+                if(packageCommonParam == null){
+                    break;
+                }
                 script.append(JenkinsTemplate.getPackageCommonStage(packageCommonParam));
             }
             //编译打包工程
@@ -271,6 +280,9 @@ public class PipelineControllerService {
             //镜像构建
             if (pipelineStage.getType() == PipelineStageTypeEnum.IMAGE_BUILD.getType()) {
                 ImageBuildParam imageBuildParam = JSONUtil.toBean(pipelineStage.getParameter(), ImageBuildParam.class);
+                if(imageBuildParam == null){
+                    break;
+                }
                 //来源于平台
                 if (imageBuildParam.getDockerfileSource() == 2) {
                     CicdDockerfile dockerfile = dockerfileService.getById(imageBuildParam.getDockerfileId());
@@ -283,6 +295,9 @@ public class PipelineControllerService {
             //镜像上传
             if (pipelineStage.getType() == PipelineStageTypeEnum.IMAGE_UPLOAD.getType()) {
                 ImageUploadParam imageUploadParam = JSONUtil.toBean(pipelineStage.getParameter(), ImageUploadParam.class);
+                if(imageUploadParam == null){
+                    break;
+                }
                 CicdRepos cicdRepos = reposService.getById(imageUploadParam.getReposId());
                 script.append(JenkinsTemplate.getImageUploadStage(cicdRepos, imageUploadParam, harborUrl));
             }
