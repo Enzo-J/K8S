@@ -1,10 +1,7 @@
-#FROM java:8
 FROM openjdk:8-jdk-alpine
 ARG JAR_FILE
 COPY ${JAR_FILE} app.jar
 ADD /src/main/resources/agent /skywalking-agent/
 EXPOSE 10068
-EXPOSE 8728
-#ENTRYPOINT ["java","-jar","/app.jar"]
-#ENTRYPOINT ["java", "-Denv=uat", "-Dskywalking.agent.service_name=tbase-sysadmin-service","-Dskywalking.collector.backend_service=172.16.0.10:11800","-Dskywalking.plugin.mysql.trace_sql_parameters=true","-javaagent:/skywalking-agent/agent/skywalking-agent.jar","-jar","/app.jar"]
+EXPOSE 8719
 ENTRYPOINT ["java","-javaagent:/skywalking-agent/skywalking-agent.jar","-jar","/app.jar"]
