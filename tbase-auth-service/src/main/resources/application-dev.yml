@@ -31,7 +31,7 @@ spring:
     sentinel:
       transport:
         dashboard: 172.16.0.8:32076
-        port: 8719
+        port: 8728
          
 swagger:
   enabled: true
