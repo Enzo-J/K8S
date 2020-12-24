@@ -2,7 +2,7 @@
 FROM openjdk:8-jdk-alpine
 ARG JAR_FILE
 COPY ${JAR_FILE} app.jar
-ADD agent.tar /skywalking-agent/
+ADD agent.tar.gz /skywalking-agent/
 EXPOSE 10063
 EXPOSE 8720
 #ENTRYPOINT ["java","-jar","/app.jar"]
