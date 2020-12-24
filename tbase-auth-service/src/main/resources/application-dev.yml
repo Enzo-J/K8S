@@ -20,6 +20,8 @@ spring:
       allow_unquoted_control_chars: true
       #允许出现单引号
       allow_single_quotes: true
+  application:
+    name: tbase-auth-service
 swagger:
   enabled: true
 logging:
