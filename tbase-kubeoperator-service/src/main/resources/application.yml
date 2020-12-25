@@ -1,0 +1,27 @@
+server:
+  # 服务端口号
+  port: 10088
+spring:
+  application:
+    name: tbase-auth-service
+  #mysql配置
+  datasource:
+    url: jdbc:mysql://172.16.0.6:31372/am_cicd?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Hongkong
+    username: root
+    password: uXsR08Ijsd
+    druid:
+      initial-size: 1
+      min-idle: 1
+      max-active: 20
+      test-on-borrow: true
+      driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 172.16.0.6:30000
+      config:
+        server-addr: 172.16.0.6:30000
+    sentinel:
+      transport:
+        dashboard: 172.16.0.8:32076
+        port: 8768
