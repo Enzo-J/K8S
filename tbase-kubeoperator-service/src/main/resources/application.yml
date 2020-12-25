@@ -1,6 +1,6 @@
 server:
   # 服务端口号
-  port: 10088
+  port: 10056
 spring:
   application:
     name: tbase-kubeoperator-service
