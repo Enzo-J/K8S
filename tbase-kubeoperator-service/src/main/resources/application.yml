@@ -3,7 +3,7 @@ server:
   port: 10088
 spring:
   application:
-    name: tbase-auth-service
+    name: tbase-kubeoperator-service
   #mysql配置
   datasource:
     url: jdbc:mysql://172.16.0.6:31372/am_cicd?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Hongkong
