@@ -362,8 +362,6 @@ public class PipelineControllerService {
                         }
                     }
                 }
-            } else {
-                break;
             }
         }
     }
