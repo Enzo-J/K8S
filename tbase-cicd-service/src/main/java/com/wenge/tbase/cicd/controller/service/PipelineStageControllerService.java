@@ -238,8 +238,13 @@ public class PipelineStageControllerService {
             int t = f + size;
             Range range = Range.build().from(f).to(t);
             List<Build> buildList = job.getAllBuilds(range);
-            int number = job.getLastBuild().getNumber();
             ListVo listVo = new ListVo();
+            if (buildList == null || buildList.size() < 1) {
+                listVo.setTotal(0L);
+                listVo.setDataList(null);
+                return listVo;
+            }
+            int number = job.getLastBuild().getNumber();
             listVo.setTotal(Long.valueOf(number));
             List<BuildHistoryVo> buildHistoryVoList = new ArrayList<>();
             for (Build b : buildList) {
