@@ -93,7 +93,7 @@ public class JenkinsTemplate {
         if (url != null) {
             stage.append("\t\tsh \"cd ").append("${env.WORKSPACE}/").append(param.getSonarFileAddress()).append("\"\n");
             stage.append("\t\tsh \"wget ").append(url).append("\"\n");
-            stage.append("\t\tsh \"mv ").append(fileName).append(" Dockerfile\"\n");
+            stage.append("\t\tsh \"mv ").append(fileName).append(" sonar-project.properties\"\n");
         }
         stage.append("\t\tdef scannerHome = tool 'sonar-scanner'\n" +
                 "\t\twithSonarQubeEnv('sonar') {\n" +

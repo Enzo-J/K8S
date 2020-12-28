@@ -86,32 +86,11 @@ public class DockerfileControllerService {
         CicdDockerfile dockerfile = new CicdDockerfile();
         dockerfile.setName(param.getName());
         dockerfile.setContent(param.getContent());
-        String property = System.getProperty("user.dir");
-        if ("/".equals(property)) {
-            property = "";
-        } else {
-            property += "/tbase-cicd-service";
-        }
-        try {
-            String path = property + "/src/main/resources/files/Dockerfile";
-            FileWriter writer = new FileWriter(path);
-            writer.write(param.getContent());
-            FileReader fileReader = new FileReader(path);
-            BufferedInputStream fileReaderInputStream = fileReader.getInputStream();
-            String fileName = "Dockerfile" + DateUtil.current(false);
-            dockerfile.setFileName(fileName);
-            MultipartFile multipartFile = new MockMultipartFile("file", fileName, ContentType.APPLICATION_OCTET_STREAM.toString(), fileReaderInputStream);
-            JSONObject upload = wosService.upload(multipartFile, bucketName);
-            Map<String, Object> msg = JSONUtil.toBean(upload, Map.class);
-            List<BaseFileEntity> objects = JSONUtil.toList(JSONUtil.parseArray(msg.get("msg")), BaseFileEntity.class);
-            BaseFileEntity baseFileEntity = objects.get(0);
-            dockerfile.setUrl(baseFileEntity.getUrl());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String fileName = "Dockerfile" + DateUtil.current(false);
+        dockerfile.setFileName(fileName);
+        dockerfile.setUrl(uploadDockerfile(fileName, param.getContent()));
         return dockerfileService.save(dockerfile);
     }
-
 
     /**
      * 修改dockerfile文件
@@ -122,8 +101,43 @@ public class DockerfileControllerService {
     public Boolean updateDockerfile(CreateAndUpdateDockerfileParam param) {
         CicdDockerfile dockerfile = new CicdDockerfile();
         BeanUtil.copyProperties(param, dockerfile);
+        String fileName = "Dockerfile" + DateUtil.current(false);
+        dockerfile.setFileName(fileName);
+        dockerfile.setUrl(uploadDockerfile(fileName, param.getContent()));
         return dockerfileService.updateById(dockerfile);
     }
+
+    /**
+     * 上传DockerFile文件
+     *
+     * @param content
+     * @return
+     */
+    public String uploadDockerfile(String fileName, String content) {
+        String property = System.getProperty("user.dir");
+        if ("/".equals(property)) {
+            property = "";
+        } else {
+            property += "/tbase-cicd-service";
+        }
+        try {
+            String path = property + "/src/main/resources/files/Dockerfile";
+            FileWriter writer = new FileWriter(path);
+            writer.write(content);
+            FileReader fileReader = new FileReader(path);
+            BufferedInputStream fileReaderInputStream = fileReader.getInputStream();
+            MultipartFile multipartFile = new MockMultipartFile("file", fileName, ContentType.APPLICATION_OCTET_STREAM.toString(), fileReaderInputStream);
+            JSONObject upload = wosService.upload(multipartFile, bucketName);
+            Map<String, Object> msg = JSONUtil.toBean(upload, Map.class);
+            List<BaseFileEntity> objects = JSONUtil.toList(JSONUtil.parseArray(msg.get("msg")), BaseFileEntity.class);
+            BaseFileEntity baseFileEntity = objects.get(0);
+            return baseFileEntity.getUrl();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     /**
      * 删除dockerfile文件
@@ -141,14 +155,19 @@ public class DockerfileControllerService {
      * @param name
      * @return
      */
-    public Boolean judgeDockerfileExist(String name) {
+    public Boolean judgeDockerfileExist(String name, Long id) {
         QueryWrapper<CicdDockerfile> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("name", name);
         CicdDockerfile dockerfile = dockerfileService.getOne(queryWrapper);
-        if (dockerfile == null) {
-            return false;
-        } else {
-            return true;
+        if (dockerfile != null) {
+            if (id != null && dockerfile.getId() == id) {
+                return false;
+            } else if (id == null) {
+                return true;
+            } else {
+                return true;
+            }
         }
+        return false;
     }
 }
