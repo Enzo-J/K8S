@@ -96,14 +96,19 @@ public class ReposControllerService {
      * @param name
      * @return
      */
-    public Boolean judgeReposExist(String name) {
+    public Boolean judgeReposExist(String name, Long id) {
         QueryWrapper<CicdRepos> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("name", name);
         CicdRepos repos = reposService.getOne(queryWrapper);
-        if (repos == null) {
-            return false;
-        } else {
-            return true;
+        if (repos != null) {
+            if (id != null && repos.getId() == id) {
+                return false;
+            } else if (id == null) {
+                return true;
+            } else {
+                return true;
+            }
         }
+        return false;
     }
 }

@@ -373,15 +373,20 @@ public class PipelineControllerService {
      * @param name
      * @return
      */
-    public Boolean judgePipelineExist(String name) {
+    public Boolean judgePipelineExist(String name, Long id) {
         QueryWrapper<CicdPipeline> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("name", name);
         CicdPipeline pipeline = pipelineService.getOne(queryWrapper);
-        if (pipeline == null) {
-            return false;
-        } else {
-            return true;
+        if (pipeline != null) {
+            if (id != null && pipeline.getId() == id) {
+                return false;
+            } else if (id == null) {
+                return true;
+            } else {
+                return true;
+            }
         }
+        return false;
     }
 
 }
