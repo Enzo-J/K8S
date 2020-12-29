@@ -10,7 +10,6 @@ import com.wenge.tbase.cicd.entity.JenkinsNameValue;
 import com.wenge.tbase.cicd.entity.param.CreateAndUpdateCredentialParam;
 import com.wenge.tbase.cicd.entity.vo.GetCredentialListVo;
 import com.wenge.tbase.cicd.service.CicdCredentialService;
-import com.wenge.tbase.commons.entity.PageParam;
 import com.wenge.tbase.commons.result.ListVo;
 import com.wenge.tbase.commons.utils.AESUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -192,14 +191,19 @@ public class CredentialControllerService {
      * @param username
      * @return
      */
-    public Boolean judgeCredentialExist(String username) {
+    public Boolean judgeCredentialExist(String username,Long id) {
         QueryWrapper<CicdCredential> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", username);
         CicdCredential credential = credentialService.getOne(queryWrapper);
-        if (credential == null) {
-            return false;
-        } else {
-            return true;
+        if (credential != null) {
+            if (id != null && credential.getId() == id) {
+                return false;
+            } else if (id == null) {
+                return true;
+            } else {
+                return true;
+            }
         }
+        return false;
     }
 }
