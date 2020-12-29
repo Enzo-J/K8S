@@ -29,7 +29,7 @@ public class K8SSecret {
     private String secretName;
 
     @NotBlank
-    @ApiModelProperty(value = "密文类型")
+    @ApiModelProperty(value = "密文类型 'kubernetes.io/dockerconfigjson','Opaque','TLS'")
     private String type;
 
     @ApiModelProperty(value = "tls.crt")
