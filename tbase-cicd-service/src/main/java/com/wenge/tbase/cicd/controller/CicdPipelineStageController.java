@@ -18,13 +18,22 @@ public class CicdPipelineStageController {
     @Resource
     private PipelineStageControllerService service;
 
-    @ApiOperation(value = "增加流水线阶段")
+    @ApiOperation(value = "增加或修改流水线阶段")
     @PostMapping(value = "/pipelineStage")
-    public ResultVO createPipelineStage(@RequestBody CreatePipelineStageParam param) {
+    public ResultVO createOrUpdatePipelineStage(@RequestBody CreatePipelineStageParam param) {
         if (param == null || param.getPipelineId() == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
-        return new ResultVO(ResultCode.SUCCESS, service.createPipelineStage(param));
+        return new ResultVO(ResultCode.SUCCESS, service.createOrUpdatePipelineStage(param));
+    }
+
+    @ApiOperation(value = "获取流水线阶段内容")
+    @GetMapping(value = "/pipelineStage/{pipelineId}")
+    public ResultVO getPipelineStage(@PathVariable Long pipelineId) {
+        if (pipelineId == null) {
+            return new ResultVO(ResultCode.PARAM_IS_EMPTY);
+        }
+        return new ResultVO(ResultCode.SUCCESS, service.getPipelineStage(pipelineId));
     }
 
     @ApiOperation(value = "获取最后构建日志")

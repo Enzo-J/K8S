@@ -46,7 +46,7 @@ public class CicdDockerfileController {
         if (param == null || param.getName() == null || param.getContent() == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
-        if (!service.judgeDockerfileExist(param.getName())) {
+        if (service.judgeDockerfileExist(param.getName(), param.getId())) {
             return new ResultVO(1001, "名称已存在", false);
         }
         return new ResultVO(ResultCode.SUCCESS, service.createDockerfile(param));
@@ -58,7 +58,7 @@ public class CicdDockerfileController {
         if (param == null || param.getName() == null || param.getContent() == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
-        if (service.judgeDockerfileExist(param.getName())) {
+        if (service.judgeDockerfileExist(param.getName(), param.getId())) {
             return new ResultVO(1001, "名称已存在", false);
         }
         return new ResultVO(ResultCode.SUCCESS, service.updateDockerfile(param));
@@ -79,7 +79,7 @@ public class CicdDockerfileController {
         if (name == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
-        return new ResultVO(ResultCode.SUCCESS, service.judgeDockerfileExist(name));
+        return new ResultVO(ResultCode.SUCCESS, service.judgeDockerfileExist(name, null));
     }
 }
 

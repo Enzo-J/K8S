@@ -16,10 +16,10 @@ public class SysadminServiceInterceptor implements HandlerInterceptor{
 ////           if(storeBucketKey.equals("sby-f133b16a") || keyExists(storeBucketKey)){
 ////        	   return true;
 ////           }
-//        }      
+//        }
         return false;
     }
-    
+
     /**
      * 判断存储bucket 是否存在
      * @param key
@@ -28,13 +28,13 @@ public class SysadminServiceInterceptor implements HandlerInterceptor{
     private boolean keyExists(String key){
 //    	boolean result=false;
 //    	try {
-//			 result=wosClient.bucketExists(key);			
+//			 result=wosClient.bucketExists(key);
 //		} catch (InvalidKeyException | InvalidBucketNameException | NoSuchAlgorithmException | InsufficientDataException
 //				| NoResponseException | ErrorResponseException | InternalException | InvalidResponseException
 //				| IOException | XmlPullParserException e) {
 //			e.printStackTrace();
 //			throw new WengeException(ErrorType.STORE_KEY_ILLEGAL);
 //		}
-    	return false;
+        return false;
     }
 }

@@ -87,9 +87,15 @@ public class JenkinsTemplate {
      * @param param
      * @return
      */
-    public static String getCodeCheckStage(CodeCheckParam param) {
-        String stage = "\tstage('" + param.getStageName() + "') {\n" +
-                "\t\tdef scannerHome = tool 'sonar-scanner'\n" +
+    public static String getCodeCheckStage(CodeCheckParam param, String url,String fileName) {
+        StringBuffer stage = new StringBuffer();
+        stage.append("\tstage('" + param.getStageName() + "') {\n");
+        if (url != null) {
+            stage.append("\t\tsh \"cd ").append("${env.WORKSPACE}/").append(param.getSonarFileAddress()).append("\"\n");
+            stage.append("\t\tsh \"wget ").append(url).append("\"\n");
+            stage.append("\t\tsh \"mv ").append(fileName).append(" sonar-project.properties\"\n");
+        }
+        stage.append("\t\tdef scannerHome = tool 'sonar-scanner'\n" +
                 "\t\twithSonarQubeEnv('sonar') {\n" +
                 "\t\t\tsh \"\"\"\n" +
                 "\t\t\t\tcd " + param.getSonarFileAddress() + "\n" +
@@ -97,8 +103,8 @@ public class JenkinsTemplate {
                 "\t\t\t\t\"\"\"\n" +
                 "\t\t\t\techo \"完成代码审查\"\n" +
                 "\t\t}\n" +
-                "\t}\n";
-        return stage;
+                "\t}\n");
+        return stage.toString();
     }
 
     /**
@@ -144,32 +150,34 @@ public class JenkinsTemplate {
      * @param param
      * @return
      */
-    public static String getImageBuildStage(ImageBuildParam param) {
+    public static String getImageBuildStage(ImageBuildParam param, String url, String fileName) {
         StringBuffer stage = new StringBuffer();
         if (param.getBuildType() == 1) {
-            stage.append("\tstage('" + param.getStageName() + "') {\n")
-                    .append("\t\tsh \"docker build --build-arg JAR_FILE=")
-                    .append(param.getProjectName())
-                    .append(" -t ").append(param.getImageName()).append(":").append(param.getImageTag());
-            if (StringUtils.isNotEmpty(param.getDockerfileAddress())) {
-                stage.append(" -f ").append(param.getDockerfileAddress());
-            } else {
-                stage.append(" -f ").append("${env.WORKSPACE}/").append(param.getProjectName()).append("/Dockerfile");
+            stage.append("\tstage('" + param.getStageName() + "') {\n");
+            if (url != null) {
+                stage.append("\t\tsh \"cd ").append("${env.WORKSPACE}/").append(param.getProjectName()).append("\"\n");
+                stage.append("\t\tsh \"wget ").append(url).append("\"\n");
+                stage.append("\t\tsh \"mv ").append(fileName).append(" Dockerfile\"\n");
             }
-            stage.append(" .\"\n");
-            stage.append("\t}\n");
+            stage.append("\t\tsh \"docker build --build-arg JAR_FILE=")
+                    .append(param.getProjectName())
+                    .append(" -t ").append(param.getImageName()).append(":").append(param.getImageTag())
+                    .append(" -f ").append("${env.WORKSPACE}/").append(param.getProjectName()).append("/Dockerfile")
+                    .append(" .\"\n")
+                    .append("\t}\n");
         }
         if (param.getBuildType() == 2) {
-            stage.append("\tstage('" + param.getStageName() + "') {\n")
-                    .append("\t\tsh \"docker build ")
-                    .append(" -t ").append(param.getImageName()).append(":").append(param.getImageTag());
-            if (StringUtils.isNotEmpty(param.getDockerfileAddress())) {
-                stage.append(" -f ").append(param.getDockerfileAddress());
-            } else {
-                stage.append(" -f ").append("${env.WORKSPACE}").append("/Dockerfile");
+            stage.append("\tstage('" + param.getStageName() + "') {\n");
+            if (url != null) {
+                stage.append("\t\tsh \"cd ").append("${env.WORKSPACE}/").append("\"\n");
+                stage.append("\t\tsh \"wget ").append(url).append("\"\n");
+                stage.append("\t\tsh \"mv ").append(fileName).append(" Dockerfile\"\n");
             }
-            stage.append(" .\"\n");
-            stage.append("\t}\n");
+            stage.append("\t\tsh \"docker build ")
+                    .append(" -t ").append(param.getImageName()).append(":").append(param.getImageTag())
+                    .append(" -f ").append("${env.WORKSPACE}").append("/Dockerfile")
+                    .append(" .\"\n")
+                    .append("\t}\n");
         }
         return stage.toString();
     }

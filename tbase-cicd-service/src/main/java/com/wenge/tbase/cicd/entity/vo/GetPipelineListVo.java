@@ -30,6 +30,9 @@ public class GetPipelineListVo {
     @ApiModelProperty(value = "0.已终止 1.运行中")
     private Integer runningStatus;
 
+    @ApiModelProperty(value = "是否可以执行 0.不可以 1.可以")
+    private Integer ifExec;
+
     @ApiModelProperty(value = "阶段状态")
     private BuildStageVo buildStageVo;
 

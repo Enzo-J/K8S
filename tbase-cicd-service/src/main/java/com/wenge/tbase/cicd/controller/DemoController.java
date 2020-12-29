@@ -3,34 +3,33 @@ package com.wenge.tbase.cicd.controller;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.io.file.FileReader;
-import cn.hutool.core.io.file.FileWriter;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpClient;
 import com.offbytwo.jenkins.helper.Range;
 import com.offbytwo.jenkins.model.*;
+import com.wenge.tbase.cicd.entity.dto.BaseFileEntity;
 import com.wenge.tbase.cicd.entity.vo.BuildStageVo;
 import com.wenge.tbase.cicd.entity.vo.K8SDeployment;
 import com.wenge.tbase.cicd.entity.vo.StageVo;
 import com.wenge.tbase.cicd.feignService.FeignK8SService;
+import com.wenge.tbase.cicd.feignService.FeignWOSService;
 import com.wenge.tbase.commons.result.ResultCode;
 import com.wenge.tbase.commons.result.ResultVO;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.json.JSONObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.ResourceUtils;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -57,6 +56,9 @@ public class DemoController {
     private JenkinsHttpClient jenkinsHttpClient;
     @Resource
     private FeignK8SService k8SService;
+
+    @Resource
+    private FeignWOSService wosService;
 
     @GetMapping(value = "/job")
     public void getJob() {
@@ -204,14 +206,40 @@ public class DemoController {
         }
     }
 
+    @PostMapping("/upload")
+    public void upload(@RequestBody MultipartFile file) {
+        JSONObject upload = wosService.upload(file, "szwg-bucket");
+        Map<String, Object> msg = JSONUtil.toBean(upload, Map.class);
+        List<BaseFileEntity> objects = JSONUtil.toList(JSONUtil.parseArray(msg.get("msg")),BaseFileEntity.class);
+        System.out.println(objects.get(0).getUrl());
+    }
+
+    @GetMapping("/writerFile")
+    public void writerFile(String content){
+        try {
+            String path = System.getProperty("user.dir");
+            FileWriter writer = new FileWriter(path + "/tbase-cicd-service/Dockerfile");
+            writer.append(content);
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public static void main(String[] args) {
 //        String property = System.getProperty("user.dir");
 //        System.out.println(property);
 //        FileReader fileReader = new FileReader(property + "/" + "tbase-cicd-service/src/main/sonar/sonar-project.properties");
 //        String result = fileReader.readString();
 //        System.out.println(result);
-        final DateTime date = DateUtil.date(1608109920994L);
+        final DateTime date = DateUtil.date(1608876537315L);
         System.out.println(date);
+
+        final long l = DateUtil.current(false);
+        System.out.println(l);
     }
 }
 

@@ -1,7 +1,8 @@
 package com.wenge.tbase.sysadmin.config;
 
-import com.wenge.tbase.sysadmin.interceptor.SysadminServiceInterceptor;
+
 import org.springframework.context.annotation.Bean;
+import com.wenge.tbase.sysadmin.interceptor.SysadminServiceInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -10,7 +11,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebServerMvcConfigurerAdapter implements WebMvcConfigurer {
 	 @Bean
-	    public SysadminServiceInterceptor storeBucketInterceptor() {
+	 public SysadminServiceInterceptor storeBucketInterceptor() {
 	        return new SysadminServiceInterceptor();
 	    }
 

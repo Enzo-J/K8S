@@ -40,6 +40,9 @@ public class CicdSonarqube implements Serializable {
     @ApiModelProperty(value = "文件地址")
     private String url;
 
+    @ApiModelProperty(value = "文件名称")
+    private String fileName;
+
     @ApiModelProperty(value = "文件内容")
     private String content;
 

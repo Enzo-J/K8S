@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.offbytwo.jenkins.JenkinsServer;
+import com.offbytwo.jenkins.model.Build;
 import com.wenge.tbase.cicd.entity.*;
 import com.wenge.tbase.cicd.entity.enums.BuildStatusEnum;
 import com.wenge.tbase.cicd.entity.enums.PipelineStageTypeEnum;
@@ -17,10 +18,8 @@ import com.wenge.tbase.cicd.jenkins.template.JenkinsTemplate;
 import com.wenge.tbase.cicd.service.*;
 import com.wenge.tbase.cicd.utils.MyThreadUtils;
 import com.wenge.tbase.commons.result.ListVo;
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.ThreadUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -131,6 +130,7 @@ public class PipelineControllerService {
         if (StringUtils.isNotEmpty(name)) {
             wrapper.like("name", name);
         }
+        wrapper.orderByDesc("gmt_modified");
         Page page = new Page(current, size);
         IPage list = pipelineService.page(page, wrapper);
         List<CicdPipeline> records = list.getRecords();
@@ -138,6 +138,11 @@ public class PipelineControllerService {
         records.stream().forEach(o -> {
             GetPipelineListVo vo = new GetPipelineListVo();
             BeanUtil.copyProperties(o, vo);
+            if (judgePipelineStageExist(o.getId())) {
+                vo.setIfExec(1);
+            } else {
+                vo.setIfExec(0);
+            }
             // 根据pipeline id查询流水线阶段内容
             if (o.getExecResult() != 2) {
                 vo.setBuildStageVo(getBuildStageStatusVo(o.getName()));
@@ -148,6 +153,23 @@ public class PipelineControllerService {
         listVo.setTotal(list.getTotal());
         listVo.setDataList(listVos);
         return listVo;
+    }
+
+    /**
+     * 判断是否存在流水线阶段
+     *
+     * @param pipelineId
+     * @return
+     */
+    public Boolean judgePipelineStageExist(Long pipelineId) {
+        QueryWrapper<CicdPipelineStage> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("pipeline_id", pipelineId);
+        List<CicdPipelineStage> list = pipelineStageService.list(queryWrapper);
+        if (list != null && list.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -202,18 +224,6 @@ public class PipelineControllerService {
     }
 
     /**
-     * 执行完成修改状态
-     *
-     * @param param
-     * @return
-     */
-    public Boolean executeFinishUpdateStatus(UpdatePipelineStatusParam param) {
-        CicdPipeline cicdPipeline = new CicdPipeline();
-        BeanUtil.copyProperties(param, cicdPipeline);
-        return pipelineService.updateById(cicdPipeline);
-    }
-
-    /**
      * 执行流水线
      *
      * @return
@@ -233,24 +243,34 @@ public class PipelineControllerService {
             //代码拉取
             if (pipelineStage.getType() == PipelineStageTypeEnum.CODE_PULL.getType()) {
                 CodePullParam codePullParam = JSONUtil.toBean(pipelineStage.getParameter(), CodePullParam.class);
+                if (codePullParam == null) {
+                    break;
+                }
                 String codePullStage = JenkinsTemplate.getCodePullStage(codePullParam);
                 script.append(codePullStage);
             }
             //代码检测
             if (pipelineStage.getType() == PipelineStageTypeEnum.CODE_CHECK.getType()) {
                 CodeCheckParam codeCheckParam = JSONUtil.toBean(pipelineStage.getParameter(), CodeCheckParam.class);
+                if (codeCheckParam == null) {
+                    break;
+                }
+                String url = null;
+                String fileName = null;
                 //来源于平台
                 if (codeCheckParam.getSonarFileSource() == 2) {
                     CicdSonarqube sonarqube = sonarqubeService.getById(codeCheckParam.getSonarId());
-                    String property = System.getProperty("user.dir");
-                    FileWriter writer = new FileWriter(property + "/" + codeCheckParam.getSonarFileAddress() + "/" + "sonar-project.properties");
-                    writer.write(sonarqube.getContent());
+                    url = sonarqube.getUrl();
+                    fileName = sonarqube.getFileName();
                 }
-                script.append(JenkinsTemplate.getCodeCheckStage(codeCheckParam));
+                script.append(JenkinsTemplate.getCodeCheckStage(codeCheckParam, url, fileName));
             }
             //编译打包公共子工程
             if (pipelineStage.getType() == PipelineStageTypeEnum.PACKAGE_COMMON.getType()) {
                 PackageCommonParam packageCommonParam = JSONUtil.toBean(pipelineStage.getParameter(), PackageCommonParam.class);
+                if (packageCommonParam == null) {
+                    break;
+                }
                 script.append(JenkinsTemplate.getPackageCommonStage(packageCommonParam));
             }
             //编译打包工程
@@ -261,18 +281,25 @@ public class PipelineControllerService {
             //镜像构建
             if (pipelineStage.getType() == PipelineStageTypeEnum.IMAGE_BUILD.getType()) {
                 ImageBuildParam imageBuildParam = JSONUtil.toBean(pipelineStage.getParameter(), ImageBuildParam.class);
+                if (imageBuildParam == null) {
+                    break;
+                }
+                String url = null;
+                String fileName = null;
                 //来源于平台
                 if (imageBuildParam.getDockerfileSource() == 2) {
                     CicdDockerfile dockerfile = dockerfileService.getById(imageBuildParam.getDockerfileId());
-                    String property = System.getProperty("user.dir");
-                    FileWriter writer = new FileWriter(property + "/" + imageBuildParam.getProjectName() + "/" + "Dockerfile");
-                    writer.write(dockerfile.getContent());
+                    url = dockerfile.getUrl();
+                    fileName = dockerfile.getFileName();
                 }
-                script.append(JenkinsTemplate.getImageBuildStage(imageBuildParam));
+                script.append(JenkinsTemplate.getImageBuildStage(imageBuildParam, url, fileName));
             }
             //镜像上传
             if (pipelineStage.getType() == PipelineStageTypeEnum.IMAGE_UPLOAD.getType()) {
                 ImageUploadParam imageUploadParam = JSONUtil.toBean(pipelineStage.getParameter(), ImageUploadParam.class);
+                if (imageUploadParam == null) {
+                    break;
+                }
                 CicdRepos cicdRepos = reposService.getById(imageUploadParam.getReposId());
                 script.append(JenkinsTemplate.getImageUploadStage(cicdRepos, imageUploadParam, harborUrl));
             }
@@ -287,11 +314,13 @@ public class PipelineControllerService {
             CicdPipeline cicdPipeline = new CicdPipeline();
             cicdPipeline.setRunningStatus(1);
             cicdPipeline.setId(pipelineId);
-            pipelineService.updateById(cicdPipeline);
+            boolean b = pipelineService.updateById(cicdPipeline);
             // 开启监控是否完成修改状态线程
-            new Thread(() -> {
-                monitorRunningStatus(pipelineId, name, nextBuildNumber);
-            }).start();
+            if (b) {
+                new Thread(() -> {
+                    monitorRunningStatus(pipelineId, name, nextBuildNumber, list.size());
+                }).start();
+            }
             return nextBuildNumber;
         } catch (IOException e) {
             log.error("执行流水线错误" + e.getMessage());
@@ -305,26 +334,34 @@ public class PipelineControllerService {
      *
      * @param pipelineId
      * @param name
-     * @param number
      */
-    public void monitorRunningStatus(Long pipelineId, String name, Integer number) {
-        Boolean flag = true;
-        MyThreadUtils.sleep(3);
-        while (flag) {
+    public void monitorRunningStatus(Long pipelineId, String name, Integer number, Integer size) {
+        CicdPipeline cicdPipeline = new CicdPipeline();
+        cicdPipeline.setRunningStatus(0);
+        cicdPipeline.setId(pipelineId);
+        while (true) {
             MyThreadUtils.sleep(1);
             BuildStageVo buildStageView = pipelineStageControllerService.getRunningBuildStageView(name, number);
             if (buildStageView != null) {
-                String status = buildStageView.getStatus();
-                if (status.equals("SUCCESS") || status.equals("FAILURE")) {
-                    CicdPipeline cicdPipeline = new CicdPipeline();
-                    cicdPipeline.setId(pipelineId);
-                    cicdPipeline.setRunningStatus(0);
-                    cicdPipeline.setExecResult(BuildStatusEnum.getBuildStatus(status));
-                    pipelineService.updateById(cicdPipeline);
-                    flag = false;
+                if (buildStageView.getId().intValue() == number) {
+                    if ("FAILED".equals(buildStageView.getStatus())) {
+                        cicdPipeline.setExecResult(0);
+                        pipelineService.updateById(cicdPipeline);
+                        break;
+                    }
+                    List<StageVo> stages = buildStageView.getStages();
+                    if (stages.size() == size) {
+                        if ("FAILED".equals(stages.get(stages.size() - 1).getStatus())) {
+                            cicdPipeline.setExecResult(0);
+                            pipelineService.updateById(cicdPipeline);
+                            break;
+                        } else if (BuildStatusEnum.SUCCESS.getResult().equals(stages.get(stages.size() - 1).getStatus())) {
+                            cicdPipeline.setExecResult(1);
+                            pipelineService.updateById(cicdPipeline);
+                            break;
+                        }
+                    }
                 }
-            } else {
-                flag = false;
             }
         }
     }
