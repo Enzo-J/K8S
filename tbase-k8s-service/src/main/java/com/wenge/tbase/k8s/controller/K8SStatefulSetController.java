@@ -17,7 +17,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.Arrays;
 import java.util.List;
 
-@Api(tags = "大屏展示K8S集群StatefulSet模块")
+@Api(tags = "应用管理平台StatefulSet模块")
 @RestController
 @RequestMapping("/Screen/StatefulSet")
 @Validated

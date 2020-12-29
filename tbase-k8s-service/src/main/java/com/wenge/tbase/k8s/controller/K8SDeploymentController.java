@@ -17,7 +17,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.Arrays;
 import java.util.List;
 
-@Api(tags = "大屏展示K8S集群Deployment模块")
+@Api(tags = "应用管理平台Deployment模块")
 @RestController
 @RequestMapping("/Screen/Deployment")
 @Validated
