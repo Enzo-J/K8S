@@ -24,7 +24,7 @@ public class K8SPersistentVolumeClaim {
     private String storageType;
 
     @NotBlank(message = "读写模式不能为空")
-    @ApiModelProperty(value = "读写模式 '只能被单点读写','可被多节点只读','可被多节点读写'")
+    @ApiModelProperty(value = "读写模式 'ReadWriteOnce'='只能被单点读写','ReadOnlyMany'='可被多节点只读','ReadWriteMany'='可被多节点读写'")
     private List<String> accessmode;
 
     @NotBlank(message = "总量不能为空")
