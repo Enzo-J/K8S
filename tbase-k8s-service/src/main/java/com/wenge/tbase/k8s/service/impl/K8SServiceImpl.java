@@ -687,7 +687,17 @@ public class K8SServiceImpl implements K8SService {
         PersistentVolumeClaimSpec pvcs = new PersistentVolumeClaimSpec();
         pvcs.setStorageClassName(pvcInfo.getStorageType());
         List<String> accessModes = (List<String>) pvcInfo.getAccessmode();
-        pvcs.setAccessModes(accessModes);
+        List<String> accessModesFin = null;
+        for (String accessMode : accessModes) {
+            if (accessMode.equals("只能被单点读写")) {
+                accessModesFin.add("ReadWriteOnce");
+            } else if (accessMode.equals("可被多节点只读")) {
+                accessModesFin.add("ReadOnlyMany");
+            } else {
+                accessModesFin.add("ReadWriteMany");
+            }
+        }
+        pvcs.setAccessModes(accessModesFin);
         ResourceRequirements resourceRequirements = new ResourceRequirements();
         Map<String, Quantity> requestsMap = new HashMap<>();
         String amountStr = pvcInfo.getTotal();
