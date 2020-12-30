@@ -234,12 +234,20 @@ public class PipelineStageControllerService {
     public ListVo getBuildHistoryList(String name, Integer current, Integer size) {
         try {
             JobWithDetails job = jenkinsServer.getJob(name);
+            ListVo listVo = new ListVo();
+            listVo.setTotal(0L);
+            listVo.setDataList(null);
+            if (job == null) {
+                return listVo;
+            }
             int f = (current - 1 < 0 ? 0 : current - 1) * size;
             int t = f + size;
             Range range = Range.build().from(f).to(t);
             List<Build> buildList = job.getAllBuilds(range);
+            if (buildList == null || buildList.size() < 1) {
+                return listVo;
+            }
             int number = job.getLastBuild().getNumber();
-            ListVo listVo = new ListVo();
             listVo.setTotal(Long.valueOf(number));
             List<BuildHistoryVo> buildHistoryVoList = new ArrayList<>();
             for (Build b : buildList) {
@@ -315,7 +323,7 @@ public class PipelineStageControllerService {
             if (entity != null) {
                 String result = EntityUtils.toString(entity, "UTF-8");
                 List<BuildStageVo> buildStageVos = JSONUtil.toList(JSONUtil.parseArray(result), BuildStageVo.class);
-                if (buildStageVos != null && buildStageVos.size() >= 0) {
+                if (buildStageVos != null && buildStageVos.size() >= 1) {
                     return buildStageVos.get(0);
                 }
             }

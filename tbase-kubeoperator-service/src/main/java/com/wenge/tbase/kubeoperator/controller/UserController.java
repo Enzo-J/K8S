@@ -1,20 +1,16 @@
 package com.wenge.tbase.kubeoperator.controller;
 
-import java.util.Map;
-
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
+import com.wenge.tbase.commons.entity.RestResult;
 import com.wenge.tbase.commons.exception.APIException;
-import com.wenge.tbase.commons.result.ResultVO;
+import com.wenge.tbase.kubeoperator.service.UsersService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,23 +21,49 @@ import io.swagger.annotations.ApiOperation;
 @Validated
 public class UserController {
 
+	@Autowired
+	private UsersService usersService;
+	
+	
 	@GetMapping("/showallusers")
-    @ApiOperation("获取所有节点")
-	public ResultVO showAllHosts(String token) {
+    @ApiOperation("获取所有用户")
+	public RestResult<?>  showAllUsers(String token) {
 		try {
-	        RestTemplate restTemplate = new RestTemplate();
-	        HttpHeaders headers = new HttpHeaders();
-	        headers.setContentType(MediaType.APPLICATION_JSON);
-	        headers.add("Authorization", "Bearer " +token);
-	        ResponseEntity<Map> response = restTemplate.exchange(
-	                "http://172.16.0.14/api/v1/users",
-	                HttpMethod.GET,
-	                new HttpEntity<String>(headers),
-	                Map.class);
-	        return new ResultVO(response.getBody());
+	        return usersService.showAllUsers(token);
 	    } catch (Exception e) {
 	        throw new APIException("请求失败");
 	    }
-		
 	}
+	
+	@GetMapping("/showauser")
+    @ApiOperation("获取一个用户")
+	public RestResult<?>  showAHosts(String token,String name) {
+		try {
+	        return usersService.showAUser(token, name);
+	    } catch (Exception e) {
+	        throw new APIException("请求失败");
+	    }
+	}
+	
+	@PostMapping("/create")
+    @ApiOperation("创建一个节点")
+	public RestResult<?> creat(String token, String email, String name, String password, int isAdmin) {
+		try {
+	        return usersService.create(token, email, name, password, isAdmin);
+	    } catch (Exception e) {
+	        throw new APIException("请求失败");
+	    }
+	}
+	
+	@DeleteMapping("/delete")
+    @ApiOperation("删除一个用户")
+	public RestResult<?> deleteAHosts(String token,String name) {
+		try {
+	        return usersService.deleteAUser(token, name);
+	    } catch (Exception e) {
+	        throw new APIException("请求失败");
+	    }
+	}
+	
+	
 }
