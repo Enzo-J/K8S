@@ -387,7 +387,8 @@ public class K8SServiceImpl implements K8SService {
         tmpMap.put("username", secretInfo.getDockerUsername());
         tmpMap.put("password", secretInfo.getDockerSecret());
         tmpMap.put("auth", baseAuth);
-        mainObject.put("DOCKER_REGISTRY_SERVER", tmpMap);
+        //mainObject.put("DOCKER_REGISTRY_SERVER", tmpMap);
+        mainObject.put(secretInfo.getDockerServer(), tmpMap);
         JSONObject authObject = new JSONObject();
         authObject.put("auths", mainObject);
         //生成最终的秘钥
