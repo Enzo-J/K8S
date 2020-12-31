@@ -114,7 +114,7 @@ public class K8SServiceTest {
     @org.junit.jupiter.api.Test
     public void createConfigMap() {
         K8SConfigMap k8SConfigMapInfo = new K8SConfigMap();
-        k8SConfigMapInfo.setName("test");
+        k8SConfigMapInfo.setName("test2");
         k8SConfigMapInfo.setNamespace("test");
         Map<String, String> map = new HashMap<>();
         map.put("ceshi", "ceshi");

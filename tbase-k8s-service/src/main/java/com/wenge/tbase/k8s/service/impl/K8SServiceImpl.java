@@ -163,25 +163,25 @@ public class K8SServiceImpl implements K8SService {
         io.fabric8.kubernetes.client.dsl.Resource<ConfigMap, DoneableConfigMap> configMapResource = kClient.configMaps()
                 .inNamespace(configMapInfo.getNamespace()).withName(configMapInfo.getName());
         ObjectMeta objectMeta = configMapResource.get().getMetadata();
-        Map<String, String> oLabels = objectMeta.getLabels();
+        //Map<String, String> oLabels = objectMeta.getLabels();
         Map<String, String> nLabels = configMapInfo.getLabels();
-        if (oLabels == null && nLabels != null) {
+        /*if (oLabels == null && nLabels != null) {
             oLabels = nLabels;
         }
         if (oLabels != null && nLabels != null) {
             oLabels.putAll(nLabels);
-        }
-        objectMeta.setLabels(oLabels);
+        }*/
+        objectMeta.setLabels(nLabels);
         //修改详细信息
         ConfigMap configMap =
                 configMapResource.edit().withMetadata(objectMeta).addToData(configMapInfo.getData()).done();
         //打印更新信息
-        if (configMapInfo.getData() != null && configMapInfo.getData().size() > 0) {
+        /*if (configMapInfo.getData() != null && configMapInfo.getData().size() > 0) {
             log.info("Upserted ConfigMap at data " + configMap.getData());
         }
         if (nLabels != null && nLabels.size() > 0) {
             log.info("Upserted ConfigMap at labels " + configMap.getMetadata().getLabels());
-        }
+        }*/
         return configMap;
     }
 
