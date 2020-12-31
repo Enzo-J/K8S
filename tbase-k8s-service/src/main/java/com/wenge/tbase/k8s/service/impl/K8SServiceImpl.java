@@ -174,7 +174,7 @@ public class K8SServiceImpl implements K8SService {
         objectMeta.setLabels(nLabels);
         //修改详细信息
         ConfigMap configMap =
-                configMapResource.edit().withMetadata(objectMeta).addToData(configMapInfo.getData()).done();
+                configMapResource.edit().withMetadata(objectMeta).withData(configMapInfo.getData()).done();//.addToData(configMapInfo.getData())
         //打印更新信息
         /*if (configMapInfo.getData() != null && configMapInfo.getData().size() > 0) {
             log.info("Upserted ConfigMap at data " + configMap.getData());
