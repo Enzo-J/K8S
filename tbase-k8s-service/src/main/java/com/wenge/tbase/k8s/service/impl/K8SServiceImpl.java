@@ -375,7 +375,7 @@ public class K8SServiceImpl implements K8SService {
                 log.error(e.getMessage());
             }
         }
-        Secret secret = secretDoneableSecretResource.edit().addToData(data).done();
+        Secret secret = secretDoneableSecretResource.edit().withData(data).done();
         return secret;
     }
 
