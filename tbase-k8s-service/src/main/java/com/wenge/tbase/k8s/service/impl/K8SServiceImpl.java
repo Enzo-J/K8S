@@ -19,13 +19,11 @@ import io.fabric8.kubernetes.api.model.storage.StorageClassList;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.kubernetes.client.Watcher;
 import io.fabric8.kubernetes.client.dsl.ExecWatch;
-import io.fabric8.kubernetes.client.dsl.RollableScalableResource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.Yaml;
 
 import javax.annotation.Resource;
-import javax.validation.constraints.NotBlank;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -237,7 +235,7 @@ public class K8SServiceImpl implements K8SService {
             secret.setData(data);
             ObjectMeta objectMeta = new ObjectMeta();
             objectMeta.setCreationTimestamp(new Date().toString());
-            objectMeta.setName(harborSecret.getSecretName());
+            objectMeta.setName(harborSecret.getName());
             objectMeta.setNamespace(harborSecret.getNamespace());
             List<ManagedFieldsEntry> managedFieldsEntryList = new ArrayList<>();
             ManagedFieldsEntry managedFieldsEntry = new ManagedFieldsEntry();
@@ -310,7 +308,7 @@ public class K8SServiceImpl implements K8SService {
             return null;
         }
         ObjectMeta objectMeta = new ObjectMeta();
-        objectMeta.setName(secretInfo.getSecretName());
+        objectMeta.setName(secretInfo.getName());
         objectMeta.setNamespace(secretInfo.getNamespace());
         secret.setMetadata(objectMeta);
         secret.setType(secretInfo.getType());
@@ -332,7 +330,7 @@ public class K8SServiceImpl implements K8SService {
     @Override
     public Secret editSecret(K8SSecret secretInfo) {
         io.fabric8.kubernetes.client.dsl.Resource<Secret, DoneableSecret> secretDoneableSecretResource =
-                kClient.secrets().inNamespace(secretInfo.getNamespace()).withName(secretInfo.getSecretName());
+                kClient.secrets().inNamespace(secretInfo.getNamespace()).withName(secretInfo.getName());
         String secretType = secretDoneableSecretResource.get().getType();
         Map<String, String> data = new HashMap<String, String>();
         if (secretType.equals("kubernetes.io/dockerconfigjson")) {
