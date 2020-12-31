@@ -70,9 +70,9 @@ public class K8SSecretController {
     @ApiOperation("删除单个密文")
     @PostMapping("/delSecret")
     @ApiImplicitParams({@ApiImplicitParam(name = "spacename", value = "命名空间名称", dataType = "String", required = true),
-            @ApiImplicitParam(name = "secretname", value = "密文名称", dataType = "String", required = true)})
-    public ResultVO delSecret(@NotBlank @RequestParam String spacename, @NotBlank @RequestParam String secretname) {
-        boolean res = k8SService.delSecret(spacename, secretname);
+            @ApiImplicitParam(name = "name", value = "密文名称", dataType = "String", required = true)})
+    public ResultVO delSecret(@NotBlank @RequestParam String spacename, @NotBlank @RequestParam String name) {
+        boolean res = k8SService.delSecret(spacename, name);
         return new ResultVO(res);
     }
 
