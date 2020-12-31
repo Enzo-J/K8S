@@ -3,16 +3,29 @@ spring:
     host: ${RABBIT_MQ_HOST:172.16.0.13}
     port: ${RABBIT_MQ_PORT:31352}
     username: ${RABBIT_MQ_USERNAME:user}
-    password: ${RABBIT_MQ_PASSWORD:szwg%2020}
+    password: ${RABBIT_MQ_PASSWORD:szwg%2020}  
   redis:
-    host: ${REDIS_HOST:172.16.0.8}
-    port: ${REDIS_PORT:31268}
-    #password: ${REDIS_PASSWORD:}
+    cluster:
+      nodes:
+        - 172.16.0.9:7000
+        - 172.16.0.9:7001
+        - 172.16.0.9:7002
+        - 172.16.0.9:7003
+        - 172.16.0.9:7004
+        - 172.16.0.9:7005
+    #single
+    #host: ${REDIS_HOST:172.16.0.8}
+    #port: ${REDIS_PORT:31268}
+    #password: ${REDIS_PASSWORD:123}
     lettuce:
+    #jedis:
       pool:
-        max-active: 10000
+        max-active: 1000
         max-wait: -1
-  
+        max-idle: 10      
+        min-idle: 5
+    
+
   datasource:
     url: jdbc:${DATASOURCE_DBTYPE:mysql}://${DATASOURCE_HOST:172.16.0.6}:${DATASOURCE_PORT:31372}/am_gateway?characterEncoding=UTF-8&useUnicode=true&useSSL=false&serverTimezone=Hongkong
     username: ${DATASOURCE_USERNAME:root}
@@ -32,27 +45,47 @@ jetcache:
     # 默认永久本地缓存
     default:
       type: caffeine
+      #type: linkedhashmap
       keyConvertor: fastjson
   remote:
     # 默认永久的远程缓存
     default:
       type: redis.lettuce
-      uri: redis://${spring.redis.host}:${spring.redis.port}/
-      keyConvertor: fastjson
+      uri[0]: redis://172.16.0.9:7000/
+      uri[1]: redis://172.16.0.9:7001/
+      uri[2]: redis://172.16.0.9:7002/
+      uri[3]: redis://172.16.0.9:7003/
+      uri[4]: redis://172.16.0.9:7004/
+      uri[5]: redis://172.16.0.9:7005/
+      #type: redis
+      #uri: redis://${spring.redis.host}:${spring.redis.port}/
+      #uri: redis://${spring.redis.password}@${spring.redis.host}:${spring.redis.port}/
+      keyConvertor: fastjson     
       valueEncoder: kryo
       valueDecoder: kryo
-
+      #jedis
+      #poolConfig:
+        #minIdle: 5
+        #maxIdle: 1000
+        #maxTotal: 2000
+      #host: ${spring.redis.host}
+      #port: ${spring.redis.port}
+      #password: redis
 
 management:
   endpoints:
     web:
       exposure:
         include: '*'
-
-logging:
-  level:
-    com.springboot.cloud.gateway: debug
-    com.jalja.org.spring: debug
-  path: logs/
-  file:
-    max-size: 1GB
+#
+#logging:
+#  level:
+#    com.springboot.cloud.gateway: debug
+#    com.jalja.org.spring: debug
+#  path: logs/
+#  file:
+#    max-size: 1GB
+mybatis-plus:
+  configuration:
+    # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

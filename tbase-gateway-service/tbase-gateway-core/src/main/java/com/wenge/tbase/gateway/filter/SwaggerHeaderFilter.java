@@ -7,7 +7,7 @@ import org.springframework.core.Ordered;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.server.ServerWebExchange;
 
-import com.wenge.tbase.gateway.config.SwaggerProvider;
+import com.wenge.tbase.gateway.conf.SwaggerProvider;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;

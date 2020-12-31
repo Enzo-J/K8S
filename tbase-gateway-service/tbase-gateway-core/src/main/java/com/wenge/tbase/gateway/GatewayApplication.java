@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
@@ -23,10 +24,10 @@ import lombok.extern.slf4j.Slf4j;
 @EnableCreateCacheAnnotation
 @ComponentScan(basePackages={"com.alicp.jetcache.autoconfigure","com.wenge.tbase.gateway"})
 @Slf4j
+@EnableFeignClients
 public class GatewayApplication {
     public static void main(String[] args) {
-        SpringApplication.run(GatewayApplication.class, args);
-        
+        SpringApplication.run(GatewayApplication.class, args);        
         log.info("                                                                                                             \n" +
                 "                                                                                                                    \n" +
                 "                                                                                                                    \n" +
@@ -39,7 +40,7 @@ public class GatewayApplication {
                 "   w:::::w     w:::::::::w     w:::::we::::::e     e:::::enn:::::::::::::::ng::::::ggggg::::::gge::::::e     e:::::e\n" +
                 "    w:::::w   w:::::w:::::w   w:::::w e:::::::eeeee::::::e  n:::::nnnn:::::ng:::::g     g:::::g e:::::::eeeee::::::e\n" +
                 "     w:::::w w:::::w w:::::w w:::::w  e:::::::::::::::::e   n::::n    n::::ng:::::g     g:::::g e:::::::::::::::::e \n" +
-                "      w:::::w:::::w   w:::::w:::::w   e::::::eeeeeeeeeee    n::::n    n::::ng:::::g     g	:::::g e::::::eeeeeeeeeee  \n" +
+                "      w:::::w:::::w   w:::::w:::::w   e::::::eeeeeeeeeee    n::::n    n::::ng:::::g     g:::::g e::::::eeeeeeeeeee  \n" +
                 "       w:::::::::w     w:::::::::w    e:::::::e             n::::n    n::::ng::::::g    g:::::g e:::::::e           \n" +
                 "        w:::::::w       w:::::::w     e::::::::e            n::::n    n::::ng:::::::ggggg:::::g e::::::::e          \n" +
                 "         w:::::w         w:::::w       e::::::::eeeeeeee    n::::n    n::::n g::::::::::::::::g  e::::::::eeeeeeee  \n" +

@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class BaseVo<T extends BasePo> implements Serializable {
-    private String id;
+	private String id;
 }

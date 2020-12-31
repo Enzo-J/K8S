@@ -12,6 +12,7 @@ public class WengeException extends RuntimeException {
      * 异常对应的错误类型
      */
     private final ErrorType errorType;
+
     /**
      * 默认是系统异常
      */

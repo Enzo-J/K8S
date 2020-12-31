@@ -23,7 +23,7 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.wenge.tbase.gateway.service.IRouteService;
 
-import io.lettuce.core.RedisClient;
+import io.lettuce.core.cluster.RedisClusterClient;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -31,10 +31,10 @@ import lombok.extern.slf4j.Slf4j;
 public class RouteService implements IRouteService {
 
     private static final String GATEWAY_ROUTES = "gateway_routes::";
-
+   
+//  private StringRedisTemplate stringRedisTemplate;//jedis
     @Autowired
-//    private StringRedisTemplate stringRedisTemplate;
-    private RedisClient stringRedisTemplate;
+    private RedisClusterClient stringRedisTemplate;//lettuce
 
     @CreateCache(name = GATEWAY_ROUTES, cacheType = CacheType.REMOTE)
     private Cache<String, RouteDefinition> gatewayRouteCache;
@@ -45,7 +45,7 @@ public class RouteService implements IRouteService {
     private void loadRouteDefinition() {
         log.info("loadRouteDefinition, 开始初使化路由");
         List<String> keys=  stringRedisTemplate.connect().sync().keys(GATEWAY_ROUTES + "*");
-//      Set<String> gatewayKeys =  stringRedisTemplate.keys(GATEWAY_ROUTES + "*").map(a->a.toString()).collect(Collectors.toSet()).block();
+//        Set<String> gatewayKeys =  stringRedisTemplate.keys(GATEWAY_ROUTES + "*");
 
         Set<String>  gatewayKeys = new HashSet<>(keys);
         if (CollectionUtils.isEmpty(gatewayKeys)) {
