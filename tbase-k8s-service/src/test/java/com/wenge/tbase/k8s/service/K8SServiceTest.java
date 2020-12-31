@@ -144,11 +144,11 @@ public class K8SServiceTest {
     public void createSecret() {
         K8SSecret k8SSecret = new K8SSecret();
         k8SSecret.setNamespace("test");
-        k8SSecret.setSecretName("test8");
+        k8SSecret.setName("test9");
         k8SSecret.setType("kubernetes.io/dockerconfigjson");
         k8SSecret.setDockerServer("https://172.16.0.11");
         k8SSecret.setDockerUsername("admin");
-        k8SSecret.setDockerServer("Szwg%2020");
+        k8SSecret.setDockerSecret("Szwg%2020");
         k8SService.createSecret(k8SSecret);
     }
 
@@ -156,7 +156,7 @@ public class K8SServiceTest {
     public void editSecret() {
         K8SSecret k8SSecret = new K8SSecret();
         k8SSecret.setNamespace("test");
-        k8SSecret.setSecretName("test2");
+        k8SSecret.setName("test2");
         k8SSecret.setDockerServer("https://172.16.0.11");
         k8SSecret.setDockerUsername("wg");
         k8SSecret.setDockerServer("Szwg%2020");
