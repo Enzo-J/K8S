@@ -24,7 +24,16 @@
 			</dependency>
 		</dependencies>      
   </dependencyManagement>
-  <dependencies>        
+  <dependencies>      
+        <!--Redis-->
+		 <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+        <dependency>
+	      <groupId>org.springframework.cloud</groupId>
+	      <artifactId>spring-cloud-starter-openfeign</artifactId>
+	    </dependency>  
         <!--注册中心-->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
@@ -59,20 +68,19 @@
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
             <optional>true</optional>
-        </dependency>
-        
-         <!--redis 客户端-->
-        <dependency>
+        </dependency>        
+         <!--redis lettuce客户端-->
+         <dependency>
             <groupId>com.alicp.jetcache</groupId>
             <artifactId>jetcache-redis-lettuce</artifactId>
             <version>2.6.0</version>
-        </dependency> 
+        </dependency>       
         
         <!--使用 lombok 简化 Java 代码-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>         
-        </dependency>        
+        </dependency>             
          <dependency>
                 <groupId>com.alicp.jetcache</groupId>
                 <artifactId>jetcache-starter-redis</artifactId>
@@ -82,8 +90,9 @@
                         <groupId>redis.clients</groupId>
                         <artifactId>jedis</artifactId>
                     </exclusion>
-                </exclusions>
-            </dependency>
+                </exclusions> 
+            </dependency>       			
+            
         <!--测试框架-->
        <!--  <dependency>
             <groupId>org.springframework.boot</groupId>

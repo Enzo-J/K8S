@@ -12,7 +12,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
-@Slf4j
 public class RedisRouteDefinitionRepository implements RouteDefinitionRepository {
 
     @Autowired

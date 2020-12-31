@@ -5,34 +5,44 @@ spring:
     username: ${RABBIT_MQ_USERNAME:user}
     password: ${RABBIT_MQ_PASSWORD:szwg%2020}
   redis:
-    host: ${REDIS_HOST:172.16.0.8}
-    port: ${REDIS_PORT:31268}
-    #password: ${REDIS_PASSWORD:}
+    cluster:
+      nodes:
+        - 172.16.0.9:7000
+        - 172.16.0.9:7001
+        - 172.16.0.9:7002
+        - 172.16.0.9:7003
+        - 172.16.0.9:7004
+        - 172.16.0.9:7005
+    #host: ${REDIS_HOST:127.0.0.1}
+    #port: ${REDIS_PORT:6379}
+    #password: ${REDIS_PASSWORD:123}
     lettuce:
+    #jedis:
       pool:
-        max-active: 10000
+        max-active: 1000
         max-wait: -1
+        max-idle: 10      
+        min-idle: 5
 
   #jwt密码
   #security:
    # oauth2:
     #  jwt:
      #   signingKey: 123456
-  cloud:
-    gateway:
-      default-filters:
-        - name: Retry
-          args:
-            retries: 3
-            statuses: BAD_GATEWAY
-        - AddResponseHeader=X-Response-Default-Foo, Default-Bar
-        - name: RequestRateLimiter
-          args:
-            redis-rate-limiter.replenishRate: 2  #流速 每秒
-            redis-rate-limiter.burstCapacity: 10   #令牌桶的容积
-            rate-limiter: "#{@defaultRedisRateLimiter}"  #SPEL表达式去的对应的bean
-            key-resolver: "#{@apiKeyResolver}" #SPEL表达式去的对应的bean
-
+  #cloud:
+   # gateway:
+    #  default-filters:
+     #   - name: Retry
+      #    args:
+       #     retries: 3
+        #    statuses: BAD_GATEWAY
+        #- AddResponseHeader=X-Response-Default-Foo, Default-Bar
+        #- name: RequestRateLimiter
+        #  args:
+        #    redis-rate-limiter.replenishRate: 2  #流速 每秒
+         #   redis-rate-limiter.burstCapacity: 10   #令牌桶的容积
+          #  rate-limiter: "#{@defaultRedisRateLimiter}"  #SPEL表达式去的对应的bean
+          #  key-resolver: "#{@apiKeyResolver}" #SPEL表达式去的对应的bean
 
 jetcache:
   statIntervalMinutes: 1
@@ -47,17 +57,34 @@ jetcache:
     # 默认永久的远程缓存
     default:
       type: redis.lettuce
-      keyConvertor: fastjson
+      #type: redis
+      keyConvertor: fastjson    
+      uri[0]: redis://172.16.0.9:7000/
+      uri[1]: redis://172.16.0.9:7001/
+      uri[2]: redis://172.16.0.9:7002/
+      uri[3]: redis://172.16.0.9:7003/
+      uri[4]: redis://172.16.0.9:7004/
+      uri[5]: redis://172.16.0.9:7005/
       valueEncoder: kryo
       valueDecoder: kryo
-      uri: redis://${spring.redis.host}:${spring.redis.port}/
-
+      #poolConfig:
+       # minIdle: 5
+        #maxIdle: 1000
+        #maxTotal: 2000
+      #host: ${spring.redis.host}
+      #port: ${spring.redis.port}
+      #password: ${spring.redis.password}
 
 #网关白名单，无需要签权url
 #gate:
  # ignore:
   #  authentication:
    #   startWith: /oauth,/open,/v2/api-docs
+feign:
+  sentinel:
+    enabled: true
+  okhttp:
+    enabled: true
 
 management:
   endpoints:
@@ -65,10 +92,11 @@ management:
       exposure:
         include: '*'
 
-logging:
-  level:
-    com.springboot.cloud: debug
-    com.jalja.org.spring: debug
-  path: logs/
-  file:
-    max-size: 1GB
+#logging:
+ # level:
+  #  com.springboot.cloud: debug
+  #  com.jalja.org.spring: debug
+  #  #org.springframework.cloud.gateway: trace
+ # path: logs/
+ # file:
+  #  max-size: 1GB

@@ -2,9 +2,10 @@ package com.wenge.tbase.gateway.service;
 
 import java.util.List;
 
-import com.wenge.tbase.gateway.entity.param.GatewayRouteQueryParam;
+import com.wenge.tbase.gateway.entity.form.GatewayRouteQueryForm;
 import com.wenge.tbase.gateway.entity.po.GatewayRoute;
 import com.wenge.tbase.gateway.entity.vo.GatewayRouteVo;
+import com.wenge.tbase.gateway.entity.vo.GatewayRouteVoPage;
 
 public interface IGatewayRouteService {
     /**
@@ -28,7 +29,7 @@ public interface IGatewayRouteService {
      *
      * @return
      */
-    List<GatewayRouteVo> query(GatewayRouteQueryParam gatewayRouteQueryParam);
+    GatewayRouteVoPage query(GatewayRouteQueryForm gatewayRouteQueryParam);
 
     /**
      * 更新网关路由信息
@@ -36,6 +37,9 @@ public interface IGatewayRouteService {
      * @param gatewayRoute
      */
     boolean update(GatewayRoute gatewayRoute);
+    
+    
+    boolean updateStatus(String id ,String status);
 
     /**
      * 根据id删除网关路由
