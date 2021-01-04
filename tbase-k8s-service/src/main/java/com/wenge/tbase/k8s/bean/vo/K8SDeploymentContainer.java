@@ -23,20 +23,12 @@ public class K8SDeploymentContainer {
     private String memoryRequest;
     @ApiModelProperty(value = "内存配额限制")
     private String memoryLimit;
-    @ApiModelProperty(value = "容器pvc")
-    private List<K8SDeploymentPVC> pvcs;
-    @ApiModelProperty(value = "configMap")
-    private List<K8SDeploymentConfigMap> configMaps;
-    @ApiModelProperty(value = "secret")
-    private List<K8SDeploymentSecret> secrets;
-    @ApiModelProperty(value = "emptydir")
-    private List<K8SDeploymentEmptyDir> emptyDirs;
-    @ApiModelProperty(value = "hostPath")
-    private List<K8SDeploymentHostPath> hostPaths;
+    @ApiModelProperty(value = "数据卷")
+    private List<K8SDeploymentVolume> volumes;
     @ApiModelProperty(value = "日志目录")
     private List<String> logPaths;
     @ApiModelProperty(value = "容器环境变量")
-    private List<K8SDeploymentEnvironmentVar> environmentVars;
+    private List<K8SKV> environmentVars;
     @ApiModelProperty(value = "启动容器命令")
     private List<String> command;
     @ApiModelProperty(value = "启动容器命令参数")

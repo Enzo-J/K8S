@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @ApiModel(value = "Deployment Pod亲和性、反亲和性")
 public class K8SDeploymentPodAffinityRule {
@@ -19,4 +21,6 @@ public class K8SDeploymentPodAffinityRule {
     protected String topologyKey;
     @ApiModelProperty(value = "作用空间")
     protected String namespace;
+    @ApiModelProperty(value = "values")
+    private List<String> values;
 }
