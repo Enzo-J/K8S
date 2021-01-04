@@ -1,5 +1,7 @@
 package com.wenge.tbase.k8s.bean.vo.deployment;
 
+import com.google.common.collect.Lists;
+import io.fabric8.kubernetes.api.model.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -17,4 +19,23 @@ public class K8SDeploymentAffinityRule {
     protected String operator;
     @ApiModelProperty(value = "values")
     private List<String> values;
+
+
+    private PreferredSchedulingTerm preferredSchedulingTerm() {
+        NodeSelectorRequirement nodeSelectorRequirement = new NodeSelectorRequirementBuilder().withKey(key).withOperator(operator).withValues(values).build();
+        NodeSelectorTerm nodeSelectorTerm = new NodeSelectorTermBuilder().withMatchExpressions(nodeSelectorRequirement).build();
+        PreferredSchedulingTerm preferredSchedulingTerm = new PreferredSchedulingTermBuilder().withPreference(nodeSelectorTerm).build();
+        return preferredSchedulingTerm;
+    }
+
+    public NodeAffinity nodeAffinity(List<K8SDeploymentAffinityRule> affinityRules) {
+        NodeAffinityBuilder nodeAffinityBuilder = new NodeAffinityBuilder();
+        List<PreferredSchedulingTerm> preferredSchedulingTerms = Lists.newArrayList();
+        for (K8SDeploymentAffinityRule affinityRule : affinityRules) {
+            preferredSchedulingTerms.add(affinityRule.preferredSchedulingTerm());
+        }
+        return nodeAffinityBuilder.withPreferredDuringSchedulingIgnoredDuringExecution(preferredSchedulingTerms).build();
+    }
+
+
 }

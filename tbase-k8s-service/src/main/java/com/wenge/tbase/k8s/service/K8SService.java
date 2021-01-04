@@ -4,6 +4,7 @@ import com.wenge.tbase.k8s.bean.vo.K8SConfigMap;
 import com.wenge.tbase.k8s.bean.vo.K8SDeployment;
 import com.wenge.tbase.k8s.bean.vo.K8SPersistentVolumeClaim;
 import com.wenge.tbase.k8s.bean.vo.K8SSecret;
+import com.wenge.tbase.k8s.bean.vo.deployment.K8SDeploymentCreate;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.*;
 
@@ -204,6 +205,8 @@ public interface K8SService {
      * @return deployment对象
      */
     Deployment createDeployment(K8SDeployment k8SDeployment);
+
+    Deployment createDeployment(K8SDeploymentCreate k8SDeployment);
 
     /**
      * 查看Deployment详细信息
