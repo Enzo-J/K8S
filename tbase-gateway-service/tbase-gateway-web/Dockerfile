@@ -2,7 +2,7 @@
 FROM openjdk:8-jdk-alpine
 ARG JAR_FILE
 COPY ${JAR_FILE} app.jar
-ADD src/main/resources/agent/skywalking-agent/
+ADD src/main/resources/agent /skywalking-agent/
 EXPOSE 10071
 EXPOSE 8729
 ENTRYPOINT ["java","-jar","/app.jar"]
