@@ -15,54 +15,50 @@ import com.alibaba.fastjson.JSON;
 import com.wenge.tbase.gateway.entity.ServiceIntercept;
 import com.wenge.tbase.gateway.fegin.ServiceInterceptService;
 
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.cluster.RedisClusterClient;
 import lombok.extern.slf4j.Slf4j;
 
 
 /**
- * 搴旂敤鏀捐URL瀹氭椂浠诲姟
+ * 应用放行URL定时任务
  */
 @Slf4j
 @Configuration
 @EnableScheduling
 public class ServiceInterceptScheduleTask {
 	
-	private static final String SSO_INTERCEPT_REDIS_PREFIX = "intercept:";
-	
-//	@Autowired
-//	private RedisTemplate<String, String> redisTemplate;	
+	private static final String SSO_INTERCEPT_REDIS_PREFIX = "intercept:";	
 	@Autowired
-    private RedisClusterClient redisTemplate;//lettuce
+    private RedisTemplate<String, String> redisTemplate;//lettuce
 	
     @Autowired
     ServiceInterceptService serviceInterceptService;
     
     @Scheduled(cron = "0 */1 * * * ?")
     private void sendData() {
-        log.info("閲嶆柊鍒锋柊搴旂敤鏀捐URL缂撳瓨");
-        //鎶婃墍鏈夋斁琛岀殑鐨勬暟鎹煡鍑烘潵瀛樿繘reid
+        log.info("开始重新刷新应用放行URL缓存");
+        //把所有放行的的数据查出来存进reid
         List<ServiceIntercept> list  =  serviceInterceptService.getAllReleaseUrl();
         if (null != list && list.size() > 0) {
-            // 鏍规嵁搴旂敤ID杩涜鍒嗙粍
+            // 根据应用ID进行分组
             Map<String, List<ServiceIntercept>> serviceInterceptMap = list.stream().collect(Collectors.groupingBy(ServiceIntercept::getAppId));
             for (Map.Entry<String, List<ServiceIntercept>> entry : serviceInterceptMap.entrySet()) {
                 String appId = entry.getKey();
                 List<ServiceIntercept> serviceInterceptList = entry.getValue();
                 if (null != serviceInterceptList && serviceInterceptList.size() > 0) {
-                    // 鏍规嵁鏀捐瑙勫垯杩涜鍒嗙粍
+                    // 根据放行规则进行分组
                     Map<Integer, List<ServiceIntercept>> matchingRulesMap = serviceInterceptList.stream().collect(Collectors.groupingBy(ServiceIntercept::getMatchingRules));
                     for (int i = 0; i < 2; i++) {
                         List<ServiceIntercept> serviceIntercepts = matchingRulesMap.get(i);
                         if (null == serviceIntercepts || serviceIntercepts.size() == 0) {
-                        	redisTemplate.connect().sync().del(SSO_INTERCEPT_REDIS_PREFIX + appId + ":" + i);
+                        	redisTemplate.delete(SSO_INTERCEPT_REDIS_PREFIX + appId + ":" + i);
                             continue;
                         }
                         List<String> matchingRulesList = serviceIntercepts.stream().map(ServiceIntercept::getUrl).collect(Collectors.toList());
-                        redisTemplate.connect().sync().setex(SSO_INTERCEPT_REDIS_PREFIX + appId + ":" + i,1800l, JSON.toJSONString(matchingRulesList));
+                        redisTemplate.opsForValue().set(SSO_INTERCEPT_REDIS_PREFIX + appId + ":" + i, JSON.toJSONString(matchingRulesList),1800l);
                     }
                 }
             }
         }
+        log.info("结束重新刷新应用放行URL缓存");
     }
 }

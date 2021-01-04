@@ -43,26 +43,14 @@ public class RedisConfig {
         return new HttpMessageConverters(converters.orderedStream().collect(Collectors.toList()));
     }
     
-    @Bean(name = "defaultClient")
-	  @DependsOn(RedisLettuceAutoConfiguration.AUTO_INIT_BEAN_NAME)
-	  public LettuceFactory defaultClient() {
-	      return new LettuceFactory("remote.default", RedisClusterClient.class);
-	  }
+//    @Bean(name = "defaultClient")
+//	  @DependsOn(RedisLettuceAutoConfiguration.AUTO_INIT_BEAN_NAME)
+//	  public LettuceFactory defaultClient() {
+//	      return new LettuceFactory("remote.default", RedisClusterClient.class);
+//	  }
  
     
-    
-	
-	//jedis
-//	@Bean
-//    public RedisTemplate<String, Serializable> redisTemplate(RedisConnectionFactory connectionFactory){
-//        RedisTemplate<String,Serializable> redisTemplate = new RedisTemplate<>();
-//        RedisSerializer<String> stringSerializer = new StringRedisSerializer();
-//        redisTemplate.setConnectionFactory(connectionFactory);
-//        redisTemplate.setKeySerializer(stringSerializer);
-//        redisTemplate.setHashKeySerializer(stringSerializer);
-//        return  redisTemplate;
-//    }
-	
+
 	
 
 }

@@ -4,8 +4,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,6 +13,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.route.RouteDefinition;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -23,69 +22,63 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.wenge.tbase.gateway.service.IRouteService;
 
-import io.lettuce.core.cluster.RedisClusterClient;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
 public class RouteService implements IRouteService {
 
-    private static final String GATEWAY_ROUTES = "gateway_routes::";
-   
-//  private StringRedisTemplate stringRedisTemplate;//jedis
-    @Autowired
-    private RedisClusterClient stringRedisTemplate;//lettuce
+	private static final String GATEWAY_ROUTES = "gateway_routes::";
+	@Autowired
+	private RedisTemplate<String, String> stringRedisTemplate;// lettuce
 
-    @CreateCache(name = GATEWAY_ROUTES, cacheType = CacheType.REMOTE)
-    private Cache<String, RouteDefinition> gatewayRouteCache;
+	@CreateCache(name = GATEWAY_ROUTES, cacheType = CacheType.REMOTE)
+	private Cache<String, RouteDefinition> gatewayRouteCache;
 
-    private Map<String, RouteDefinition> routeDefinitionMaps = new HashMap<>();
+	private Map<String, RouteDefinition> routeDefinitionMaps = new HashMap<>();
 
-    @PostConstruct
-    private void loadRouteDefinition() {
-        log.info("loadRouteDefinition, å¼€å§‹åˆä½¿åŒ–è·¯ç”±");
-        List<String> keys=  stringRedisTemplate.connect().sync().keys(GATEWAY_ROUTES + "*");
-//        Set<String> gatewayKeys =  stringRedisTemplate.keys(GATEWAY_ROUTES + "*");
+	@PostConstruct
+	private void loadRouteDefinition() {
+		log.info("loadRouteDefinition, ¿ªÊ¼³õÊ¹»¯Â·ÓÉ");
+		Set<String> gatewayKeys = stringRedisTemplate.keys(GATEWAY_ROUTES + "*");
+		if (CollectionUtils.isEmpty(gatewayKeys)) {
+			return;
+		}
+		log.info("Ô¤¼Æ³õÊ¹»¯Â·ÓÉ, gatewayKeys£º{}", gatewayKeys);
+		// È¥µôkeyµÄÇ°×º
+		Set<String> gatewayKeyIds = gatewayKeys.stream().map(key -> {
+			return key.replace(GATEWAY_ROUTES, StringUtils.EMPTY);
+		}).collect(Collectors.toSet());
+		Map<String, RouteDefinition> allRoutes = gatewayRouteCache.getAll(gatewayKeyIds);
+		log.info("gatewayKeys£º{}", allRoutes);
+		// ÒÔÏÂ´úÂëÔ­ÒòÊÇ£¬jetcache½«RouteDefinition·µĞòÁĞ»¯ºó£¬uri·¢Éú±ä»¯£¬Î´³õÊ¹»¯£¬µ¼ÖÂÂ·ÓÉÒì³££¬ÒÔÏÂ´úÂëÊÇÖØĞÂ³õÊ¹»¯uri
+		allRoutes.values().forEach(routeDefinition -> {
+			try {
+				routeDefinition.setUri(new URI(routeDefinition.getUri().toASCIIString()));
+			} catch (URISyntaxException e) {
+				log.error("Íø¹Ø¼ÓÔØRouteDefinitionÒì³££º", e);
+			}
+		});
+		routeDefinitionMaps.putAll(allRoutes);
+		log.info("¹²³õÊ¹»¯Â·ÓÉĞÅÏ¢£º{}", routeDefinitionMaps.size());
+	}
 
-        Set<String>  gatewayKeys = new HashSet<>(keys);
-        if (CollectionUtils.isEmpty(gatewayKeys)) {
-            return;
-        }
-        log.info("é¢„è®¡åˆä½¿åŒ–è·¯ç”±, gatewayKeysï¼š{}", gatewayKeys);
-        // å»æ‰keyçš„å‰ç¼€
-        Set<String> gatewayKeyIds = gatewayKeys.stream().map(key -> {
-            return key.replace(GATEWAY_ROUTES, StringUtils.EMPTY);
-        }).collect(Collectors.toSet());
-        Map<String, RouteDefinition> allRoutes = gatewayRouteCache.getAll(gatewayKeyIds);
-        log.info("gatewayKeysï¼š{}", allRoutes);
-        // ä»¥ä¸‹ä»£ç åŸå› æ˜¯ï¼Œjetcacheå°†RouteDefinitionè¿”åºåˆ—åŒ–åï¼Œuriå‘ç”Ÿå˜åŒ–ï¼Œæœªåˆä½¿åŒ–ï¼Œå¯¼è‡´è·¯ç”±å¼‚å¸¸ï¼Œä»¥ä¸‹ä»£ç æ˜¯é‡æ–°åˆä½¿åŒ–uri
-        allRoutes.values().forEach(routeDefinition -> {
-            try {
-                routeDefinition.setUri(new URI(routeDefinition.getUri().toASCIIString()));
-            } catch (URISyntaxException e) {
-                log.error("ç½‘å…³åŠ è½½RouteDefinitionå¼‚å¸¸ï¼š", e);
-            }
-        });
-        routeDefinitionMaps.putAll(allRoutes);
-        log.info("å…±åˆä½¿åŒ–è·¯ç”±ä¿¡æ¯ï¼š{}", routeDefinitionMaps.size());
-    }
+	@Override
+	public Collection<RouteDefinition> getRouteDefinitions() {
+		return routeDefinitionMaps.values();
+	}
 
-    @Override
-    public Collection<RouteDefinition> getRouteDefinitions() {
-        return routeDefinitionMaps.values();
-    }
+	@Override
+	public boolean save(RouteDefinition routeDefinition) {
+		routeDefinitionMaps.put(routeDefinition.getId(), routeDefinition);
+		log.info("ĞÂÔöÂ·ÓÉ1Ìõ£º{},Ä¿Ç°Â·ÓÉ¹²{}Ìõ", routeDefinition, routeDefinitionMaps.size());
+		return true;
+	}
 
-    @Override
-    public boolean save(RouteDefinition routeDefinition) {
-        routeDefinitionMaps.put(routeDefinition.getId(), routeDefinition);
-        log.info("æ–°å¢è·¯ç”±1æ¡ï¼š{},ç›®å‰è·¯ç”±å…±{}æ¡", routeDefinition, routeDefinitionMaps.size());
-        return true;
-    }
-
-    @Override
-    public boolean delete(String routeId) {
-        routeDefinitionMaps.remove(routeId);
-        log.info("åˆ é™¤è·¯ç”±1æ¡ï¼š{},ç›®å‰è·¯ç”±å…±{}æ¡", routeId, routeDefinitionMaps.size());
-        return true;
-    }
+	@Override
+	public boolean delete(String routeId) {
+		routeDefinitionMaps.remove(routeId);
+		log.info("É¾³ıÂ·ÓÉ1Ìõ£º{},Ä¿Ç°Â·ÓÉ¹²{}Ìõ", routeId, routeDefinitionMaps.size());
+		return true;
+	}
 }

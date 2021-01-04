@@ -21,10 +21,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>  
+		 <!--gateway-core-->	    
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-gateway-core</artifactId>            
         </dependency>  
+         <!--公共类-->	
         <dependency>
 				<groupId>com.wenge</groupId>
 				<artifactId>tbase-commons</artifactId>					
