@@ -15,10 +15,12 @@ public class K8SDeploymentCreate {
     private String namespace;
     @ApiModelProperty(value = "期望副本数")
     private int replicas = 1;
-    @ApiModelProperty(value = "发布策略,0滚动更新，1重新发布")
-    private int deployStrategy = 0;
-    @ApiModelProperty(value = "Deployment更新策略,deployStrategy为0，可以指定这个")
-    private K8SDeploymentRollingUpdateStrategy rollingUpdateStrategy;
+    @ApiModelProperty(value = "最短就绪时间")
+    private int minReadySeconds;
+    @ApiModelProperty(value = "最大不可用副本数,传小数")
+    private Double maxUnavailable;
+    @ApiModelProperty(value = "最大超预期副本数,传小数")
+    private Double maxSurge;
     @ApiModelProperty(value = "容器配置")
     private List<K8SDeploymentContainer> containers;
     @ApiModelProperty(value = "仓库密钥")
