@@ -45,7 +45,7 @@ node {
             def currentProject = selectedProjects[i];
             //项目名称
             def currentProjectName = currentProject.split('@')[0]
-            //判断名称是否包含父目录
+             //判断名称是否包含父目录            
             if(currentProjectName.contains("/")){
                currentProjectName=currentProjectName.split("/")[currentProjectName.split("/").size()-1]
             }
@@ -55,6 +55,7 @@ node {
             def imageName = "${currentProjectName}:${tag}"
             //编译，构建本地镜像
             sh "mvn -f ${currentProjectName} clean package dockerfile:build "
+           
             //给镜像打标签
             sh "docker tag ${imageName} ${harbor_url}/${harbor_project_name}/${imageName} "
             //把镜像推送到harbor
