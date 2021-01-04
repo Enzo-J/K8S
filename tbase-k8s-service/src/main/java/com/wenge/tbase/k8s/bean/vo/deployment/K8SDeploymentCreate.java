@@ -16,7 +16,7 @@ public class K8SDeploymentCreate {
     @ApiModelProperty(value = "期望副本数")
     private int replicas = 1;
     @ApiModelProperty(value = "最短就绪时间")
-    private int minReadySeconds;
+    private Integer minReadySeconds;
     @ApiModelProperty(value = "最大不可用副本数,传小数")
     private Double maxUnavailable;
     @ApiModelProperty(value = "最大超预期副本数,传小数")
