@@ -2,6 +2,7 @@ package com.wenge.tbase.k8s.controller;
 
 import com.wenge.tbase.commons.result.ResultVO;
 import com.wenge.tbase.k8s.bean.vo.K8SDeployment;
+import com.wenge.tbase.k8s.bean.vo.deployment.K8SDeploymentCreate;
 import com.wenge.tbase.k8s.service.K8SService;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentList;
@@ -28,9 +29,10 @@ public class K8SDeploymentController {
     @ApiOperation("创建deployment")
     @PostMapping("/createDeployment")
     @ApiImplicitParams(@ApiImplicitParam(name = "K8SDeployment", value = "部署对象", dataType = "K8SDeployment"))
-    public ResultVO createDeployment(@RequestBody K8SDeployment deploymentInfo) {
-        Deployment deployment = k8SService.createDeployment(deploymentInfo);
-        return new ResultVO(deployment);
+    public ResultVO createDeployment(@RequestBody K8SDeploymentCreate deploymentInfo) {
+//        Deployment deployment = k8SService.createDeployment(deploymentInfo);
+//        return new ResultVO(deployment);
+        return new ResultVO(null);
     }
 
     @ApiOperation("查看Deployment详细信息")
