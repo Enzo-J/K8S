@@ -45,6 +45,10 @@ node {
             def currentProject = selectedProjects[i];
             //项目名称
             def currentProjectName = currentProject.split('@')[0]
+            //判断名称是否包含父目录
+            if(currentProjectName.contains("/")){
+               currentProjectName=currentProjectName.split("/")[currentProjectName.split("/").size()-1]
+            }
             //项目启动端口
             def currentProjectPort = currentProject.split('@')[1]
             //定义镜像名称
