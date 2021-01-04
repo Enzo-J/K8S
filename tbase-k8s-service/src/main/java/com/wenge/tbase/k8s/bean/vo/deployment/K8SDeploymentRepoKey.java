@@ -1,4 +1,4 @@
-package com.wenge.tbase.k8s.bean.vo;
+package com.wenge.tbase.k8s.bean.vo.deployment;
 
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
