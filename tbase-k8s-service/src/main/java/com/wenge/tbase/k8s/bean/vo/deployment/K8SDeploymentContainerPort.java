@@ -13,7 +13,7 @@ public class K8SDeploymentContainerPort {
     private String name;
     @ApiModelProperty(value = "容器port")
     private int containerPort;
-    @ApiModelProperty(value = "容器协议,TCP或者HTTP")
+    @ApiModelProperty(value = "容器协议,TCP或者UDP")
     private String protocol;
 
 

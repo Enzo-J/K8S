@@ -97,13 +97,14 @@ public class K8SDeploymentCreate {
 
     private DeploymentStrategy deploymentStrategy() {
         DeploymentStrategyBuilder deploymentStrategyBuilder = new DeploymentStrategyBuilder();
-        RollingUpdateDeployment rollingUpdateDeployment = deploymentStrategyBuilder.buildRollingUpdate();
+        RollingUpdateDeployment rollingUpdateDeployment = new RollingUpdateDeploymentBuilder().build();
         if (StringUtils.isNotBlank(maxUnavailable)) {
             rollingUpdateDeployment.setMaxUnavailable(new IntOrStringBuilder().withStrVal(maxUnavailable).build());
         }
         if (StringUtils.isNotBlank(maxSurge)) {
             rollingUpdateDeployment.setMaxSurge(new IntOrStringBuilder().withStrVal(maxSurge).build());
         }
+        deploymentStrategyBuilder.withRollingUpdate(rollingUpdateDeployment);
         return deploymentStrategyBuilder.build();
     }
 
