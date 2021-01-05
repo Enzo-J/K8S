@@ -46,13 +46,20 @@ public class K8SDeploymentCreate {
     @ApiModelProperty(value = "容忍")
     private List<K8SDeploymentToleration> tolerations;
 
-    public ObjectMeta metadata() {
+    private Map<String, String> label() {
         Map<String, String> labelMap = Maps.newHashMap();
-        if (labels != null) {
+        if (labels != null && !labels.isEmpty()) {
             for (K8SKV label : labels) {
                 labelMap.put(label.getKey(), label.getValue());
             }
+        } else {
+            labelMap.put("app", name);
         }
+        return labelMap;
+    }
+
+    public ObjectMeta metadata() {
+
         Map<String, String> annotationMap = Maps.newHashMap();
         if (annotations != null) {
             for (K8SKV annotation : annotations) {
@@ -61,22 +68,16 @@ public class K8SDeploymentCreate {
         }
         return new ObjectMetaBuilder().withNamespace(namespace)
                 .withName(name)
-                .withLabels(labelMap)
+                .withLabels(label())
                 .withAnnotations(annotationMap).build();
     }
 
     public DeploymentSpec spec() {
-        Map<String, String> labelMap = Maps.newHashMap();
-        if (labels != null) {
-            for (K8SKV label : labels) {
-                labelMap.put(label.getKey(), label.getValue());
-            }
-        }
         LabelSelector labelSelector = new LabelSelectorBuilder()
-                .withMatchLabels(labelMap)
+                .withMatchLabels(label())
                 .build();
         ObjectMeta podObjectMeta = new ObjectMetaBuilder()
-                .withLabels(labelMap)
+                .withLabels(label())
                 .build();
         PodTemplateSpecBuilder podTemplateSpecBuilder = new PodTemplateSpecBuilder()
                 .withMetadata(podObjectMeta);
@@ -117,8 +118,12 @@ public class K8SDeploymentCreate {
             }
         }
         PodSpecBuilder podSpecBuilder = new PodSpecBuilder();
-        podSpecBuilder.addToInitContainers(initContainers.toArray(new Container[0]));
-        podSpecBuilder.addToContainers(regularContainers.toArray(new Container[0]));
+        if (!regularContainers.isEmpty()) {
+            podSpecBuilder.withContainers(regularContainers);
+        }
+        if (!initContainers.isEmpty()) {
+            podSpecBuilder.withInitContainers(initContainers);
+        }
         podSpecBuilder.withHostNetwork(hostNetwork);
         if ((nodeAffinitys != null && !nodeAffinitys.isEmpty()) || (podAffinitys != null && !podAffinitys.isEmpty()) || (podAntiAffinitys != null && !podAntiAffinitys.isEmpty())) {
             podSpecBuilder.withAffinity(affinity());
@@ -130,7 +135,7 @@ public class K8SDeploymentCreate {
             }
             podSpecBuilder.withTolerations(tolerationList);
         }
-        return new PodSpecBuilder().build();
+        return podSpecBuilder.build();
     }
 
 
