@@ -12,17 +12,17 @@ import lombok.EqualsAndHashCode;
 @Data
 public class GatewayRouteQueryForm extends BaseQueryForm {
 
-    @ApiModelProperty(value = "路由发布状态")
+    @ApiModelProperty(value = "璺敱鍙戝竷鐘舵��")
     private String status;
     
-    @ApiModelProperty(value = "路由id")
+    @ApiModelProperty(value = "璺敱id")
     private String routeId;
     
-    @ApiModelProperty(value = "路由描述")
+    @ApiModelProperty(value = "璺敱鎻忚堪")
     private String description;
     
-    @ApiModelProperty(value = "路由绑定服务名")
-    private String  serverName;
+    @ApiModelProperty(value = "璺敱缁戝畾鏈嶅姟鍚�")
+    private String  serverId;
    
     
 }

@@ -1,7 +1,6 @@
 package com.wenge.tbase.gateway.entity.param;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,53 +17,51 @@ import com.wenge.tbase.gateway.entity.po.RuleDef;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 
 @ApiModel
 @Data
-@Slf4j
 public class GatewayRouteParam {
-	@NotEmpty(message = "ç½‘å…³åˆ¤æ–­è§„åˆ™ä¸èƒ½ä¸ºç©º")
-	@ApiModelProperty(value = "ç½‘å…³åˆ¤æ–­è§„åˆ™")
+	@NotEmpty(message = "Íø¹ØÅĞ¶Ï¹æÔò²»ÄÜÎª¿Õ")
+	@ApiModelProperty(value = "Íø¹ØÅĞ¶Ï¹æÔò")
 	private List<RuleDef> ruleDefs = new ArrayList<>();
 
-	@NotBlank(message = "uriä¸èƒ½ä¸ºç©º")
-	@ApiModelProperty(value = "ç½‘å…³uri")
+	@NotBlank(message = "uri²»ÄÜÎª¿Õ")
+	@ApiModelProperty(value = "Íø¹Øuri")
 	private String uri;
 
-	@NotBlank(message = "è·¯ç”±idä¸èƒ½ä¸ºç©º")
-	@ApiModelProperty(value = "ç½‘å…³è·¯ç”±id")
+	@NotBlank(message = "Â·ÓÉid²»ÄÜÎª¿Õ")
+	@ApiModelProperty(value = "Íø¹ØÂ·ÓÉid")
 	private String routeId;
 
-	@ApiModelProperty(value = "æ’åº")
+	@ApiModelProperty(value = "ÅÅĞò")
 	private Integer orders;
 	
-	@NotBlank(message = "è·¯ç”±ç»‘å®šæœåŠ¡åä¸èƒ½ä¸ºç©º")
-	@ApiModelProperty(value = "è·¯ç”±ç»‘å®šæœåŠ¡å")
-	private String  serverName;
+	@NotBlank(message = "Â·ÓÉ°ó¶¨·şÎñÃû²»ÄÜÎª¿Õ")
+	@ApiModelProperty(value = "Â·ÓÉ°ó¶¨·şÎñID")
+	private String  serverId;
 	
-	@ApiModelProperty(value = "Y : å‘å¸ƒçŠ¶æ€ Nï¼šæœªå‘å¸ƒçŠ¶æ€")
+	@ApiModelProperty(value = "Y : ·¢²¼×´Ì¬ N£ºÎ´·¢²¼×´Ì¬")
 	private String status;
 
-	@ApiModelProperty(value = "ç½‘å…³è·¯ç”±æè¿°ä¿¡æ¯")
+	@ApiModelProperty(value = "Íø¹ØÂ·ÓÉÃèÊöĞÅÏ¢")
 	private String description;
 
-	@ApiModelProperty(value = "ç§Ÿæˆ·id")
+	@ApiModelProperty(value = "×â»§id")
 	private String tenantId;
 
 	public GatewayRouteForm toForm() {
 		GatewayRouteForm gatewayRouteForm = new GatewayRouteForm();
 		List<FilterDefinition> filters = gatewayRouteForm.getFilters();
-		/* å¤„ç†è§„åˆ™ */
+		/* ´¦Àí¹æÔò */
 		List<PredicateDefinition> predicates = gatewayRouteForm.getPredicates();
-		/* é»˜è®¤è¿‡æ»¤ start */
+		/* Ä¬ÈÏ¹ıÂË start */
 		FilterDefinition filter = new FilterDefinition();
 		filter.setName("StripPrefix");
 		Map<String, String> map = filter.getArgs();
 		map.put("parts", "1");
 		filter.setArgs(map);
 		filters.add(filter);
-		/* é»˜è®¤è¿‡æ»¤ end */
+		/* Ä¬ÈÏ¹ıÂË end */
 		BeanUtils.copyProperties(this, gatewayRouteForm);
 		for (RuleDef ruleDef : ruleDefs) {
 			PredicateDefinition pdf = new PredicateDefinition();
@@ -73,7 +70,7 @@ public class GatewayRouteParam {
 			String name = convertType(type);
 			Map<String, String> pdfMap = pdf.getArgs();
 			pdf.setName(name);
-			// æ˜¯å¦æ¨¡ç³Šæˆ–è€…ç²¾ç¡®
+			// ÊÇ·ñÄ£ºı»òÕß¾«È·
 			if (matchType == 0) {
 				// Path
 				if (type == 1) {
@@ -110,7 +107,7 @@ public class GatewayRouteParam {
 						index++;
 					}
 				}
-				// æ¨¡ç³Š
+				// Ä£ºı
 			} else if (matchType == 1) {
 				
 				// Path
