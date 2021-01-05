@@ -7,6 +7,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.FilterDefinition;
 import org.springframework.cloud.gateway.handler.predicate.PredicateDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinition;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -41,7 +43,6 @@ import com.wenge.tbase.gateway.events.EventSender;
 import com.wenge.tbase.gateway.exception.WengeException;
 import com.wenge.tbase.gateway.service.IGatewayRouteService;
 
-import io.lettuce.core.cluster.RedisClusterClient;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -85,7 +86,7 @@ public class GatewayRouteService extends ServiceImpl<GatewayRouteMapper, Gateway
 	
 	private boolean charge(GatewayRoute gatewayRoute) {	
 		boolean flag=true;		
-		List<GatewayRoute> grs=gatewayRouteMapper.selectList(new QueryWrapper<GatewayRoute>().eq("server_name", gatewayRoute.getServerId()));
+		List<GatewayRoute> grs=gatewayRouteMapper.selectList(new QueryWrapper<GatewayRoute>().eq("server_id", gatewayRoute.getServerId()));
 		if(StringUtils.isNotBlank(gatewayRoute.getId())){
 			grs=grs.stream().filter(item -> !item.getId().equals(gatewayRoute.getId())).collect(Collectors.toList());
 		}
@@ -254,16 +255,16 @@ public class GatewayRouteService extends ServiceImpl<GatewayRouteMapper, Gateway
 		result.setTotalPages(gatewayRoutes.getPages());
 		return result;
 	}
-	 @Autowired
-	   private RedisClusterClient stringRedisTemplate;//lettuce
+	
+	@Autowired
+	private RedisTemplate<String, String> stringRedisTemplate;//lettuce
 
 	@Override
 	@PostConstruct
-	public boolean overload() {		
-//		
-		List<String> keys=  stringRedisTemplate.connect().sync().keys(GATEWAY_ROUTES + "*");
+	public boolean overload() {	
+		Set<String> keys=  stringRedisTemplate.keys(GATEWAY_ROUTES + "*");
 		for (String key : keys) {
-			stringRedisTemplate.connect().sync().del(key);
+			stringRedisTemplate.delete(key);
 		}
 		List<GatewayRoute> gatewayRoutes = this.list(new QueryWrapper<>());
 		gatewayRoutes.forEach(gatewayRoute -> gatewayRouteCache.put(gatewayRoute.getRouteId(),
