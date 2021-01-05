@@ -10,12 +10,12 @@ import java.util.List;
 
 @Data
 @ApiModel(value = "Deployment亲和性、反亲和性")
-public class K8SDeploymentAffinityRule {
+public class K8SDeploymentNodeAffinityRule {
 //    @ApiModelProperty(value = "1 Required, 0 Preferred")
 //    protected int type;
-    @ApiModelProperty(value = "亲和性、反亲和性 key")
+    @ApiModelProperty(value = "亲和性key")
     protected String key;
-    @ApiModelProperty(value = "亲和性、反亲和性操作符")
+    @ApiModelProperty(value = "亲和性 In,DoesNotExist,NotIn,Exists,Gt,Lt")
     protected String operator;
     @ApiModelProperty(value = "values")
     private List<String> values;
@@ -31,10 +31,10 @@ public class K8SDeploymentAffinityRule {
         return preferredSchedulingTerm;
     }
 
-    public static NodeAffinity nodeAffinity(List<K8SDeploymentAffinityRule> affinityRules) {
+    public static NodeAffinity nodeAffinity(List<K8SDeploymentNodeAffinityRule> affinityRules) {
         NodeAffinityBuilder nodeAffinityBuilder = new NodeAffinityBuilder();
         List<PreferredSchedulingTerm> preferredSchedulingTerms = Lists.newArrayList();
-        for (K8SDeploymentAffinityRule affinityRule : affinityRules) {
+        for (K8SDeploymentNodeAffinityRule affinityRule : affinityRules) {
             preferredSchedulingTerms.add(affinityRule.preferredSchedulingTerm());
         }
         return nodeAffinityBuilder.withPreferredDuringSchedulingIgnoredDuringExecution(preferredSchedulingTerms).build();

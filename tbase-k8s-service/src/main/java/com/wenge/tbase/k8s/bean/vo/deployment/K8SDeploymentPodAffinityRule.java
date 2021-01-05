@@ -17,7 +17,7 @@ public class K8SDeploymentPodAffinityRule {
 //    protected int type;
     @ApiModelProperty(value = "亲和性、反亲和性 key")
     protected String key;
-    @ApiModelProperty(value = "亲和性、反亲和性操作符")
+    @ApiModelProperty(value = "亲和性、反亲和性操作符,In,DoesNotExist,NotIn,Exists")
     protected String operator;
     @ApiModelProperty(value = "拓扑域")
     protected String topologyKey;

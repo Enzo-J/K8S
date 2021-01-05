@@ -9,7 +9,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +38,7 @@ public class K8SDeploymentCreate {
     @ApiModelProperty(value = "HostNetwork")
     private Boolean hostNetwork;
     @ApiModelProperty(value = "节点亲和性")
-    private List<K8SDeploymentAffinityRule> nodeAffinitys;
+    private List<K8SDeploymentNodeAffinityRule> nodeAffinitys;
     @ApiModelProperty(value = "副本亲和性")
     private List<K8SDeploymentPodAffinityRule> podAffinitys;
     @ApiModelProperty(value = "副本反亲和性")
@@ -138,7 +137,7 @@ public class K8SDeploymentCreate {
     public Affinity affinity() {
         AffinityBuilder affinityBuilder = new AffinityBuilder();
         if (nodeAffinitys != null && !nodeAffinitys.isEmpty()) {
-            affinityBuilder.withNodeAffinity(K8SDeploymentAffinityRule.nodeAffinity(nodeAffinitys));
+            affinityBuilder.withNodeAffinity(K8SDeploymentNodeAffinityRule.nodeAffinity(nodeAffinitys));
         }
         if (podAffinitys != null && !podAffinitys.isEmpty()) {
             affinityBuilder.withPodAffinity(K8SDeploymentPodAffinityRule.podAffinity(podAffinitys));
