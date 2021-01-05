@@ -65,7 +65,7 @@ public class K8SDeploymentContainer {
         if (StringUtils.isNotBlank(memoryLimit)) {
             resourceRequirementsBuilder.addToLimits("memory", Quantity.parse(memoryLimit));
         }
-        if (resourceRequirementsBuilder.getLimits().size() != 0 || resourceRequirementsBuilder.getRequests().size() != 0) {
+        if ((resourceRequirementsBuilder.getLimits() != null && !resourceRequirementsBuilder.getLimits().isEmpty()) || (resourceRequirementsBuilder.getRequests() != null && !resourceRequirementsBuilder.getRequests().isEmpty())) {
             containerBuilder.withResources(resourceRequirementsBuilder.build());
         }
 
