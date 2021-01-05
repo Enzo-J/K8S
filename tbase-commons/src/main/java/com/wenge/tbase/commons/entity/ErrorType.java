@@ -14,10 +14,12 @@ public enum ErrorType {
 	GATEWAY_NOT_FOUND_SERVICE(010404, "服务未找到"),
     GATEWAY_ERROR(010500, "网关异常"),
     GATEWAY_CONNECT_TIME_OUT(010002, "网关超时"),
-    ARGUMENT_NOT_VALID(020000, "请求参数校验不通过"),
-   
+    ARGUMENT_NOT_VALID(020000, "请求参数校验不通过"),   
     DUPLICATE_PRIMARY_KEY(030000,"唯一键冲突"),
-	/** gateway end*/
+    PARAM_NOT_NULL(030001,"参数不能为空"),
+    DB_FAILED(1003,"入库失败"),
+    ROUTE_DUPLICATE(1004,"路由冲突，相同服务不能拥有相同的过滤规则")
+	 /** gateway end*/
 	;
 	
     private int code;

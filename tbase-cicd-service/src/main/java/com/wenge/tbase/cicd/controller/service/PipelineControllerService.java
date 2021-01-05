@@ -243,7 +243,7 @@ public class PipelineControllerService {
             //代码拉取
             if (pipelineStage.getType() == PipelineStageTypeEnum.CODE_PULL.getType()) {
                 CodePullParam codePullParam = JSONUtil.toBean(pipelineStage.getParameter(), CodePullParam.class);
-                if(codePullParam == null){
+                if (codePullParam == null) {
                     break;
                 }
                 String codePullStage = JenkinsTemplate.getCodePullStage(codePullParam);
@@ -252,22 +252,23 @@ public class PipelineControllerService {
             //代码检测
             if (pipelineStage.getType() == PipelineStageTypeEnum.CODE_CHECK.getType()) {
                 CodeCheckParam codeCheckParam = JSONUtil.toBean(pipelineStage.getParameter(), CodeCheckParam.class);
-                if(codeCheckParam == null){
+                if (codeCheckParam == null) {
                     break;
                 }
+                String url = null;
+                String fileName = null;
                 //来源于平台
-//                if (codeCheckParam.getSonarFileSource() == 2) {
-//                    CicdSonarqube sonarqube = sonarqubeService.getById(codeCheckParam.getSonarId());
-//                    String property = System.getProperty("user.dir");
-//                    FileWriter writer = new FileWriter(property + "/" + codeCheckParam.getSonarFileAddress() + "/" + "sonar-project.properties");
-//                    writer.write(sonarqube.getContent());
-//                }
-                script.append(JenkinsTemplate.getCodeCheckStage(codeCheckParam));
+                if (codeCheckParam.getSonarFileSource() == 2) {
+                    CicdSonarqube sonarqube = sonarqubeService.getById(codeCheckParam.getSonarId());
+                    url = sonarqube.getUrl();
+                    fileName = sonarqube.getFileName();
+                }
+                script.append(JenkinsTemplate.getCodeCheckStage(codeCheckParam, url, fileName));
             }
             //编译打包公共子工程
             if (pipelineStage.getType() == PipelineStageTypeEnum.PACKAGE_COMMON.getType()) {
                 PackageCommonParam packageCommonParam = JSONUtil.toBean(pipelineStage.getParameter(), PackageCommonParam.class);
-                if(packageCommonParam == null){
+                if (packageCommonParam == null) {
                     break;
                 }
                 script.append(JenkinsTemplate.getPackageCommonStage(packageCommonParam));
@@ -280,22 +281,23 @@ public class PipelineControllerService {
             //镜像构建
             if (pipelineStage.getType() == PipelineStageTypeEnum.IMAGE_BUILD.getType()) {
                 ImageBuildParam imageBuildParam = JSONUtil.toBean(pipelineStage.getParameter(), ImageBuildParam.class);
-                if(imageBuildParam == null){
+                if (imageBuildParam == null) {
                     break;
                 }
+                String url = null;
+                String fileName = null;
                 //来源于平台
-//                if (imageBuildParam.getDockerfileSource() == 2) {
-//                    CicdDockerfile dockerfile = dockerfileService.getById(imageBuildParam.getDockerfileId());
-//                    String property = System.getProperty("user.dir");
-//                    FileWriter writer = new FileWriter(property + "/" + imageBuildParam.getProjectName() + "/" + "Dockerfile");
-//                    writer.write(dockerfile.getContent());
-//                }
-                script.append(JenkinsTemplate.getImageBuildStage(imageBuildParam));
+                if (imageBuildParam.getDockerfileSource() == 2) {
+                    CicdDockerfile dockerfile = dockerfileService.getById(imageBuildParam.getDockerfileId());
+                    url = dockerfile.getUrl();
+                    fileName = dockerfile.getFileName();
+                }
+                script.append(JenkinsTemplate.getImageBuildStage(imageBuildParam, url, fileName));
             }
             //镜像上传
             if (pipelineStage.getType() == PipelineStageTypeEnum.IMAGE_UPLOAD.getType()) {
                 ImageUploadParam imageUploadParam = JSONUtil.toBean(pipelineStage.getParameter(), ImageUploadParam.class);
-                if(imageUploadParam == null){
+                if (imageUploadParam == null) {
                     break;
                 }
                 CicdRepos cicdRepos = reposService.getById(imageUploadParam.getReposId());
@@ -360,8 +362,6 @@ public class PipelineControllerService {
                         }
                     }
                 }
-            } else {
-               break;
             }
         }
     }
@@ -373,15 +373,20 @@ public class PipelineControllerService {
      * @param name
      * @return
      */
-    public Boolean judgePipelineExist(String name) {
+    public Boolean judgePipelineExist(String name, Long id) {
         QueryWrapper<CicdPipeline> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("name", name);
         CicdPipeline pipeline = pipelineService.getOne(queryWrapper);
-        if (pipeline == null) {
-            return false;
-        } else {
-            return true;
+        if (pipeline != null) {
+            if (id != null && pipeline.getId() == id) {
+                return false;
+            } else if (id == null) {
+                return true;
+            } else {
+                return true;
+            }
         }
+        return false;
     }
 
 }

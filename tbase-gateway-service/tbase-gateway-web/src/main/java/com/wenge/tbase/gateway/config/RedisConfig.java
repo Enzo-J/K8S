@@ -1,46 +1,67 @@
-//package com.wenge.tbase.gateway.config;
-//
-//import java.time.Duration;
-//
-//import org.springframework.cache.CacheManager;
-//import org.springframework.cache.annotation.CachingConfigurerSupport;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
-//
-//import com.fasterxml.jackson.annotation.JsonAutoDetect;
-//import com.fasterxml.jackson.annotation.PropertyAccessor;
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//
-//@Configuration
-//public class RedisConfig extends CachingConfigurerSupport {
-//
-//    @Bean
-//    public CacheManager cacheManager(RedisConnectionFactory factory) {
-//        //对象的序列化
-//        RedisSerializationContext.SerializationPair valueSerializationPair
-//                = RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer());
-//        //全局redis缓存过期时间
-//        RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-//                .entryTtl(Duration.ofDays(1))
-////                .serializeKeysWith()
-//                .serializeValuesWith(valueSerializationPair);
-//
-//        return new RedisCacheManager(RedisCacheWriter.nonLockingRedisCacheWriter(factory), redisCacheConfiguration);
+package com.wenge.tbase.gateway.config;
+import java.io.Serializable;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.http.converter.HttpMessageConverter;
+
+import com.alicp.jetcache.autoconfigure.LettuceFactory;
+import com.alicp.jetcache.autoconfigure.RedisLettuceAutoConfiguration;
+
+import io.lettuce.core.cluster.RedisClusterClient;
+
+/**
+ * Redis全局配置
+ *
+ * Create by dangwei
+ */
+@Configuration
+public class RedisConfig {	
+	//lettuce
+    @Bean
+    public RedisTemplate<String, Serializable> redisTemplate(LettuceConnectionFactory connectionFactory) {
+        RedisTemplate<String, Serializable> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        redisTemplate.setConnectionFactory(connectionFactory);
+        return redisTemplate;
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean
+    public HttpMessageConverters messageConverters(ObjectProvider<HttpMessageConverter<?>> converters) {
+        return new HttpMessageConverters(converters.orderedStream().collect(Collectors.toList()));
+    }
+    
+    @Bean(name = "defaultClient")
+	  @DependsOn(RedisLettuceAutoConfiguration.AUTO_INIT_BEAN_NAME)
+	  public LettuceFactory defaultClient() {
+	      return new LettuceFactory("remote.default", RedisClusterClient.class);
+	  }
+ 
+    
+    
+	
+	//jedis
+//	@Bean
+//    public RedisTemplate<String, Serializable> redisTemplate(RedisConnectionFactory connectionFactory){
+//        RedisTemplate<String,Serializable> redisTemplate = new RedisTemplate<>();
+//        RedisSerializer<String> stringSerializer = new StringRedisSerializer();
+//        redisTemplate.setConnectionFactory(connectionFactory);
+//        redisTemplate.setKeySerializer(stringSerializer);
+//        redisTemplate.setHashKeySerializer(stringSerializer);
+//        return  redisTemplate;
 //    }
-//
-//    private Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer() {
-//
-//        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
-//        jackson2JsonRedisSerializer.setObjectMapper(objectMapper());
-//        return jackson2JsonRedisSerializer;
-//    }
-//
-//    private ObjectMapper objectMapper() {
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-//        objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
-//        return objectMapper;
-//    }
-//
-//
-//}
+	
+	
+
+}

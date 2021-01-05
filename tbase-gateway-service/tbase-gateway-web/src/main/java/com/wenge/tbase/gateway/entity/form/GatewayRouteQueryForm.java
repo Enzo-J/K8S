@@ -1,13 +1,6 @@
 package com.wenge.tbase.gateway.entity.form;
 
-import java.util.Date;
-
-import javax.validation.constraints.Past;
-
-import org.springframework.format.annotation.DateTimeFormat;
-
 import com.wenge.tbase.gateway.entity.base.BaseQueryForm;
-import com.wenge.tbase.gateway.entity.param.GatewayRouteQueryParam;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -17,18 +10,19 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @ApiModel
 @Data
-public class GatewayRouteQueryForm extends BaseQueryForm<GatewayRouteQueryParam> {
+public class GatewayRouteQueryForm extends BaseQueryForm {
 
-    @ApiModelProperty(value = "uri路径", required = true)
-    private String uri;
-
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    @Past(message = "查询开始时间必须小于当前日期")
-    @ApiModelProperty(value = "查询开始时间")
-    private Date createdTimeStart;
-
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    @Past(message = "查询结束时间必须小于当前日期")
-    @ApiModelProperty(value = "查询结束时间")
-    private Date createdTimeEnd;
+    @ApiModelProperty(value = "璺敱鍙戝竷鐘舵��")
+    private String status;
+    
+    @ApiModelProperty(value = "璺敱id")
+    private String routeId;
+    
+    @ApiModelProperty(value = "璺敱鎻忚堪")
+    private String description;
+    
+    @ApiModelProperty(value = "璺敱缁戝畾鏈嶅姟鍚�")
+    private String  serverId;
+   
+    
 }

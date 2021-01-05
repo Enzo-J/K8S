@@ -2,6 +2,7 @@ package com.wenge.tbase.gateway.entity.po;
 
 import com.wenge.tbase.gateway.entity.base.BasePo;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,5 +23,6 @@ public class GatewayRoute extends BasePo {
     private String filters;
     private String description;
     private Integer orders;
-    private String status = "Y";
+    private String status ;
+    private String  serverId;
 }

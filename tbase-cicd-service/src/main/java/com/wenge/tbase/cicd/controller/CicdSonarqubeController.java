@@ -46,7 +46,7 @@ public class CicdSonarqubeController {
         if (param == null || param.getName() == null || param.getContent() == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
-        if (service.judgeSonarqubeExist(param.getName())) {
+        if (service.judgeSonarqubeExist(param.getName(), param.getId())) {
             return new ResultVO(1001, "名称已存在", false);
         }
         return new ResultVO(ResultCode.SUCCESS, service.createSonarqube(param));
@@ -58,7 +58,7 @@ public class CicdSonarqubeController {
         if (param == null || param.getId() == null || param.getName() == null || param.getContent() == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
-        if (service.judgeSonarqubeExist(param.getName())) {
+        if (service.judgeSonarqubeExist(param.getName(), param.getId())) {
             return new ResultVO(1001, "名称已存在", false);
         }
         return new ResultVO(ResultCode.SUCCESS, service.updateSonarqube(param));
@@ -79,7 +79,7 @@ public class CicdSonarqubeController {
         if (name == null) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
-        return new ResultVO(ResultCode.SUCCESS, service.judgeSonarqubeExist(name));
+        return new ResultVO(ResultCode.SUCCESS, service.judgeSonarqubeExist(name, null));
     }
 }
 

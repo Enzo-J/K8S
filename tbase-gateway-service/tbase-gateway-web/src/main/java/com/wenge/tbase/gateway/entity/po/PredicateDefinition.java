@@ -1,9 +1,13 @@
 package com.wenge.tbase.gateway.entity.po;
 
-import lombok.*;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @EqualsAndHashCode
 @Data
@@ -11,6 +15,8 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PredicateDefinition {
+	
     private String name;
-    private Map<String, String> args = new LinkedHashMap<>();
+    private Map<String, String> args = new LinkedHashMap<>();    
+
 }

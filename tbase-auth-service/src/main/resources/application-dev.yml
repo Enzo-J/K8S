@@ -51,8 +51,8 @@ feign:
         readTimeout: 5000
 sso:
   client-id: app_manage00000000000000000000003f537b2c88f82b823c5b3fb4706126c7
-  client-secret: 应用管理平台
-#  redirect_uri: http://192.168.1.68:8080
+  client-secret: app_manage
+  redirect_uri: http://172.16.0.10:8088
 #  TODO:redirect_uri 待填,这里要改为应用管理平台的跳转地址
-  redirect_uri: http://172.16.0.12:32645
+#  redirect_uri: http://172.16.0.12:32645
   sso_uri: http://172.16.0.13:30713

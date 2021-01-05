@@ -1,5 +1,7 @@
 server:
   port: ${SERVER_PORT:10070}
+  servlet:
+        context-path: /
 spring:
   application:
     name: tbase-gateway-core
@@ -13,3 +15,6 @@ spring:
     sentinel:
       transport:
         dashboard: ${SENTINEL_DASHBOARD_HOST:172.16.0.8}:${SENTINEL_DASHBOARD_PORT:32076}
+        port: 8730
+
+    
