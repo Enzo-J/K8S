@@ -2,6 +2,7 @@ package com.wenge.tbase.k8s.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.wenge.tbase.k8s.bean.vo.*;
+import com.wenge.tbase.k8s.bean.vo.deployment.K8SDeploymentCreate;
 import com.wenge.tbase.k8s.constant.K8SConstant;
 import com.wenge.tbase.k8s.listener.SimpleListener;
 import com.wenge.tbase.k8s.service.K8SService;
@@ -464,6 +465,13 @@ public class K8SServiceImpl implements K8SService {
             log.error(e.getMessage());
             return null;
         }
+    }
+
+    public Deployment createDeployment(K8SDeploymentCreate k8SDeployment) {
+        Deployment deployment = new DeploymentBuilder().withMetadata(k8SDeployment.metadata())
+                .withSpec(k8SDeployment.spec()).build();
+        deployment = kClient.apps().deployments().inNamespace(k8SDeployment.getNamespace()).create(deployment);
+        return deployment;
     }
 
     @Override

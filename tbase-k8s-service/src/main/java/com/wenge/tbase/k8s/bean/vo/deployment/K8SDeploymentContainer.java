@@ -1,8 +1,11 @@
 package com.wenge.tbase.k8s.bean.vo.deployment;
 
+import com.google.common.collect.Lists;
+import io.fabric8.kubernetes.api.model.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -28,9 +31,9 @@ public class K8SDeploymentContainer {
     @ApiModelProperty(value = "日志目录")
     private List<String> logPaths;
     @ApiModelProperty(value = "容器环境变量")
-    private List<K8SKV> environmentVars;
+    private List<K8SKV> envs;
     @ApiModelProperty(value = "启动容器命令")
-    private List<String> command;
+    private List<String> commands;
     @ApiModelProperty(value = "启动容器命令参数")
     private List<String> commandArgs;
     @ApiModelProperty(value = "存活探测")
@@ -40,9 +43,90 @@ public class K8SDeploymentContainer {
     @ApiModelProperty(value = "生命周期-启动前")
     private K8sDeploymentProbe lifecyclePreStop;
     @ApiModelProperty(value = "生命周期-启动后")
-    private K8sDeploymentProbe lifecyclePostStop;
+    private K8sDeploymentProbe lifecyclePostStart;
     @ApiModelProperty(value = "容器暴露端口")
     private List<K8SDeploymentContainerPort> ports;
     @ApiModelProperty(value = "镜像拉取策略,IfNotPresent,Always,Never,默认不用传")
     private String imagePullPolicy;
+
+    public Container container() {
+        ContainerBuilder containerBuilder = new ContainerBuilder().withName(name).withImage(imageName);
+
+        ResourceRequirementsBuilder resourceRequirementsBuilder = new ResourceRequirementsBuilder();
+        if (StringUtils.isNotBlank(cpuRequest)) {
+            resourceRequirementsBuilder.addToRequests("cpu", Quantity.parse(cpuRequest));
+        }
+        if (StringUtils.isNotBlank(memoryRequest)) {
+            resourceRequirementsBuilder.addToRequests("memory", Quantity.parse(memoryRequest));
+        }
+        if (StringUtils.isNotBlank(cpuLimit)) {
+            resourceRequirementsBuilder.addToLimits("cpu", Quantity.parse(cpuLimit));
+        }
+        if (StringUtils.isNotBlank(memoryLimit)) {
+            resourceRequirementsBuilder.addToLimits("memory", Quantity.parse(memoryLimit));
+        }
+        if (resourceRequirementsBuilder.getLimits().size() != 0 || resourceRequirementsBuilder.getRequests().size() != 0) {
+            containerBuilder.withResources(resourceRequirementsBuilder.build());
+        }
+
+        if (volumes != null) {
+            List<VolumeMount> volumeMounts = Lists.newArrayList();
+            for (K8SDeploymentVolume volume : volumes) {
+                if (volume.getType() == 0) {
+
+                } else if (volume.getType() == 5) {
+
+                } else {
+                    volumeMounts.add(volume.volumeMount());
+                }
+            }
+            containerBuilder.withVolumeMounts(volumeMounts);
+        }
+        if (envs != null) {
+            List<EnvVar> envVars = Lists.newArrayList();
+            List<EnvFromSource> envFromSources = Lists.newArrayList();
+            for (K8SKV env : envs) {
+                if (env.getType() == 1 || env.getType() == 2) {
+                    EnvFromSource envFromSource = env.envFromSource();
+                    if (envFromSource != null) {
+                        envFromSources.add(envFromSource);
+                    }
+                } else if (env.getType() == 0 || env.getType() == 3 || env.getType() == 4) {
+                    envVars.add(env.envVar());
+                }
+            }
+            containerBuilder.withEnv(envVars);
+            containerBuilder.withEnvFrom(envFromSources);
+        }
+        if (commands != null) {
+            containerBuilder.addAllToCommand(commands);
+        }
+        if (commandArgs != null) {
+            containerBuilder.addAllToArgs(commandArgs);
+        }
+        if (livenessProbe != null) {
+            containerBuilder.withLivenessProbe(livenessProbe.probe());
+        }
+        if (startupProbe != null) {
+            containerBuilder.withStartupProbe(startupProbe.probe());
+        }
+        if (lifecyclePreStop != null) {
+            containerBuilder.withLifecycle(lifecyclePreStop.lifecycle(true));
+        }
+        if (lifecyclePostStart != null) {
+            containerBuilder.withLifecycle(lifecyclePostStart.lifecycle(false));
+        }
+        if (ports != null) {
+            List<ContainerPort> containerPorts = Lists.newArrayList();
+            for (K8SDeploymentContainerPort port : ports) {
+                containerPorts.add(port.containerPort());
+            }
+            containerBuilder.withPorts(containerPorts);
+        }
+
+        if (StringUtils.isNotBlank(imagePullPolicy)) {
+            containerBuilder.withImagePullPolicy(imagePullPolicy);
+        }
+        return containerBuilder.build();
+    }
 }

@@ -44,13 +44,18 @@ node {
             //取出每个项目的名称和端口
             def currentProject = selectedProjects[i];
             //项目名称
-            def currentProjectName = currentProject.split('@')[0]
+            def currentProjectName = currentProject.split('@')[0]             
             //项目启动端口
             def currentProjectPort = currentProject.split('@')[1]
             //定义镜像名称
             def imageName = "${currentProjectName}:${tag}"
             //编译，构建本地镜像
             sh "mvn -f ${currentProjectName} clean package dockerfile:build "
+           //判断名称是否包含父目录            
+            if(currentProjectName.contains("/")){
+               currentProjectName=currentProjectName.split("/")[currentProjectName.split("/").size()-1]
+               imageName = "${currentProjectName}:${tag}"
+            }
             //给镜像打标签
             sh "docker tag ${imageName} ${harbor_url}/${harbor_project_name}/${imageName} "
             //把镜像推送到harbor
