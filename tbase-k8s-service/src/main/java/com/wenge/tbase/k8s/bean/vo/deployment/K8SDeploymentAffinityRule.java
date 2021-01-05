@@ -11,8 +11,8 @@ import java.util.List;
 @Data
 @ApiModel(value = "Deployment亲和性、反亲和性")
 public class K8SDeploymentAffinityRule {
-    @ApiModelProperty(value = "1 Required, 0 Preferred")
-    protected int type;
+//    @ApiModelProperty(value = "1 Required, 0 Preferred")
+//    protected int type;
     @ApiModelProperty(value = "亲和性、反亲和性 key")
     protected String key;
     @ApiModelProperty(value = "亲和性、反亲和性操作符")
@@ -22,13 +22,16 @@ public class K8SDeploymentAffinityRule {
 
 
     private PreferredSchedulingTerm preferredSchedulingTerm() {
-        NodeSelectorRequirement nodeSelectorRequirement = new NodeSelectorRequirementBuilder().withKey(key).withOperator(operator).withValues(values).build();
-        NodeSelectorTerm nodeSelectorTerm = new NodeSelectorTermBuilder().withMatchExpressions(nodeSelectorRequirement).build();
+        NodeSelectorRequirementBuilder nodeSelectorRequirementBuilder = new NodeSelectorRequirementBuilder().withKey(key).withOperator(operator);
+        if (!("Exists".equals(operator) || "DoesNotExist".equals(operator))) {
+            nodeSelectorRequirementBuilder.withValues(values);
+        }
+        NodeSelectorTerm nodeSelectorTerm = new NodeSelectorTermBuilder().withMatchExpressions(nodeSelectorRequirementBuilder.build()).build();
         PreferredSchedulingTerm preferredSchedulingTerm = new PreferredSchedulingTermBuilder().withPreference(nodeSelectorTerm).build();
         return preferredSchedulingTerm;
     }
 
-    public NodeAffinity nodeAffinity(List<K8SDeploymentAffinityRule> affinityRules) {
+    public static NodeAffinity nodeAffinity(List<K8SDeploymentAffinityRule> affinityRules) {
         NodeAffinityBuilder nodeAffinityBuilder = new NodeAffinityBuilder();
         List<PreferredSchedulingTerm> preferredSchedulingTerms = Lists.newArrayList();
         for (K8SDeploymentAffinityRule affinityRule : affinityRules) {

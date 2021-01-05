@@ -1,5 +1,6 @@
 package com.wenge.tbase.k8s.bean.vo.deployment;
 
+import com.google.common.collect.Lists;
 import io.fabric8.kubernetes.api.model.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -12,8 +13,8 @@ import java.util.List;
 public class K8SDeploymentPodAffinityRule {
     @ApiModelProperty(value = "weight, 1-100")
     protected Integer weight = 100;
-    @ApiModelProperty(value = "1 Required, 0 Preferred")
-    protected int type;
+//    @ApiModelProperty(value = "1 Required, 0 Preferred")
+//    protected int type;
     @ApiModelProperty(value = "亲和性、反亲和性 key")
     protected String key;
     @ApiModelProperty(value = "亲和性、反亲和性操作符")
@@ -47,17 +48,24 @@ public class K8SDeploymentPodAffinityRule {
         return weightedPodAffinityTermBuilder.build();
     }
 
-    public PodAffinity podAffinity(List<K8SDeploymentPodAffinityRule> podAffinityRules) {
+    public static PodAffinity podAffinity(List<K8SDeploymentPodAffinityRule> podAffinityRules) {
         PodAffinityBuilder podAffinityBuilder = new PodAffinityBuilder();
+        List<WeightedPodAffinityTerm> weightedPodAffinityTerms = Lists.newArrayList();
         for (K8SDeploymentPodAffinityRule podAffinityRule : podAffinityRules) {
-
+            weightedPodAffinityTerms.add(podAffinityRule.weightedPodAffinityTerm());
         }
-        podAffinityBuilder.withPreferredDuringSchedulingIgnoredDuringExecution();
+
+        podAffinityBuilder.withPreferredDuringSchedulingIgnoredDuringExecution(weightedPodAffinityTerms);
         return podAffinityBuilder.build();
     }
 
-    public PodAntiAffinity podAntiAffinity(List<K8SDeploymentPodAffinityRule> podAffinityRules) {
-
-        return null;
+    public static PodAntiAffinity podAntiAffinity(List<K8SDeploymentPodAffinityRule> podAntiAffinityRules) {
+        PodAntiAffinityBuilder podAntiAffinityBuilder = new PodAntiAffinityBuilder();
+        List<WeightedPodAffinityTerm> weightedPodAffinityTerms = Lists.newArrayList();
+        for (K8SDeploymentPodAffinityRule podAntiAffinityRule : podAntiAffinityRules) {
+            weightedPodAffinityTerms.add(podAntiAffinityRule.weightedPodAffinityTerm());
+        }
+        podAntiAffinityBuilder.withPreferredDuringSchedulingIgnoredDuringExecution(weightedPodAffinityTerms);
+        return podAntiAffinityBuilder.build();
     }
 }

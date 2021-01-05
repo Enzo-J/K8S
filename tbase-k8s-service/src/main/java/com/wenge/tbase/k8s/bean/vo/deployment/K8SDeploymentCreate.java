@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -45,11 +46,6 @@ public class K8SDeploymentCreate {
     private List<K8SDeploymentPodAffinityRule> podAntiAffinitys;
     @ApiModelProperty(value = "容忍")
     private List<K8SDeploymentToleration> tolerations;
-    public String valid() {
-
-        return null;
-    }
-
 
     public ObjectMeta metadata() {
         Map<String, String> labelMap = Maps.newHashMap();
@@ -99,7 +95,6 @@ public class K8SDeploymentCreate {
         return deploymentSpecBuilder.build();
     }
 
-
     private DeploymentStrategy deploymentStrategy() {
         DeploymentStrategyBuilder deploymentStrategyBuilder = new DeploymentStrategyBuilder();
         RollingUpdateDeployment rollingUpdateDeployment = deploymentStrategyBuilder.buildRollingUpdate();
@@ -126,8 +121,33 @@ public class K8SDeploymentCreate {
         podSpecBuilder.addToInitContainers(initContainers.toArray(new Container[0]));
         podSpecBuilder.addToContainers(regularContainers.toArray(new Container[0]));
         podSpecBuilder.withHostNetwork(hostNetwork);
-
-        //TODO:
+        if ((nodeAffinitys != null && !nodeAffinitys.isEmpty()) || (podAffinitys != null && !podAffinitys.isEmpty()) || (podAntiAffinitys != null && !podAntiAffinitys.isEmpty())) {
+            podSpecBuilder.withAffinity(affinity());
+        }
+        if (tolerations != null && !tolerations.isEmpty()) {
+            List<Toleration> tolerationList = Lists.newArrayList();
+            for (K8SDeploymentToleration toleration : tolerations) {
+                tolerationList.add(toleration.toleration());
+            }
+            podSpecBuilder.withTolerations(tolerationList);
+        }
         return new PodSpecBuilder().build();
     }
+
+
+    public Affinity affinity() {
+        AffinityBuilder affinityBuilder = new AffinityBuilder();
+        if (nodeAffinitys != null && !nodeAffinitys.isEmpty()) {
+            affinityBuilder.withNodeAffinity(K8SDeploymentAffinityRule.nodeAffinity(nodeAffinitys));
+        }
+        if (podAffinitys != null && !podAffinitys.isEmpty()) {
+            affinityBuilder.withPodAffinity(K8SDeploymentPodAffinityRule.podAffinity(podAffinitys));
+        }
+        if (podAntiAffinitys != null && podAntiAffinitys.isEmpty()) {
+            affinityBuilder.withPodAntiAffinity(K8SDeploymentPodAffinityRule.podAntiAffinity(podAntiAffinitys));
+        }
+        return affinityBuilder.build();
+    }
+
+
 }

@@ -49,8 +49,6 @@ public class K8SDeploymentContainer {
     @ApiModelProperty(value = "镜像拉取策略,IfNotPresent,Always,Never,默认不用传")
     private String imagePullPolicy;
 
-
-
     public Container container() {
         ContainerBuilder containerBuilder = new ContainerBuilder().withName(name).withImage(imageName);
 
