@@ -94,10 +94,10 @@ management:
       exposure:
         include: '*'
 
-logging:
-  level:
-    com.springboot.cloud: debug
-    com.jalja.org.spring: debug
-  path: logs/
-  file:
-    max-size: 1GB
+#logging:
+ # level:
+  #  com.springboot.cloud: debug
+   # com.jalja.org.spring: debug
+  #path: logs/
+  #file:
+   # max-size: 1GB
