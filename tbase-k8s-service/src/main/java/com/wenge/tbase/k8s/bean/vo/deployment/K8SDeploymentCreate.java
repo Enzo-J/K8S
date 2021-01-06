@@ -46,6 +46,25 @@ public class K8SDeploymentCreate {
     @ApiModelProperty(value = "容忍")
     private List<K8SDeploymentToleration> tolerations;
 
+    /**
+     * 初始化操作,设置卷挂载名称
+     */
+    public void init() {
+        Map<String, Integer> map = Maps.newHashMap();
+        for (K8SDeploymentContainer container : containers) {
+            List<K8SDeploymentVolume> deploymentVolumes = container.getVolumes();
+            if (deploymentVolumes == null) {
+                continue;
+            }
+            for (K8SDeploymentVolume deploymentVolume : deploymentVolumes) {
+                map.putIfAbsent(container.getName(), 0);
+                Integer index = map.get(container.getName());
+                String volumeMountName = "data-volume-" + container.getName() + "-" + index;
+                deploymentVolume.setVolumeMountName(volumeMountName);
+            }
+        }
+    }
+
     private Map<String, String> label() {
         Map<String, String> labelMap = Maps.newHashMap();
         if (labels != null && !labels.isEmpty()) {
@@ -125,6 +144,12 @@ public class K8SDeploymentCreate {
         if (!initContainers.isEmpty()) {
             podSpecBuilder.withInitContainers(initContainers);
         }
+
+        List<Volume> volumes = volumes();
+        if (!volumes.isEmpty()) {
+            podSpecBuilder.withVolumes(volumes);
+        }
+
         podSpecBuilder.withHostNetwork(hostNetwork);
         if ((nodeAffinitys != null && !nodeAffinitys.isEmpty()) || (podAffinitys != null && !podAffinitys.isEmpty()) || (podAntiAffinitys != null && !podAntiAffinitys.isEmpty())) {
             podSpecBuilder.withAffinity(affinity());
@@ -139,8 +164,24 @@ public class K8SDeploymentCreate {
         return podSpecBuilder.build();
     }
 
+    private List<Volume> volumes() {
+        List<Volume> volumes = Lists.newArrayList();
+        for (K8SDeploymentContainer container : containers) {
+            List<K8SDeploymentVolume> deploymentVolumes = container.getVolumes();
+            if (deploymentVolumes == null) {
+                continue;
+            }
+            for (K8SDeploymentVolume deploymentVolume : deploymentVolumes) {
+                Volume volume = deploymentVolume.volume();
+                if (volume != null) {
+                    volumes.add(volume);
+                }
+            }
+        }
+        return volumes;
+    }
 
-    public Affinity affinity() {
+    private Affinity affinity() {
         AffinityBuilder affinityBuilder = new AffinityBuilder();
         if (nodeAffinitys != null && !nodeAffinitys.isEmpty()) {
             affinityBuilder.withNodeAffinity(K8SDeploymentNodeAffinityRule.nodeAffinity(nodeAffinitys));

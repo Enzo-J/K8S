@@ -23,7 +23,11 @@ public class NacosServiceServiceImpl implements NacosServiceService{
 
 		try {
 				result =JsoupUtils.post(ConstantConfig.nacosServiceAddress, serviceMap);
-				return RestResult.ok(result);
+				if(result.equals("ok")) {
+					return RestResult.ok(result);
+				}else {
+					return RestResult.error("服务创建失败,请重试！！！");
+				}
 			} catch (Exception e) {
 				return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
@@ -36,7 +40,11 @@ public class NacosServiceServiceImpl implements NacosServiceService{
 
 		try {
 				result =JsoupUtils.delete(ConstantConfig.nacosServiceAddress, serviceMap);
+			if(result.equals("ok")) {
 				return RestResult.ok(result);
+			}else {
+				return RestResult.error("服务删除失败,请重试！！！");
+			}
 			} catch (Exception e) {
 				return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
