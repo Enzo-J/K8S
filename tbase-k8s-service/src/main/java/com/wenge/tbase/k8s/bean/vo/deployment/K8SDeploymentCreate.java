@@ -191,7 +191,7 @@ public class K8SDeploymentCreate {
         if (podAffinitys != null && !podAffinitys.isEmpty()) {
             affinityBuilder.withPodAffinity(K8SDeploymentPodAffinityRule.podAffinity(podAffinitys));
         }
-        if (podAntiAffinitys != null && podAntiAffinitys.isEmpty()) {
+        if (podAntiAffinitys != null && !podAntiAffinitys.isEmpty()) {
             affinityBuilder.withPodAntiAffinity(K8SDeploymentPodAffinityRule.podAntiAffinity(podAntiAffinitys));
         }
         return affinityBuilder.build();
