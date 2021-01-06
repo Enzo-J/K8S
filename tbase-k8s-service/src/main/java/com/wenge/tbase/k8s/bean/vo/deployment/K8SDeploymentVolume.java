@@ -26,8 +26,10 @@ public class K8SDeploymentVolume {
     private String hostPathPath;
     @ApiModelProperty(value = "hostPath->Type")
     private String hostPathType;
-    @ApiModelProperty(value = "emptyDirSizeLimit")
-    private String emptyDirSizeLimit;
+    @ApiModelProperty(value = "emptyDir 容量限制 MB")
+    private Integer emptyDirSizeLimit;
+    @ApiModelProperty(value = "emptyDir 单位 Memory")
+    private String emptyDirMedium;
 
     public VolumeMount volumeMount() {
         VolumeMountBuilder volumeMountBuilder = new VolumeMountBuilder().withName(volumeMountName);
@@ -41,11 +43,16 @@ public class K8SDeploymentVolume {
     }
 
     private EmptyDirVolumeSource emptyDirVolumeSource() {
-        EmptyDirVolumeSourceBuilder emptyDirVolumeSourceBuilder = new EmptyDirVolumeSourceBuilder().withSizeLimit(Quantity.parse(emptyDirSizeLimit));
+        EmptyDirVolumeSourceBuilder emptyDirVolumeSourceBuilder = new EmptyDirVolumeSourceBuilder();
+        if ("Memory".equals(emptyDirSizeLimit)) {
+            Quantity quantity = Quantity.parse(String.valueOf(emptyDirSizeLimit * 1024 * 1024));
+            emptyDirVolumeSourceBuilder.withSizeLimit(quantity);
+            emptyDirVolumeSourceBuilder.withMedium(emptyDirMedium);
+        }
         return emptyDirVolumeSourceBuilder.build();
     }
 
-    public HostPathVolumeSource hostPathVolumeSource() {
+    private HostPathVolumeSource hostPathVolumeSource() {
         return new HostPathVolumeSourceBuilder().withPath(hostPathPath).withType(hostPathType).build();
     }
 

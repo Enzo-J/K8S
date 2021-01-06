@@ -59,6 +59,9 @@ public class K8SDeploymentCreate {
             for (K8SDeploymentVolume deploymentVolume : deploymentVolumes) {
                 map.putIfAbsent(container.getName(), 0);
                 Integer index = map.get(container.getName());
+                index++;
+                map.put(container.getName(), index);
+
                 String volumeMountName = "data-volume-" + container.getName() + "-" + index;
                 deploymentVolume.setVolumeMountName(volumeMountName);
             }
@@ -67,12 +70,11 @@ public class K8SDeploymentCreate {
 
     private Map<String, String> label() {
         Map<String, String> labelMap = Maps.newHashMap();
+        labelMap.put("app", name);
         if (labels != null && !labels.isEmpty()) {
             for (K8SKV label : labels) {
                 labelMap.put(label.getKey(), label.getValue());
             }
-        } else {
-            labelMap.put("app", name);
         }
         return labelMap;
     }
