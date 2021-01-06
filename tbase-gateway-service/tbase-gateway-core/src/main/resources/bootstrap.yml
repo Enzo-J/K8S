@@ -9,12 +9,13 @@ spring:
     nacos:
       discovery: 
         server-addr: ${REGISTER_HOST:172.16.0.6}:${REGISTER_PORT:30000}
+        #server-addr: ${REGISTER_HOST:10.148.25.11}:${REGISTER_PORT:30000}
       config:
         server-addr: ${REGISTER_HOST:172.16.0.6}:${REGISTER_PORT:30000}
+        #server-addr: ${REGISTER_HOST:10.148.25.11}:${REGISTER_PORT:30000}
         file-extension: yml
     sentinel:
       transport:
         dashboard: ${SENTINEL_DASHBOARD_HOST:172.16.0.8}:${SENTINEL_DASHBOARD_PORT:32076}
+        #dashboard: ${SENTINEL_DASHBOARD_HOST:10.148.25.24}:${SENTINEL_DASHBOARD_PORT:8858}
         port: 8730
-
-    
