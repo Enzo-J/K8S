@@ -2,6 +2,7 @@ package com.wenge.tbase.k8s.bean.vo.deployment;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.wenge.tbase.k8s.utils.StringUtil;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.*;
 import io.swagger.annotations.ApiModel;
@@ -120,10 +121,22 @@ public class K8SDeploymentCreate {
         DeploymentStrategyBuilder deploymentStrategyBuilder = new DeploymentStrategyBuilder();
         RollingUpdateDeployment rollingUpdateDeployment = new RollingUpdateDeploymentBuilder().build();
         if (StringUtils.isNotBlank(maxUnavailable)) {
-            rollingUpdateDeployment.setMaxUnavailable(new IntOrStringBuilder().withStrVal(maxUnavailable).build());
+            IntOrStringBuilder intOrStringBuilder = new IntOrStringBuilder();
+            if (StringUtil.isIntString(maxUnavailable)) {
+                intOrStringBuilder.withIntVal(Integer.valueOf(maxUnavailable));
+            } else {
+                intOrStringBuilder.withStrVal(maxUnavailable);
+            }
+            rollingUpdateDeployment.setMaxUnavailable(intOrStringBuilder.build());
         }
         if (StringUtils.isNotBlank(maxSurge)) {
-            rollingUpdateDeployment.setMaxSurge(new IntOrStringBuilder().withStrVal(maxSurge).build());
+            IntOrStringBuilder intOrStringBuilder = new IntOrStringBuilder();
+            if (StringUtil.isIntString(maxSurge)) {
+                intOrStringBuilder.withIntVal(Integer.valueOf(maxSurge));
+            } else {
+                intOrStringBuilder.withStrVal(maxSurge);
+            }
+            rollingUpdateDeployment.setMaxSurge(intOrStringBuilder.build());
         }
         deploymentStrategyBuilder.withRollingUpdate(rollingUpdateDeployment);
         return deploymentStrategyBuilder.build();
