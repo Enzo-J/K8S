@@ -468,6 +468,7 @@ public class K8SServiceImpl implements K8SService {
     }
 
     public Deployment createDeployment(K8SDeploymentCreate k8SDeployment) {
+        k8SDeployment.init();
         Deployment deployment = new DeploymentBuilder().withMetadata(k8SDeployment.metadata())
                 .withSpec(k8SDeployment.spec()).build();
         deployment = kClient.apps().deployments().inNamespace(k8SDeployment.getNamespace()).create(deployment);

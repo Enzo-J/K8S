@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 @Data
 @ApiModel(value = "K8S kv键值对，用于label,annotation,environment")
 public class K8SKV {
-    @ApiModelProperty(value = "类型,0 值,1 configmap,2 secert")
+    @ApiModelProperty(value = "类型,0 值,1 configmap,2 secert,3 Field,4 Resource")
     private int type;
     @ApiModelProperty(value = "key")
     private String key;
