@@ -28,32 +28,32 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GatewayRouteForm extends BaseForm<GatewayRoute> {
 
-    @NotEmpty(message = "网关断言不能为空")
-    @ApiModelProperty(value = "网关断言")
+    @NotEmpty(message = "缃戝叧鏂█涓嶈兘涓虹┖")
+    @ApiModelProperty(value = "缃戝叧鏂█")
     private List<PredicateDefinition> predicates = new ArrayList<>();
     
-    @ApiModelProperty(value = "网关过滤器信息")
+    @ApiModelProperty(value = "缃戝叧杩囨护鍣ㄤ俊鎭�")
     private List<FilterDefinition> filters = new ArrayList<>();
     
-    @NotBlank(message = "uri不能为空")
-    @ApiModelProperty(value = "网关uri")
+    @NotBlank(message = "uri涓嶈兘涓虹┖")
+    @ApiModelProperty(value = "缃戝叧uri")
     private String uri;    
 
-    @NotBlank(message = "路由绑定服务名不能为空")
-    @ApiModelProperty(value = "路由绑定服务名")
-    private String  serverName;    
+    @NotBlank(message = "璺敱缁戝畾鏈嶅姟鍚嶄笉鑳戒负绌�")
+    @ApiModelProperty(value = "璺敱缁戝畾鏈嶅姟鍚�")
+    private String  serverId;    
 
-    @NotBlank(message = "路由id不能为空")
-    @ApiModelProperty(value = "网关路由id")
+    @NotBlank(message = "璺敱id涓嶈兘涓虹┖")
+    @ApiModelProperty(value = "缃戝叧璺敱id")
     private String routeId;
     
-    @ApiModelProperty(value = "排序")
+    @ApiModelProperty(value = "鎺掑簭")
     private Integer orders;
 
-    @ApiModelProperty(value = "网关路由描述信息")
+    @ApiModelProperty(value = "缃戝叧璺敱鎻忚堪淇℃伅")
     private String description;   
     
-    @ApiModelProperty(value = "Y : 发布状态 N：未发布状态")
+    @ApiModelProperty(value = "Y : 鍙戝竷鐘舵�� N锛氭湭鍙戝竷鐘舵��")
 	private String status;
     
 
@@ -66,7 +66,7 @@ public class GatewayRouteForm extends BaseForm<GatewayRoute> {
             gatewayRoute.setFilters(objectMapper.writeValueAsString(this.getFilters()));
             gatewayRoute.setPredicates(objectMapper.writeValueAsString(this.getPredicates()));
         } catch (JsonProcessingException e) {
-            log.error("网关filter或predicates配置转换异常", e);
+            log.error("缃戝叧filter鎴杙redicates閰嶇疆杞崲寮傚父", e);
         }
         return gatewayRoute;
     }

@@ -7,6 +7,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.FilterDefinition;
 import org.springframework.cloud.gateway.handler.predicate.PredicateDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinition;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -41,7 +43,6 @@ import com.wenge.tbase.gateway.events.EventSender;
 import com.wenge.tbase.gateway.exception.WengeException;
 import com.wenge.tbase.gateway.service.IGatewayRouteService;
 
-import io.lettuce.core.cluster.RedisClusterClient;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -71,7 +72,7 @@ public class GatewayRouteService extends ServiceImpl<GatewayRouteMapper, Gateway
 			gatewayRoute.setStatus(status);
 		}			
 		boolean isSuccess = this.save(gatewayRoute);
-		// è½¬åŒ–ä¸ºgatewayéœ€è¦çš„ç±»å‹ï¼Œç¼“å­˜åˆ°redis, å¹¶äº‹ä»¶é€šçŸ¥å„ç½‘å…³åº”ç”¨
+		// ×ª»¯ÎªgatewayĞèÒªµÄÀàĞÍ£¬»º´æµ½redis, ²¢ÊÂ¼şÍ¨Öª¸÷Íø¹ØÓ¦ÓÃ
 		if(isSuccess) {
 			RouteDefinition routeDefinition = gatewayRouteToRouteDefinition(gatewayRoute);
 			gatewayRouteCache.put(gatewayRoute.getRouteId(), routeDefinition);
@@ -85,7 +86,7 @@ public class GatewayRouteService extends ServiceImpl<GatewayRouteMapper, Gateway
 	
 	private boolean charge(GatewayRoute gatewayRoute) {	
 		boolean flag=true;		
-		List<GatewayRoute> grs=gatewayRouteMapper.selectList(new QueryWrapper<GatewayRoute>().eq("server_name", gatewayRoute.getServerName()));
+		List<GatewayRoute> grs=gatewayRouteMapper.selectList(new QueryWrapper<GatewayRoute>().eq("server_id", gatewayRoute.getServerId()));
 		if(StringUtils.isNotBlank(gatewayRoute.getId())){
 			grs=grs.stream().filter(item -> !item.getId().equals(gatewayRoute.getId())).collect(Collectors.toList());
 		}
@@ -134,7 +135,7 @@ public class GatewayRouteService extends ServiceImpl<GatewayRouteMapper, Gateway
 	
 		boolean isSuccess=this.removeById(id);
 		if(isSuccess) {
-			// åˆ é™¤redisç¼“å­˜, å¹¶äº‹ä»¶é€šçŸ¥å„ç½‘å…³åº”ç”¨
+			// É¾³ıredis»º´æ, ²¢ÊÂ¼şÍ¨Öª¸÷Íø¹ØÓ¦ÓÃ
 			gatewayRouteCache.remove(gatewayRoute.getRouteId());
 			JSONObject sendObj = new JSONObject();
 			sendObj.put("ACTION_KEY", "DEL");
@@ -151,7 +152,7 @@ public class GatewayRouteService extends ServiceImpl<GatewayRouteMapper, Gateway
 		String uri = gatewayRoute.getUri();
 		gatewayRoute.setUri(convertUri(uri));
 		boolean isSuccess = this.updateById(gatewayRoute);
-		// è½¬åŒ–ä¸ºgatewayéœ€è¦çš„ç±»å‹ï¼Œç¼“å­˜åˆ°redis, å¹¶äº‹ä»¶é€šçŸ¥å„ç½‘å…³åº”ç”¨
+		// ×ª»¯ÎªgatewayĞèÒªµÄÀàĞÍ£¬»º´æµ½redis, ²¢ÊÂ¼şÍ¨Öª¸÷Íø¹ØÓ¦ÓÃ
 		if(isSuccess) {
 			RouteDefinition routeDefinition = gatewayRouteToRouteDefinition(gatewayRoute);
 			gatewayRouteCache.put(gatewayRoute.getRouteId(), routeDefinition);
@@ -184,7 +185,7 @@ public class GatewayRouteService extends ServiceImpl<GatewayRouteMapper, Gateway
 	
 
 	/**
-	 * å°†æ•°æ®åº“ä¸­jsonå¯¹è±¡è½¬æ¢ä¸ºç½‘å…³éœ€è¦çš„RouteDefinitionå¯¹è±¡
+	 * ½«Êı¾İ¿âÖĞjson¶ÔÏó×ª»»ÎªÍø¹ØĞèÒªµÄRouteDefinition¶ÔÏó
 	 *
 	 * @param gatewayRoute
 	 * @return RouteDefinition
@@ -209,7 +210,7 @@ public class GatewayRouteService extends ServiceImpl<GatewayRouteMapper, Gateway
 					new TypeReference<List<PredicateDefinition>>() {
 					}));
 		} catch (IOException e) {
-			log.error("ç½‘å…³è·¯ç”±å¯¹è±¡è½¬æ¢å¤±è´¥", e);
+			log.error("Íø¹ØÂ·ÓÉ¶ÔÏó×ª»»Ê§°Ü", e);
 		}
 		return routeDefinition;
 	}
@@ -228,20 +229,17 @@ public class GatewayRouteService extends ServiceImpl<GatewayRouteMapper, Gateway
 		
 		if(StringUtils.isNotBlank(gatewayRouteQueryParam.getDescription()) && StringUtils.isNotBlank(gatewayRouteQueryParam.getRouteId())) {
 			
-			queryWrapper.like(StringUtils.isNotBlank(gatewayRouteQueryParam.getServerName()),GatewayRoute::getUri,
-					gatewayRouteQueryParam.getServerName()).and(i ->     	
+			queryWrapper.eq(StringUtils.isNotBlank(gatewayRouteQueryParam.getServerId()),GatewayRoute::getServerId,
+					gatewayRouteQueryParam.getServerId()).and(i ->     	
 							i
 							.like(GatewayRoute::getRouteId,
 									gatewayRouteQueryParam.getRouteId())
 							.or().like(GatewayRoute::getDescription,
 									gatewayRouteQueryParam.getDescription()));	
 		}else {
-			queryWrapper.like(StringUtils.isNotBlank(gatewayRouteQueryParam.getServerName()),GatewayRoute::getUri,
-					gatewayRouteQueryParam.getServerName());
-		}
-			
-		
-		
+			queryWrapper.eq(StringUtils.isNotBlank(gatewayRouteQueryParam.getServerId()),GatewayRoute::getServerId,
+					gatewayRouteQueryParam.getServerId());
+		}		
 		queryWrapper.orderByDesc(GatewayRoute::getCreatedTime);
 		IPage gatewayRoutes = this.page(gatewayRouteQueryParam.getPage(), queryWrapper);
 		List<GatewayRoute> gatewayRouteList = gatewayRoutes.getRecords();
@@ -257,26 +255,26 @@ public class GatewayRouteService extends ServiceImpl<GatewayRouteMapper, Gateway
 		result.setTotalPages(gatewayRoutes.getPages());
 		return result;
 	}
-	 @Autowired
-	   private RedisClusterClient stringRedisTemplate;//lettuce
+	
+	@Autowired
+	private RedisTemplate<String, String> stringRedisTemplate;//lettuce
 
 	@Override
 	@PostConstruct
-	public boolean overload() {		
-//		
-		List<String> keys=  stringRedisTemplate.connect().sync().keys(GATEWAY_ROUTES + "*");
+	public boolean overload() {	
+		Set<String> keys=  stringRedisTemplate.keys(GATEWAY_ROUTES + "*");
 		for (String key : keys) {
-			stringRedisTemplate.connect().sync().del(key);
+			stringRedisTemplate.delete(key);
 		}
 		List<GatewayRoute> gatewayRoutes = this.list(new QueryWrapper<>());
 		gatewayRoutes.forEach(gatewayRoute -> gatewayRouteCache.put(gatewayRoute.getRouteId(),
 				gatewayRouteToRouteDefinition(gatewayRoute)));
-		log.info("å…¨å±€åˆä½¿åŒ–ç½‘å…³è·¯ç”±æˆåŠŸ!");
+		log.info("È«¾Ö³õÊ¹»¯Íø¹ØÂ·ÓÉ³É¹¦!");
 		return true;
 	}
 
 	/**
-	 * è½¬æ¢uri
+	 * ×ª»»uri
 	 * 
 	 * @return uri
 	 */

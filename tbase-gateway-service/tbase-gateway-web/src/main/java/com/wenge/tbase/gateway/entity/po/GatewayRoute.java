@@ -24,5 +24,5 @@ public class GatewayRoute extends BasePo {
     private String description;
     private Integer orders;
     private String status ;
-    private String  serverName;
+    private String  serverId;
 }

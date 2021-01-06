@@ -34,7 +34,7 @@ import com.wenge.tbase.gateway.service.IGatewayServiceService;
 
 /**
  * <p>
- *  服务实现类
+ *  鏈嶅姟瀹炵幇绫�
  * </p>
  *
  * @author dangwei
@@ -55,7 +55,7 @@ public class GatewayServiceServiceImpl extends ServiceImpl<GatewayServiceMapper,
 	@Override
 	public GatewayServiceVoPage query(String serviceName,long current,long size) {	
 		QueryWrapper<GatewayService> queryWrapper=new QueryWrapper<GatewayService>();
-		queryWrapper.like(StringUtils.isNotBlank(serviceName),"service_name", serviceName);	
+		queryWrapper.like(StringUtils.isNotBlank(serviceName),"service_id", serviceName);	
 		queryWrapper.orderByDesc("created_time");
 		IPage<GatewayService> result=gatewayServiceMapper.selectPage(new Page(current, size), queryWrapper);		
 		return new GatewayServiceVoPage(result);
@@ -67,17 +67,17 @@ public class GatewayServiceServiceImpl extends ServiceImpl<GatewayServiceMapper,
 		RestResult<?> result = microserviceConfigFeign.getServiceList(true, false, 1, 10000000, null,null,null);
 		if(200 != result.status) 
 			throw new RpcException(result.data.toString(),result.status);		
-		//交集
+		//浜ら泦
 		List<GatewayService> intersection = null;
-	    //fromCenter - 交集 =  新增集合
+	    //fromCenter - 浜ら泦 =  鏂板闆嗗悎
 		List<GatewayService> reduceServer = null;	
-		//下线集合
+		//涓嬬嚎闆嗗悎
 		List<GatewayService> offlineServer = null;	
 				
 		try {
-			//注册中心同步的服务对象
+			//娉ㄥ唽涓績鍚屾鐨勬湇鍔″璞�
 			List<GatewayService> gatewayServicefromCenter=new LinkedList<>();
-			//本地服务对象集合
+			//鏈湴鏈嶅姟瀵硅薄闆嗗悎
 			List<GatewayService> gatewayServicefromLocal=new LinkedList<>();
 			
 			gatewayServicefromLocal=gatewayServiceMapper.selectList(new QueryWrapper<GatewayService>());			
@@ -91,18 +91,18 @@ public class GatewayServiceServiceImpl extends ServiceImpl<GatewayServiceMapper,
 			}
 			
 			List<GatewayService> gatewayServicefromLocalTemp=gatewayServicefromLocal;
-//			//更新交集
+//			//鏇存柊浜ら泦
 			intersection =gatewayServicefromCenter.stream().filter(item -> find1(item.getServiceName(), gatewayServicefromLocalTemp) > -1).collect(Collectors.toList());
 //			
 //			for (GatewayService gatewayService : intersection) {
 //				flag=this.update(gatewayService, new LambdaQueryWrapper<GatewayService>().eq(GatewayService::getServiceName, gatewayService.getServiceName()));
 //			}
 //			
-//			//插入差集
+//			//鎻掑叆宸泦
 			reduceServer =gatewayServicefromCenter.stream().filter(item -> !(find1(item.getServiceName(), gatewayServicefromLocalTemp) > -1)).collect(Collectors.toList());
 //			flag=this.saveBatch(reduceServer);
 //						
-//			//更新已经下线的服务			
+//			//鏇存柊宸茬粡涓嬬嚎鐨勬湇鍔�			
 			offlineServer =gatewayServicefromLocalTemp.stream().filter(item -> !(find1(item.getServiceName(), gatewayServicefromCenter) > -1)).collect(Collectors.toList());
 //			for (GatewayService gatewayService : reduceServer1) {
 //				gatewayService.setStatus("N");
@@ -110,9 +110,9 @@ public class GatewayServiceServiceImpl extends ServiceImpl<GatewayServiceMapper,
 //			}
 //			if(!flag)
 //				throw new WengeException(ErrorType.DB_FAILED);		
-//			//覆盖服务名集合
+//			//瑕嗙洊鏈嶅姟鍚嶉泦鍚�
 //			intersectionStr=intersection.stream().map(e -> e.getServiceName()).collect(Collectors.toList());
-//			//新增服务名集合
+//			//鏂板鏈嶅姟鍚嶉泦鍚�
 //			reduceStr=reduceServer.stream().map(e -> e.getServiceName()).collect(Collectors.toList());
 						
 		} catch (Exception e) {
@@ -128,18 +128,18 @@ public class GatewayServiceServiceImpl extends ServiceImpl<GatewayServiceMapper,
 	public boolean submit2Db(List<GatewayService> intersection,List<GatewayService> reduceServer,List<GatewayService> offlineServer) {
 		boolean flag=false;
 	    try {
-			//批量更新交集
+			//鎵归噺鏇存柊浜ら泦
 			if(!CollectionUtils.isEmpty(intersection)) {			
 				for (GatewayService gatewayService : intersection) {
 					flag=this.update(gatewayService, new LambdaQueryWrapper<GatewayService>().eq(GatewayService::getServiceName, gatewayService.getServiceName()));
 				}	
 			}		
-			//插入差集
+			//鎻掑叆宸泦
 			if(!CollectionUtils.isEmpty(intersection)) {
 				flag=this.saveBatch(reduceServer);
 			}
 						
-			//更新已经下线的服务
+			//鏇存柊宸茬粡涓嬬嚎鐨勬湇鍔�
 			if(!CollectionUtils.isEmpty(offlineServer))
 			for (GatewayService gatewayService : offlineServer) {
 				gatewayService.setStatus("N");
@@ -172,13 +172,13 @@ public class GatewayServiceServiceImpl extends ServiceImpl<GatewayServiceMapper,
 		gatewayServiceEntity.setStatus(STATUS_Y);
 		gatewayServiceEntity.setSynchronize(STATUS_Y);
 		gatewayServiceEntity.setServerType(SERVER_TYPE)	;
-		//获取服务实例对象
+		//鑾峰彇鏈嶅姟瀹炰緥瀵硅薄
 		RestResult<?> result = microserviceConfigFeign.getInstanceList(servName, null, null, null, true);
 		if(200 != result.status) 
 			throw new RpcException(result.data.toString(),result.status);		
 		JSONObject data =JSON.parseObject(JSON.toJSONString(result.data));	
 		List<JSONObject> microserviceList=data.getJSONArray("hosts").toJavaList(JSONObject.class);
-		//默认取第一个服务实例的ip+port
+		//榛樿鍙栫涓�涓湇鍔″疄渚嬬殑ip+port
 		if(!CollectionUtils.isEmpty(microserviceList)) {
 			String ip=microserviceList.get(0).getString("ip");
 			Integer  port = microserviceList.get(0).getInteger("port");

@@ -25,31 +25,31 @@ import lombok.extern.slf4j.Slf4j;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Slf4j
-@ApiModel("è¿”å›è·¯ç”±å¯¹è±¡")
+@ApiModel("·µ»ØÂ·ÓÉ¶ÔÏó")
 public class GatewayRouteVo extends BaseVo {
-	@ApiModelProperty(value = "å”¯ä¸€ID")
+	@ApiModelProperty(value = "Î¨Ò»ID")
 	private String id;
-	@ApiModelProperty(value = "ç§Ÿæˆ·id")
+	@ApiModelProperty(value = "×â»§id")
 	private String tenantId;
-	@ApiModelProperty(value = "è·¯ç”±åç§°")
+	@ApiModelProperty(value = "Â·ÓÉÃû³Æ")
 	private String routeId;
-	@ApiModelProperty(value = "è·¯ç”±æè¿°")
+	@ApiModelProperty(value = "Â·ÓÉÃèÊö")
 	private String description;
-	@ApiModelProperty(value = "è·¯ç”±çŠ¶æ€ Yï¼šå¯ç”¨ N:ç¦ç”¨")
+	@ApiModelProperty(value = "Â·ÓÉ×´Ì¬ Y£º¿ÉÓÃ N:½ûÓÃ")
 	private String status;
-	@ApiModelProperty(value = "è·¯ç”±çš„åœ°å€")
+	@ApiModelProperty(value = "Â·ÓÉµÄµØÖ·")
 	private String uri;
-	@ApiModelProperty(value = "è·¯ç”±ç»‘å®šæœåŠ¡å")
-	private String  serverName;
-	@ApiModelProperty(value = "æ’åº")
+	@ApiModelProperty(value = "Â·ÓÉ°ó¶¨·şÎñid")
+	private String  serverId;
+	@ApiModelProperty(value = "ÅÅĞò")
 	private Integer orders;
-	@ApiModelProperty(value = "åˆ›å»ºäºº")
+	@ApiModelProperty(value = "´´½¨ÈË")
 	private String createdBy;
-	@ApiModelProperty(value = "åˆ›å»ºæ—¶é—´")
+	@ApiModelProperty(value = "´´½¨Ê±¼ä")
 	private String createdTime;
-	@ApiModelProperty(value = "æ›´æ–°äºº")
+	@ApiModelProperty(value = "¸üĞÂÈË")
 	private String updatedBy;
-	@ApiModelProperty(value = "æ›´æ–°æ—¶é—´")
+	@ApiModelProperty(value = "¸üĞÂÊ±¼ä")
 	private String updatedTime;
 	private List<RuleDef> ruleDefs = new ArrayList<>();
 	public GatewayRouteVo() {}
@@ -65,7 +65,7 @@ public class GatewayRouteVo extends BaseVo {
 		this.updatedBy = gatewayRoute.getUpdatedBy();
 		this.updatedTime = DateFormatUtils.format(gatewayRoute.getUpdatedTime(),"yyyy-MM-dd HH:mm:ss");
 		this.tenantId = gatewayRoute.getTenantId();
-		this.serverName = gatewayRoute.getServerName();
+		this.serverId = gatewayRoute.getServerId();
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
 			List<FilterDefinition> filters = objectMapper.readValue(gatewayRoute.getFilters(),
@@ -135,7 +135,7 @@ public class GatewayRouteVo extends BaseVo {
 				}
 			}
 		} catch (IOException e) {
-			log.error("ç½‘å…³è·¯ç”±å¯¹è±¡è½¬æ¢å¤±è´¥", e);
+			log.error("Íø¹ØÂ·ÓÉ¶ÔÏó×ª»»Ê§°Ü", e);
 		}
 
 	}
