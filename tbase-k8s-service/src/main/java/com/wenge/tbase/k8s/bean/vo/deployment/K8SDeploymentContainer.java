@@ -72,13 +72,7 @@ public class K8SDeploymentContainer {
         if (volumes != null) {
             List<VolumeMount> volumeMounts = Lists.newArrayList();
             for (K8SDeploymentVolume volume : volumes) {
-                if (volume.getType() == 0) {
-
-                } else if (volume.getType() == 5) {
-
-                } else {
-                    volumeMounts.add(volume.volumeMount());
-                }
+                volumeMounts.add(volume.volumeMount());
             }
             containerBuilder.withVolumeMounts(volumeMounts);
         }
