@@ -27,7 +27,7 @@ public class K8SDeploymentNodeAffinityRule {
             nodeSelectorRequirementBuilder.withValues(values);
         }
         NodeSelectorTerm nodeSelectorTerm = new NodeSelectorTermBuilder().withMatchExpressions(nodeSelectorRequirementBuilder.build()).build();
-        PreferredSchedulingTerm preferredSchedulingTerm = new PreferredSchedulingTermBuilder().withPreference(nodeSelectorTerm).build();
+        PreferredSchedulingTerm preferredSchedulingTerm = new PreferredSchedulingTermBuilder().withPreference(nodeSelectorTerm).withWeight(100).build();
         return preferredSchedulingTerm;
     }
 

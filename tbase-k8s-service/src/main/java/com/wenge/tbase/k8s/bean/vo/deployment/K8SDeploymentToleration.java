@@ -17,6 +17,8 @@ public class K8SDeploymentToleration {
     private String value;
     @ApiModelProperty(value = "effect为NoSchedule、PreferNoSchedule、NoExecute")
     private String effect;
+    @ApiModelProperty(value = "容忍时长")
+    private Long tolerationSeconds;
 
 
 
@@ -27,6 +29,9 @@ public class K8SDeploymentToleration {
             tolerationBuilder.withValue(value);
         }
         tolerationBuilder.withEffect(effect);
+        if (tolerationSeconds != null) {
+            tolerationBuilder.withTolerationSeconds(tolerationSeconds);
+        }
         return tolerationBuilder.build();
     }
 }

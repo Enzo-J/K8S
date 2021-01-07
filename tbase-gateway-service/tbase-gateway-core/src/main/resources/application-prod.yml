@@ -1,0 +1,103 @@
+spring:
+  profiles:
+    active: prod
+  rabbitmq:
+    host: ${RABBIT_MQ_HOST:10.148.25.24}
+    port: ${RABBIT_MQ_PORT:5672}
+    username: ${RABBIT_MQ_USERNAME:admin}
+    password: ${RABBIT_MQ_PASSWORD:admin%2020}
+  redis:
+    cluster:
+      nodes:
+        - 10.148.25.30:8001
+        - 10.148.25.30:8002
+        - 10.148.25.30:8003
+        - 10.148.25.30:8004
+        - 10.148.25.30:8005
+        - 10.148.25.30:8006
+    #host: ${REDIS_HOST:127.0.0.1}
+    #port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:uBOWSBEo8N}
+    lettuce:
+    #jedis:
+      pool:
+        max-active: 1000
+        max-wait: -1
+        max-idle: 10      
+        min-idle: 5
+
+  #jwt密码
+  #security:
+   # oauth2:
+    #  jwt:
+     #   signingKey: 123456
+  #cloud:
+   # gateway:
+    #  default-filters:
+     #   - name: Retry
+      #    args:
+       #     retries: 3
+        #    statuses: BAD_GATEWAY
+        #- AddResponseHeader=X-Response-Default-Foo, Default-Bar
+        #- name: RequestRateLimiter
+        #  args:
+        #    redis-rate-limiter.replenishRate: 2  #流速 每秒
+         #   redis-rate-limiter.burstCapacity: 10   #令牌桶的容积
+          #  rate-limiter: "#{@defaultRedisRateLimiter}"  #SPEL表达式去的对应的bean
+          #  key-resolver: "#{@apiKeyResolver}" #SPEL表达式去的对应的bean
+
+jetcache:
+  statIntervalMinutes: 1
+  areaInCacheName: false
+  hidePackages: com.wenge.tbase.gateway
+  local:
+    # 默认永久本地缓存
+    default:
+      type: caffeine
+      keyConvertor: fastjson
+  remote:
+    # 默认永久的远程缓存
+    default:
+      type: redis.lettuce
+      #type: redis
+      keyConvertor: fastjson    
+      uri[0]: redis://${spring.redis.password}@10.148.25.30:8001/
+      uri[1]: redis://${spring.redis.password}@10.148.25.30:8002/
+      uri[2]: redis://${spring.redis.password}@10.148.25.30:8003/
+      uri[3]: redis://${spring.redis.password}@10.148.25.30:8004/
+      uri[4]: redis://${spring.redis.password}@10.148.25.30:8005/
+      uri[5]: redis://${spring.redis.password}@10.148.25.30:8006/
+      valueEncoder: kryo
+      valueDecoder: kryo
+      #poolConfig:
+       # minIdle: 5
+        #maxIdle: 1000
+        #maxTotal: 2000
+      #host: ${spring.redis.host}
+      #port: ${spring.redis.port}
+      #password: ${spring.redis.password}
+
+#网关白名单，无需要签权url
+#gate:
+ # ignore:
+  #  authentication:
+   #   startWith: /oauth,/open,/v2/api-docs
+feign:
+  sentinel:
+    enabled: true
+  okhttp:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+#logging:
+ # level:
+  #  com.springboot.cloud: debug
+   # com.jalja.org.spring: debug
+  #path: logs/
+  #file:
+   # max-size: 1GB

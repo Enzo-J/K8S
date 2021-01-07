@@ -18,16 +18,17 @@ public class NacosServiceServiceImpl implements NacosServiceService{
 
 	@Override
 	public RestResult<?> createService(HashMap<String, String> serviceMap) {
-		  String result;
-		log.info("serviceMap"+JSONObject.toJSONString(serviceMap));
-
 		try {
+		String result=null;
+		Boolean isOk=true;
+		log.info("serviceMap"+JSONObject.toJSONString(serviceMap));
+			while (isOk){
 				result =JsoupUtils.post(ConstantConfig.nacosServiceAddress, serviceMap);
 				if(result.equals("ok")) {
-					return RestResult.ok(result);
-				}else {
-					return RestResult.error("服务创建失败,请重试！！！");
+					isOk=false;
 				}
+			}
+			return RestResult.ok(result);
 			} catch (Exception e) {
 				return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
@@ -35,19 +36,22 @@ public class NacosServiceServiceImpl implements NacosServiceService{
 
 	@Override
 	public RestResult<?> deleteService(HashMap<String, String> serviceMap) {
-		  String result;
-		log.info("serviceMap"+JSONObject.toJSONString(serviceMap));
-
 		try {
+		  String result=null;
+		  Boolean isOk=true;
+		  log.info("serviceMap"+JSONObject.toJSONString(serviceMap));
+			while (isOk){
 				result =JsoupUtils.delete(ConstantConfig.nacosServiceAddress, serviceMap);
-			if(result.equals("ok")) {
-				return RestResult.ok(result);
-			}else {
-				return RestResult.error("服务删除失败,请重试！！！");
+				if(result.equals("ok")) {
+					isOk=false;
+
+				}
 			}
+			return RestResult.ok(result);
 			} catch (Exception e) {
 				return RestResult.error(ResultCode.NOT_FIND_RESOURCE.getMsg());
 		}
+
 	}
 
 	@Override

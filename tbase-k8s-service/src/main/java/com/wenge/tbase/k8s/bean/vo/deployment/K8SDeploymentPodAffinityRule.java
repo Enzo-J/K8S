@@ -12,7 +12,7 @@ import java.util.List;
 @ApiModel(value = "Deployment Pod亲和性、反亲和性")
 public class K8SDeploymentPodAffinityRule {
     @ApiModelProperty(value = "weight, 1-100")
-    protected Integer weight;
+    protected Integer weight = 100;
 //    @ApiModelProperty(value = "1 Required, 0 Preferred")
 //    protected int type;
     @ApiModelProperty(value = "亲和性、反亲和性 key")

@@ -78,19 +78,12 @@ public class K8SDeploymentContainer {
         }
         if (envs != null) {
             List<EnvVar> envVars = Lists.newArrayList();
-            List<EnvFromSource> envFromSources = Lists.newArrayList();
+//            List<EnvFromSource> envFromSources = Lists.newArrayList();
             for (K8SKV env : envs) {
-                if (env.getType() == 1 || env.getType() == 2) {
-                    EnvFromSource envFromSource = env.envFromSource();
-                    if (envFromSource != null) {
-                        envFromSources.add(envFromSource);
-                    }
-                } else if (env.getType() == 0 || env.getType() == 3 || env.getType() == 4) {
-                    envVars.add(env.envVar());
-                }
+                envVars.add(env.envVar());
             }
             containerBuilder.withEnv(envVars);
-            containerBuilder.withEnvFrom(envFromSources);
+//            containerBuilder.withEnvFrom(envFromSources);
         }
         if (commands != null) {
             containerBuilder.addAllToCommand(commands);

@@ -18,19 +18,46 @@ public class K8SKV {
     @ApiModelProperty(value = "configmap 或者 secert key ref, ")
     private String ref;
 
-
     public EnvVar envVar() {
-        return new EnvVarBuilder().withName(key).withValue(value).build();
+        EnvVarBuilder envVarBuilder = new EnvVarBuilder();
+        envVarBuilder.withName(key);
+        if (type == 0) {
+            envVarBuilder.withValue(value);
+        } else {
+            EnvVarSourceBuilder envVarSourceBuilder = new EnvVarSourceBuilder();
+            if (type == 1) {
+                ConfigMapKeySelectorBuilder configMapKeySelectorBuilder = new ConfigMapKeySelectorBuilder();
+                configMapKeySelectorBuilder.withName(value);
+                configMapKeySelectorBuilder.withKey(ref);
+                envVarSourceBuilder.withConfigMapKeyRef(configMapKeySelectorBuilder.build());
+            } else if (type == 2) {
+                SecretKeySelectorBuilder secretKeySelectorBuilder = new SecretKeySelectorBuilder();
+                secretKeySelectorBuilder.withName(value);
+                secretKeySelectorBuilder.withKey(ref);
+                envVarSourceBuilder.withSecretKeyRef(secretKeySelectorBuilder.build());
+            } else if (type == 3) {
+                ObjectFieldSelectorBuilder objectFieldSelectorBuilder = new ObjectFieldSelectorBuilder();
+                objectFieldSelectorBuilder.withFieldPath(value);
+                envVarSourceBuilder.withFieldRef(objectFieldSelectorBuilder.build());
+            } else {
+                ResourceFieldSelectorBuilder resourceFieldSelectorBuilder = new ResourceFieldSelectorBuilder();
+                resourceFieldSelectorBuilder.withResource(ref);
+                envVarSourceBuilder.withResourceFieldRef(resourceFieldSelectorBuilder.build());
+            }
+            envVarBuilder.withValueFrom(envVarSourceBuilder.build());
+        }
+        return envVarBuilder.build();
     }
-
 
     public EnvFromSource envFromSource() {
         EnvFromSourceBuilder envFromSourceBuilder = new EnvFromSourceBuilder();
         if (type == 1) {
-            ConfigMapEnvSource configMapEnvSource = new ConfigMapEnvSourceBuilder().withName(value).build();
+            ConfigMapEnvSourceBuilder configMapEnvSourceBuilder = new ConfigMapEnvSourceBuilder().withName(value);
+            ConfigMapEnvSource configMapEnvSource = configMapEnvSourceBuilder.build();
             envFromSourceBuilder.withConfigMapRef(configMapEnvSource);
         } else {
-            SecretEnvSource secretEnvSource = new SecretEnvSourceBuilder().withName(value).build();
+            SecretEnvSourceBuilder secretEnvSourceBuilder = new SecretEnvSourceBuilder().withName(value);
+            SecretEnvSource secretEnvSource = secretEnvSourceBuilder.build();
             envFromSourceBuilder.withSecretRef(secretEnvSource);
         }
         if (StringUtils.isNotBlank(ref)) {
