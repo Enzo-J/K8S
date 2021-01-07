@@ -4,8 +4,6 @@ import com.wenge.tbase.commons.result.ResultCode;
 import com.wenge.tbase.commons.result.ResultVO;
 import com.wenge.tbase.k8s.bean.vo.K8SSecret;
 import com.wenge.tbase.k8s.service.K8SService;
-import io.fabric8.kubernetes.api.model.Secret;
-import io.fabric8.kubernetes.api.model.SecretList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -36,8 +34,7 @@ public class K8SSecretController {
                 return new ResultVO(ResultCode.PARAM_IS_EMPTY);
             }
         }
-        Secret secret = k8SService.createSecret(secretInfo);
-        return new ResultVO(secret);
+        return k8SService.createSecret(secretInfo);
     }
 
     @ApiOperation("查看对应密文的详细信息")
@@ -47,24 +44,21 @@ public class K8SSecretController {
             @ApiImplicitParam(name = "namespace", value = "名称空间", dataType = "String", required = true)})
     public ResultVO findSecretDetail(@NotBlank @RequestParam String secretName,
                                      @NotBlank @RequestParam String namespace) {
-        Secret secretDetail = k8SService.findSecretDetail(secretName, namespace);
-        return new ResultVO(secretDetail);
+        return k8SService.findSecretDetail(secretName, namespace);
     }
 
     @ApiOperation("查询当前名称空间下所有密文")
     @GetMapping("/listSecret")
     @ApiImplicitParams(@ApiImplicitParam(name = "namespace", value = "名称空间", dataType = "String", required = true))
     public ResultVO listSecret(@NotBlank @RequestParam String namespace) {
-        SecretList secretList = k8SService.listSecret(namespace);
-        return new ResultVO(secretList);
+        return k8SService.listSecret(namespace);
     }
 
     @ApiOperation("修改密文")
     @PutMapping("/editSecret")
     @ApiImplicitParams(@ApiImplicitParam(name = "K8SSecret", value = "K8SSecret对象", dataType = "K8SSecret"))
     public ResultVO editSecret(@RequestBody K8SSecret secretInfo) {
-        Secret secret = k8SService.editSecret(secretInfo);
-        return new ResultVO(secret);
+        return k8SService.editSecret(secretInfo);
     }
 
     @ApiOperation("删除单个密文")
@@ -72,8 +66,7 @@ public class K8SSecretController {
     @ApiImplicitParams({@ApiImplicitParam(name = "spacename", value = "命名空间名称", dataType = "String", required = true),
             @ApiImplicitParam(name = "name", value = "密文名称", dataType = "String", required = true)})
     public ResultVO delSecret(@NotBlank @RequestParam String spacename, @NotBlank @RequestParam String name) {
-        boolean res = k8SService.delSecret(spacename, name);
-        return new ResultVO(res);
+        return k8SService.delSecret(spacename, name);
     }
 
     @ApiOperation("批量删除密文")
@@ -83,15 +76,13 @@ public class K8SSecretController {
     public ResultVO delSecrets(@NotBlank @RequestParam String spacename, @NotBlank @RequestParam String secretnames) {
         String[] secretnamesArr = secretnames.split(",", -1);
         List<String> secretnamesList = Arrays.asList(secretnamesArr);
-        boolean res = k8SService.delSecrets(spacename, secretnamesList);
-        return new ResultVO(res);
+        return k8SService.delSecrets(spacename, secretnamesList);
     }
 
     @ApiOperation("删除该命名空间下的所有密文")
     @PostMapping("/delSecretsAll")
     @ApiImplicitParams(@ApiImplicitParam(name = "spacename", value = "命名空间名称", dataType = "String", required = true))
     public ResultVO delSecretsAll(@NotBlank @RequestParam String spacename) {
-        boolean res = k8SService.delSecretsAll(spacename);
-        return new ResultVO(res);
+        return k8SService.delSecretsAll(spacename);
     }
 }

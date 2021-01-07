@@ -1,5 +1,6 @@
 package com.wenge.tbase.k8s.service;
 
+import com.wenge.tbase.commons.result.ResultVO;
 import com.wenge.tbase.k8s.bean.vo.K8SConfigMap;
 import com.wenge.tbase.k8s.bean.vo.K8SDeployment;
 import com.wenge.tbase.k8s.bean.vo.K8SPersistentVolumeClaim;
@@ -32,7 +33,7 @@ public interface K8SService {
      * @param configMapInfo 配置信息
      * @return ConfigMap
      */
-    ConfigMap createConfigMap(K8SConfigMap configMapInfo);
+    ResultVO<?> createConfigMap(K8SConfigMap configMapInfo);
 
     /**
      * 查询命名空间下的configMap
@@ -45,14 +46,14 @@ public interface K8SService {
      * @param namespace 名称空间
      * @return 检索字典信息
      */
-    ConfigMap findConfigMapDetail(String name, String namespace);
+    ResultVO<?> findConfigMapDetail(String name, String namespace);
 
     /**
      *查询当前名称空间下的所有字典
      * @param namespace 名称空间
      * @return 字典集
      */
-    ConfigMapList listConfigMap(String namespace);
+    ResultVO<?> listConfigMap(String namespace);
 
     /**
      * 修改对应configMap下的详细信息
@@ -60,7 +61,7 @@ public interface K8SService {
      * @param configMapInfo 更新信息
      * @return ConfigMap
      */
-    ConfigMap editConfigMapDetail(K8SConfigMap configMapInfo);
+    ResultVO<?> editConfigMapDetail(K8SConfigMap configMapInfo);
 
     /**
      * 删除单个ConfigMap
@@ -69,7 +70,7 @@ public interface K8SService {
      * @param namespace
      * @return 删除结果
      */
-    boolean delConfigMap(String name, String namespace);
+    ResultVO<?> delConfigMap(String name, String namespace);
 
     /**
      * 批量删除ConfigMap
@@ -78,7 +79,7 @@ public interface K8SService {
      * @param namespace
      * @return 删除结果
      */
-    boolean delConfigMaps(List<String> names, String namespace);
+    ResultVO<?> delConfigMaps(List<String> names, String namespace);
 
     /**
      * 删除该命名空间下的所有字典
@@ -86,7 +87,7 @@ public interface K8SService {
      * @param namespace 命名空间
      * @return 删除结果
      */
-    boolean delConfigMapsAll(String namespace);
+    ResultVO<?> delConfigMapsAll(String namespace);
 
     /**
      * 生成密文
@@ -94,7 +95,7 @@ public interface K8SService {
      * @param secretInfo 密文配置信息
      * @return 密文
      */
-    Secret createSecret(K8SSecret secretInfo);
+    ResultVO<?> createSecret(K8SSecret secretInfo);
 
     /**
      * 查看对应密文的详细信息
@@ -102,14 +103,14 @@ public interface K8SService {
      * @param namespace 命名空间名称
      * @return 密文详细信息
      */
-    Secret findSecretDetail(String name, String namespace);
+    ResultVO<?> findSecretDetail(String name, String namespace);
 
     /**
      * 查询当前名称空间下所有密文
      * @param namespace
      * @return
      */
-    SecretList listSecret(String namespace);
+    ResultVO<?> listSecret(String namespace);
 
     /**
      * 修改密文
@@ -117,7 +118,7 @@ public interface K8SService {
      * @param secretInfo 密文配置信息
      * @return 密文
      */
-    Secret editSecret(K8SSecret secretInfo);
+    ResultVO<?> editSecret(K8SSecret secretInfo);
 
     /**
      * 删除单个secret
@@ -126,7 +127,7 @@ public interface K8SService {
      * @param secretName secret名
      * @return 删除结果
      */
-    boolean delSecret(String namespace, String secretName);
+    ResultVO<?> delSecret(String namespace, String secretName);
 
     /**
      * 批量删除secret
@@ -135,7 +136,7 @@ public interface K8SService {
      * @param secretNames secret名
      * @return 删除结果
      */
-    boolean delSecrets(String namespace, List<String> secretNames);
+    ResultVO<?> delSecrets(String namespace, List<String> secretNames);
 
     /**
      * 删除该命名空间下的所有密文
@@ -143,7 +144,7 @@ public interface K8SService {
      * @param namespace 命名空间
      * @return
      */
-    boolean delSecretsAll(String namespace);
+    ResultVO<?> delSecretsAll(String namespace);
 
     /**
      * 创建存储卷声明
@@ -151,7 +152,7 @@ public interface K8SService {
      * @param pvcInfo 存储卷声明配置信息
      * @return pvc
      */
-    PersistentVolumeClaim createPVC(K8SPersistentVolumeClaim pvcInfo);
+    ResultVO<?> createPVC(K8SPersistentVolumeClaim pvcInfo);
 
     /**
      * 查看存储卷声明详细信息
@@ -159,14 +160,14 @@ public interface K8SService {
      * @param namespace 名称空间
      * @return  存储卷声明信息
      */
-    PersistentVolumeClaim findPVCDetail(String name, String namespace);
+    ResultVO<?> findPVCDetail(String name, String namespace);
 
     /**
      * 查询当前名称空间下所有存储卷
      * @param namespace 名称空间
      * @return 存储卷集
      */
-    PersistentVolumeClaimList listPVC(String namespace);
+    ResultVO<?> listPVC(String namespace);
 
     /**
      * 删除单个存储卷声明
@@ -175,7 +176,7 @@ public interface K8SService {
      * @param pvcName   存储卷声明名称
      * @return 删除结果
      */
-    boolean delPVC(String namespace, String pvcName);
+    ResultVO<?> delPVC(String namespace, String pvcName);
 
     /**
      * 删除单个存储卷声明
@@ -184,7 +185,7 @@ public interface K8SService {
      * @param pvcNames  存储卷声明名称集合
      * @return 删除结果
      */
-    boolean delPVCs(String namespace, List<String> pvcNames);
+    ResultVO<?> delPVCs(String namespace, List<String> pvcNames);
 
     /**
      * 删除当前命名空间下所有存储卷声明
@@ -192,7 +193,7 @@ public interface K8SService {
      * @param namespace 命名空间
      * @return 删除结果
      */
-    boolean delPVCsAll(String namespace);
+    ResultVO<?> delPVCsAll(String namespace);
 
     /**
      * 创建docker仓库密码
