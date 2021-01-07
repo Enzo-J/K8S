@@ -1,5 +1,6 @@
 package com.wenge.tbase.k8s.service;
 
+import com.wenge.tbase.commons.result.ResultVO;
 import com.wenge.tbase.k8s.bean.vo.K8SConfigMap;
 import com.wenge.tbase.k8s.bean.vo.K8SDeployment;
 import com.wenge.tbase.k8s.bean.vo.K8SPersistentVolumeClaim;
@@ -246,6 +247,11 @@ public interface K8SService {
      */
     boolean delDeploymentsAll(String namespace);
 
+
+    Deployment deploymentYaml(String namespace, String deploymentName);
+
+
+    Deployment yamlToDeployment(String namespace, Deployment deployment);
     /**
      * StatefulSet服务部署
      * @param statefulSet 配置信息

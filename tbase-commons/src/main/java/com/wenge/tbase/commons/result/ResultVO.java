@@ -2,6 +2,7 @@ package com.wenge.tbase.commons.result;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @ClassName: ResultVO
@@ -11,6 +12,7 @@ import lombok.Getter;
  */
 
 @Getter
+@Setter
 @AllArgsConstructor
 public class ResultVO<T> {
     /**
@@ -26,6 +28,8 @@ public class ResultVO<T> {
      */
     private T data;
 
+    public ResultVO() {
+    }
     public ResultVO(T data) {
         this(ResultCode.SUCCESS, data);
     }
@@ -34,5 +38,19 @@ public class ResultVO<T> {
         this.code = resultCode.getCode();
         this.msg = resultCode.getMsg();
         this.data = data;
+    }
+
+    public static ResultVO success(Object data) {
+        ResultVO resultVO = new ResultVO();
+        resultVO.setCode(ResultCode.SUCCESS.getCode());
+        resultVO.setData(data);
+        return resultVO;
+    }
+
+    public static ResultVO fail(String msg) {
+        ResultVO resultVO = new ResultVO();
+        resultVO.setCode(ResultCode.FAILED.getCode());
+        resultVO.setMsg(msg);
+        return resultVO;
     }
 }

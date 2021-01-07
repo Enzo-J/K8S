@@ -1,6 +1,7 @@
 package com.wenge.tbase.k8s.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.wenge.tbase.commons.result.ResultVO;
 import com.wenge.tbase.k8s.bean.vo.*;
 import com.wenge.tbase.k8s.bean.vo.deployment.K8SDeploymentCreate;
 import com.wenge.tbase.k8s.constant.K8SConstant;
@@ -468,10 +469,10 @@ public class K8SServiceImpl implements K8SService {
     }
 
     public Deployment createDeployment(K8SDeploymentCreate k8SDeployment) {
-        k8SDeployment.init();
-        Deployment deployment = new DeploymentBuilder().withMetadata(k8SDeployment.metadata())
-                .withSpec(k8SDeployment.spec()).build();
-        deployment = kClient.apps().deployments().inNamespace(k8SDeployment.getNamespace()).create(deployment);
+            k8SDeployment.init();
+            Deployment deployment = new DeploymentBuilder().withMetadata(k8SDeployment.metadata())
+                    .withSpec(k8SDeployment.spec()).build();
+            deployment = kClient.apps().deployments().inNamespace(k8SDeployment.getNamespace()).createOrReplace(deployment);
         return deployment;
     }
 
@@ -510,6 +511,16 @@ public class K8SServiceImpl implements K8SService {
     public boolean delDeploymentsAll(String namespace) {
         Boolean deleted = kClient.apps().deployments().inNamespace(namespace).delete();
         return deleted;
+    }
+
+    @Override
+    public Deployment deploymentYaml(String namespace, String deploymentName) {
+        return kClient.apps().deployments().inNamespace(namespace).withName(deploymentName).get();
+    }
+
+    @Override
+    public Deployment yamlToDeployment(String namespace, Deployment deployment) {
+        return kClient.apps().deployments().inNamespace(namespace).createOrReplace(deployment);
     }
 
     @Override

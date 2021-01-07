@@ -1,5 +1,9 @@
 package com.wenge.tbase.k8s.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.common.collect.Lists;
 import com.wenge.tbase.commons.result.ResultVO;
 import com.wenge.tbase.k8s.bean.vo.K8SDeployment;
 import com.wenge.tbase.k8s.bean.vo.deployment.K8SDeploymentCreate;
@@ -10,6 +14,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,17 +28,24 @@ import java.util.List;
 @RestController
 @RequestMapping("/Screen/Deployment")
 @Validated
+@Slf4j
 public class K8SDeploymentController {
     @Resource
     private K8SService k8SService;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @ApiOperation("创建deployment")
     @PostMapping("/createDeployment")
     @ApiImplicitParams(@ApiImplicitParam(name = "K8SDeployment", value = "部署对象", dataType = "K8SDeployment"))
     public ResultVO createDeployment(@RequestBody K8SDeploymentCreate deploymentInfo) {
-//        Deployment deployment = k8SService.createDeployment(deploymentInfo);
-//        return new ResultVO(deployment);
-        return new ResultVO(null);
+        try {
+            Deployment deployment = k8SService.createDeployment(deploymentInfo);
+            return ResultVO.success(deployment);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResultVO.fail(e.getMessage());
+        }
     }
 
     @ApiOperation("查看Deployment详细信息")
@@ -84,4 +97,43 @@ public class K8SDeploymentController {
         boolean result = k8SService.delDeploymentsAll(spacename);
         return new ResultVO(result);
     }
+
+
+    @ApiOperation("获取deployment Yaml文件")
+    @GetMapping("/deploymentYaml")
+    @ApiImplicitParams(
+            {@ApiImplicitParam(name = "namespace", value = "名称空间", dataType = "String", required = true),
+                    @ApiImplicitParam(name = "deploymentName", value = "deployment名称", dataType = "String", required =
+                            true)}
+            )
+    public ResultVO deploymentYaml(String namespace, String deploymentName) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
+            Deployment deployment = k8SService.deploymentYaml(namespace, deploymentName);
+            return ResultVO.success(objectMapper.writeValueAsString(deployment));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResultVO.fail(e.getMessage());
+        }
+    }
+
+
+    @ApiOperation("根据deployment Yaml反向生成Deployment")
+    @PostMapping("/yamlToDeployment")
+    @ApiImplicitParams(
+            {@ApiImplicitParam(name = "namespace", value = "名称空间", dataType = "String", required = true),
+                    @ApiImplicitParam(name = "yaml", value = "yaml", dataType = "String", required =
+                            true)}
+    )
+    public ResultVO yamlToDeployment(String namespace, String yaml) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
+            Deployment deployment = objectMapper.readValue(yaml.getBytes(), Deployment.class);
+            return ResultVO.success(k8SService.yamlToDeployment(namespace, deployment));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResultVO.fail(e.getMessage());
+        }
+    }
+
 }
