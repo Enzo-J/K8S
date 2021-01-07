@@ -33,8 +33,7 @@ public class K8SConfigMapController {
         if (configMapInfo.getData() == null || configMapInfo.getData().size() == 0) {
             return new ResultVO(ResultCode.PARAM_IS_EMPTY);
         }
-        ConfigMap configMap = k8SService.createConfigMap(configMapInfo);
-        return new ResultVO(configMap);
+        return k8SService.createConfigMap(configMapInfo);
     }
 
     @ApiOperation("查看对应configMap下的详细信息")
@@ -44,24 +43,21 @@ public class K8SConfigMapController {
             @ApiImplicitParam(name = "namespace", value = "名称空间", dataType = "String", required = true)})
     public ResultVO findConfigMapDetail(@NotBlank @RequestParam String configMapName,
                                         @NotBlank @RequestParam String namespace) {
-        ConfigMap configMapDetail = k8SService.findConfigMapDetail(configMapName, namespace);
-        return new ResultVO(configMapDetail);
+        return k8SService.findConfigMapDetail(configMapName, namespace);
     }
 
     @ApiOperation("查询当前名称空间下的所有字典")
     @GetMapping("/listConfigMap")
     @ApiImplicitParams(@ApiImplicitParam(name = "namespace", value = "名称空间", dataType = "String", required = true))
     public ResultVO listConfigMap(@NotBlank @RequestParam String namespace) {
-        ConfigMapList configMapList = k8SService.listConfigMap(namespace);
-        return new ResultVO(configMapList);
+        return k8SService.listConfigMap(namespace);
     }
 
     @ApiOperation("修改对应字典下的详细信息")
     @PutMapping("/editConfigMapDetail")
     @ApiImplicitParams(@ApiImplicitParam(name = "K8SConfigMap", value = "K8SConfigMap对象", dataType = "K8SConfigMap"))
     public ResultVO editConfigMapDetail(@RequestBody K8SConfigMap configMapInfo) {
-        ConfigMap configMap = k8SService.editConfigMapDetail(configMapInfo);
-        return new ResultVO(configMap);
+        return k8SService.editConfigMapDetail(configMapInfo);
     }
 
     @ApiOperation("删除单个字典")
@@ -69,8 +65,7 @@ public class K8SConfigMapController {
     @ApiImplicitParams({@ApiImplicitParam(name = "name", value = "字典名称", dataType = "String", required = true),
             @ApiImplicitParam(name = "spacename", value = "名称空间", dataType = "String", required = true)})
     public ResultVO delConfigMap(@NotBlank @RequestParam String name, @NotBlank @RequestParam String spacename) {
-        boolean result = k8SService.delConfigMap(name, spacename);
-        return new ResultVO(result);
+        return k8SService.delConfigMap(name, spacename);
     }
 
     @ApiOperation("批量删除字典")
@@ -80,15 +75,13 @@ public class K8SConfigMapController {
     public ResultVO delConfigMaps(@NotBlank @RequestParam String names, @NotBlank @RequestParam String spacename) {
         String[] namesArr = names.split(",", -1);
         List<String> namesList = Arrays.asList(namesArr);
-        boolean result = k8SService.delConfigMaps(namesList, spacename);
-        return new ResultVO(result);
+        return k8SService.delConfigMaps(namesList, spacename);
     }
 
     @ApiOperation("删除当前命名空间下的所有字典")
     @PostMapping("/delConfigMapsAll")
     @ApiImplicitParams(@ApiImplicitParam(name = "spacename", value = "名称空间", dataType = "String", required = true))
     public ResultVO delConfigMapsAll(@NotBlank @RequestParam String spacename) {
-        boolean result = k8SService.delConfigMapsAll(spacename);
-        return new ResultVO(result);
+        return k8SService.delConfigMapsAll(spacename);
     }
 }

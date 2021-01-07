@@ -1,6 +1,7 @@
 package com.wenge.tbase.k8s.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.wenge.tbase.commons.result.ResultCode;
 import com.wenge.tbase.commons.result.ResultVO;
 import com.wenge.tbase.k8s.bean.vo.*;
 import com.wenge.tbase.k8s.bean.vo.deployment.K8SDeploymentCreate;
@@ -30,6 +31,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -115,16 +117,21 @@ public class K8SServiceImpl implements K8SService {
     }
 
     @Override
-    public ConfigMap createConfigMap(K8SConfigMap configMapInfo) {
-        ConfigMap configMap = new ConfigMap();
-        ObjectMeta objectMeta = new ObjectMeta();
-        objectMeta.setName(configMapInfo.getName());
-        objectMeta.setNamespace(configMapInfo.getNamespace());
-        objectMeta.setLabels(configMapInfo.getLabels());
-        configMap.setMetadata(objectMeta);
-        configMap.setData(configMapInfo.getData());
-        ConfigMap map = kClient.configMaps().inNamespace(configMapInfo.getNamespace()).create(configMap);
-        return map;
+    public ResultVO<?> createConfigMap(K8SConfigMap configMapInfo) {
+        ConfigMap map;
+        try {
+            ConfigMap configMap = new ConfigMap();
+            ObjectMeta objectMeta = new ObjectMeta();
+            objectMeta.setName(configMapInfo.getName());
+            objectMeta.setNamespace(configMapInfo.getNamespace());
+            objectMeta.setLabels(configMapInfo.getLabels());
+            configMap.setMetadata(objectMeta);
+            configMap.setData(configMapInfo.getData());
+            map = kClient.configMaps().inNamespace(configMapInfo.getNamespace()).create(configMap);
+        } catch (Exception e) {
+            return new ResultVO<>(ResultCode.SYSYTEM_CLIENT_ERROR, e);
+        }
+        return new ResultVO<>(map);
     }
 
     /**
@@ -144,70 +151,77 @@ public class K8SServiceImpl implements K8SService {
     }
 
     @Override
-    public ConfigMap findConfigMapDetail(String name, String namespace) {
-        /*io.fabric8.kubernetes.client.dsl.Resource<ConfigMap, DoneableConfigMap> configMapResource =
-                kClient.configMaps().inNamespace(namespace).withName(name);
-        ConfigMap configMap = configMapResource.edit().done();*/
-        ConfigMap configMap = kClient.configMaps().inNamespace(namespace).withName(name).get();
-        return configMap;
-    }
-
-    @Override
-    public ConfigMapList listConfigMap(String namespace) {
-        ConfigMapList configMapList = kClient.configMaps().inNamespace(namespace).list();
-        return configMapList;
-    }
-
-    @Override
-    public ConfigMap editConfigMapDetail(K8SConfigMap configMapInfo) {
-        io.fabric8.kubernetes.client.dsl.Resource<ConfigMap, DoneableConfigMap> configMapResource = kClient.configMaps()
-                .inNamespace(configMapInfo.getNamespace()).withName(configMapInfo.getName());
-        ObjectMeta objectMeta = configMapResource.get().getMetadata();
-        //Map<String, String> oLabels = objectMeta.getLabels();
-        Map<String, String> nLabels = configMapInfo.getLabels();
-        /*if (oLabels == null && nLabels != null) {
-            oLabels = nLabels;
+    public ResultVO<?> findConfigMapDetail(String name, String namespace) {
+        ConfigMap configMap;
+        try {
+            configMap = kClient.configMaps().inNamespace(namespace).withName(name).get();
+        } catch (Exception e) {
+            return new ResultVO<>(ResultCode.SYSYTEM_CLIENT_ERROR, e);
         }
-        if (oLabels != null && nLabels != null) {
-            oLabels.putAll(nLabels);
-        }*/
-        objectMeta.setLabels(nLabels);
-        //修改详细信息
-        ConfigMap configMap =
-                configMapResource.edit().withMetadata(objectMeta).withData(configMapInfo.getData()).done();//.addToData(configMapInfo.getData())
-        //打印更新信息
-        /*if (configMapInfo.getData() != null && configMapInfo.getData().size() > 0) {
-            log.info("Upserted ConfigMap at data " + configMap.getData());
+        return new ResultVO<>(configMap);
+    }
+
+    @Override
+    public ResultVO<?> listConfigMap(String namespace) {
+        ConfigMapList configMapList;
+        try {
+            configMapList = kClient.configMaps().inNamespace(namespace).list();
+        } catch (Exception e) {
+            return new ResultVO<>(ResultCode.SYSYTEM_CLIENT_ERROR, e);
         }
-        if (nLabels != null && nLabels.size() > 0) {
-            log.info("Upserted ConfigMap at labels " + configMap.getMetadata().getLabels());
-        }*/
-        return configMap;
+        return new ResultVO<>(configMapList);
     }
 
     @Override
-    public boolean delConfigMap(String name, String namespace) {
-        Boolean delete = kClient.configMaps().inNamespace(namespace).withName(name).delete();
-        return delete;
+    public ResultVO<?> editConfigMapDetail(K8SConfigMap configMapInfo) {
+        ConfigMap configMap;
+        try {
+            io.fabric8.kubernetes.client.dsl.Resource<ConfigMap, DoneableConfigMap> configMapResource = kClient.configMaps()
+                    .inNamespace(configMapInfo.getNamespace()).withName(configMapInfo.getName());
+            ObjectMeta objectMeta = configMapResource.get().getMetadata();
+            Map<String, String> nLabels = configMapInfo.getLabels();
+            objectMeta.setLabels(nLabels);
+            //修改详细信息
+            configMap = configMapResource.edit().withMetadata(objectMeta).withData(configMapInfo.getData()).done();
+        } catch (Exception e) {
+            return new ResultVO<>(ResultCode.SYSYTEM_CLIENT_ERROR, e);
+        }
+        return new ResultVO<>(configMap);
     }
 
     @Override
-    public boolean delConfigMaps(List<String> names, String namespace) {
+    public ResultVO<?> delConfigMap(String name, String namespace) {
+        Boolean delete;
+        try {
+            delete = kClient.configMaps().inNamespace(namespace).withName(name).delete();
+        } catch (Exception e) {
+            return new ResultVO<>(ResultCode.NOT_FIND_RESOURCE, e);
+        }
+        return new ResultVO<>(delete);
+    }
+
+    @Override
+    public ResultVO<?> delConfigMaps(List<String> names, String namespace) {
         boolean deleted = true;
         try {
             for (int i = 0; i < names.size(); i++) {
                 delConfigMap(names.get(i), namespace);
             }
         } catch (Exception e) {
-            deleted = false;
+            return new ResultVO<>(ResultCode.NOT_FIND_RESOURCE, e);
         }
-        return deleted;
+        return new ResultVO<>(deleted);
     }
 
     @Override
-    public boolean delConfigMapsAll(String namespace) {
-        Boolean delete = kClient.configMaps().inNamespace(namespace).delete();
-        return delete;
+    public ResultVO<?> delConfigMapsAll(String namespace) {
+        Boolean delete;
+        try {
+            delete = kClient.configMaps().inNamespace(namespace).delete();
+        } catch (Exception e) {
+            return new ResultVO<>(ResultCode.NOT_FIND_RESOURCE, e);
+        }
+        return new ResultVO<>(delete);
     }
 
     /**
@@ -259,7 +273,7 @@ public class K8SServiceImpl implements K8SService {
     }
 
     @Override
-    public Secret createSecret(K8SSecret secretInfo) {
+    public ResultVO<?> createSecret(K8SSecret secretInfo) {
         Secret secret = new Secret();
         String secretType = secretInfo.getType();
         //{"auths":{"DOCKER_REGISTRY_SERVER":{"username":"DOCKER_USER","password":"DOCKER_PASSWORD",
@@ -271,7 +285,7 @@ public class K8SServiceImpl implements K8SService {
                 data.put(".dockerconfigjson", finalAuth);
                 secret.setData(data);
             } catch (UnsupportedEncodingException e) {
-                log.error(e.getMessage());
+                return new ResultVO<>(ResultCode.ERROR, e);
             }
         } else if (secretType.equals("Opaque")) {
             try {
@@ -286,7 +300,7 @@ public class K8SServiceImpl implements K8SService {
                     secret.setData(data);
                 }
             } catch (UnsupportedEncodingException e) {
-                log.error(e.getMessage());
+                return new ResultVO<>(ResultCode.ERROR, e);
             }
         } else if (secretType.equals("kubernetes.io/tls")) {
             try {
@@ -303,86 +317,99 @@ public class K8SServiceImpl implements K8SService {
                     secret.setData(data);
                 }
             } catch (UnsupportedEncodingException e) {
-                log.error(e.getMessage());
+                return new ResultVO<>(ResultCode.ERROR, e);
             }
         } else {
             log.error("密文类型不正确！");
-            return null;
+            return new ResultVO<>(ResultCode.VALIDATE_FAILED, null);
         }
-        ObjectMeta objectMeta = new ObjectMeta();
-        objectMeta.setName(secretInfo.getName());
-        objectMeta.setNamespace(secretInfo.getNamespace());
-        secret.setMetadata(objectMeta);
-        secret.setType(secretInfo.getType());
-        return kClient.secrets().inNamespace(secretInfo.getNamespace()).create(secret);
+        Secret newSecret;
+        try {
+            ObjectMeta objectMeta = new ObjectMeta();
+            objectMeta.setName(secretInfo.getName());
+            objectMeta.setNamespace(secretInfo.getNamespace());
+            secret.setMetadata(objectMeta);
+            secret.setType(secretInfo.getType());
+            newSecret = kClient.secrets().inNamespace(secretInfo.getNamespace()).create(secret);
+            return new ResultVO<>(newSecret);
+        } catch (Exception e) {
+            return new ResultVO<>(ResultCode.ERROR, e);
+        }
     }
 
     @Override
-    public Secret findSecretDetail(String name, String namespace) {
-        Secret secret = kClient.secrets().inNamespace(namespace).withName(name).get();
-        return secret;
+    public ResultVO<?> findSecretDetail(String name, String namespace) {
+        Secret secret;
+        try {
+            secret = kClient.secrets().inNamespace(namespace).withName(name).get();
+        } catch (Exception e) {
+            return new ResultVO<>(ResultCode.SYSYTEM_CLIENT_ERROR, e);
+        }
+        return new ResultVO<>(secret);
     }
 
     @Override
-    public SecretList listSecret(String namespace) {
-        SecretList secretList = kClient.secrets().inNamespace(namespace).list();
-        return secretList;
+    public ResultVO<?> listSecret(String namespace) {
+        SecretList secretList;
+        try {
+            secretList = kClient.secrets().inNamespace(namespace).list();
+        } catch (Exception e) {
+            return new ResultVO<>(ResultCode.SYSYTEM_CLIENT_ERROR, e);
+        }
+        return new ResultVO<>(secretList);
     }
 
     @Override
-    public Secret editSecret(K8SSecret secretInfo) {
+    public ResultVO<?> editSecret(K8SSecret secretInfo) {
         io.fabric8.kubernetes.client.dsl.Resource<Secret, DoneableSecret> secretDoneableSecretResource =
                 kClient.secrets().inNamespace(secretInfo.getNamespace()).withName(secretInfo.getName());
         String secretType = secretDoneableSecretResource.get().getType();
         Map<String, String> data = new HashMap<String, String>();
         if (secretType.equals("kubernetes.io/dockerconfigjson")) {
             if (secretInfo.getDockerSecret() == null && secretInfo.getDockerServer() == null && secretInfo.getDockerUsername() == null) {
-                return null;
+                return new ResultVO<>(ResultCode.PARAM_IS_EMPTY, null);
             }
             try {
                 String finalAuth = CreateCipher(secretInfo);
                 data.put(".dockerconfigjson", finalAuth);
             } catch (UnsupportedEncodingException e) {
-                log.error(e.getMessage());
+                return new ResultVO<>(ResultCode.ERROR, e);
             }
         } else if (secretType.equals("Opaque")) {
-            try {
-                if (secretInfo.getData() != null) {
-                    data = secretInfo.getData();
-                    for (Map.Entry<String, String> entry : data.entrySet()) {
-                        String key = entry.getKey();
-                        String value = entry.getValue();
-                        String baseVal = Base64.getEncoder().encodeToString(value.getBytes("utf-8"));
-                        data.put(key, baseVal);
-                    }
+            if (secretInfo.getData() != null) {
+                data = secretInfo.getData();
+                for (Map.Entry<String, String> entry : data.entrySet()) {
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+                    String baseVal = Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
+                    data.put(key, baseVal);
                 }
-            } catch (UnsupportedEncodingException e) {
-                log.error(e.getMessage());
             }
         } else {
-            try {
-                if (secretInfo.getTlsCrt() != null || secretInfo.getTlsKey() != null) {
-                    if (secretInfo.getTlsKey() != null) {
-                        String baseKey = Base64.getEncoder().encodeToString(secretInfo.getTlsKey().getBytes("utf-8"));
-                        data.put("tls.key", baseKey);
-                    }
-                    if (secretInfo.getTlsCrt() != null) {
-                        String baseCrt = Base64.getEncoder().encodeToString(secretInfo.getTlsCrt().getBytes("utf-8"));
-                        data.put("tls.crt", baseCrt);
-                    }
+            if (secretInfo.getTlsCrt() != null || secretInfo.getTlsKey() != null) {
+                if (secretInfo.getTlsKey() != null) {
+                    String baseKey = Base64.getEncoder().encodeToString(secretInfo.getTlsKey().getBytes(StandardCharsets.UTF_8));
+                    data.put("tls.key", baseKey);
                 }
-            } catch (UnsupportedEncodingException e) {
-                log.error(e.getMessage());
+                if (secretInfo.getTlsCrt() != null) {
+                    String baseCrt = Base64.getEncoder().encodeToString(secretInfo.getTlsCrt().getBytes(StandardCharsets.UTF_8));
+                    data.put("tls.crt", baseCrt);
+                }
             }
         }
-        Secret secret = secretDoneableSecretResource.edit().withData(data).done();
-        return secret;
+        Secret secret;
+        try {
+            secret = secretDoneableSecretResource.edit().withData(data).done();
+        } catch (Exception e) {
+            return new ResultVO<>(ResultCode.SYSYTEM_CLIENT_ERROR, e);
+        }
+        return new ResultVO<>(secret);
     }
 
     private String CreateCipher(K8SSecret secretInfo) throws UnsupportedEncodingException {
         String auth = secretInfo.getDockerUsername() + ":" + secretInfo.getDockerSecret();
         //Base64编码
-        String baseAuth = Base64.getEncoder().encodeToString(auth.getBytes("utf-8"));
+        String baseAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
         //拼接秘钥
         JSONObject mainObject = new JSONObject();
         Map tmpMap = new HashMap();
@@ -394,32 +421,42 @@ public class K8SServiceImpl implements K8SService {
         JSONObject authObject = new JSONObject();
         authObject.put("auths", mainObject);
         //生成最终的秘钥
-        return Base64.getEncoder().encodeToString(authObject.toJSONString().getBytes("utf-8"));
+        return Base64.getEncoder().encodeToString(authObject.toJSONString().getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
-    public boolean delSecret(String namespace, String secretName) {
-        Boolean deleted = kClient.secrets().inNamespace(namespace).withName(secretName).delete();
-        return deleted;
+    public ResultVO<?> delSecret(String namespace, String secretName) {
+        Boolean deleted;
+        try {
+            deleted = kClient.secrets().inNamespace(namespace).withName(secretName).delete();
+        } catch (Exception e) {
+            return new ResultVO<>(ResultCode.NOT_FIND_RESOURCE, e);
+        }
+        return new ResultVO<>(deleted);
     }
 
     @Override
-    public boolean delSecrets(String namespace, List<String> secretNames) {
+    public ResultVO<?> delSecrets(String namespace, List<String> secretNames) {
         boolean deleted = true;
         try {
             for (int i = 0; i < secretNames.size(); i++) {
                 delSecret(namespace, secretNames.get(i));
             }
         } catch (Exception e) {
-            deleted = false;
+            return new ResultVO<>(ResultCode.NOT_FIND_RESOURCE, e);
         }
-        return deleted;
+        return new ResultVO<>(deleted);
     }
 
     @Override
-    public boolean delSecretsAll(String namespace) {
-        Boolean deleted = kClient.secrets().inNamespace(namespace).delete();
-        return deleted;
+    public ResultVO<?> delSecretsAll(String namespace) {
+        Boolean deleted;
+        try {
+            deleted = kClient.secrets().inNamespace(namespace).delete();
+        } catch (Exception e) {
+            return new ResultVO<>(ResultCode.NOT_FIND_RESOURCE, e);
+        }
+        return new ResultVO<>(deleted);
     }
 
     @Override
@@ -469,10 +506,10 @@ public class K8SServiceImpl implements K8SService {
     }
 
     public Deployment createDeployment(K8SDeploymentCreate k8SDeployment) {
-            k8SDeployment.init();
-            Deployment deployment = new DeploymentBuilder().withMetadata(k8SDeployment.metadata())
-                    .withSpec(k8SDeployment.spec()).build();
-            deployment = kClient.apps().deployments().inNamespace(k8SDeployment.getNamespace()).createOrReplace(deployment);
+        k8SDeployment.init();
+        Deployment deployment = new DeploymentBuilder().withMetadata(k8SDeployment.metadata())
+                .withSpec(k8SDeployment.spec()).build();
+        deployment = kClient.apps().deployments().inNamespace(k8SDeployment.getNamespace()).create(deployment);
         return deployment;
     }
 
@@ -511,16 +548,6 @@ public class K8SServiceImpl implements K8SService {
     public boolean delDeploymentsAll(String namespace) {
         Boolean deleted = kClient.apps().deployments().inNamespace(namespace).delete();
         return deleted;
-    }
-
-    @Override
-    public Deployment deploymentYaml(String namespace, String deploymentName) {
-        return kClient.apps().deployments().inNamespace(namespace).withName(deploymentName).get();
-    }
-
-    @Override
-    public Deployment yamlToDeployment(String namespace, Deployment deployment) {
-        return kClient.apps().deployments().inNamespace(namespace).createOrReplace(deployment);
     }
 
     @Override
@@ -694,79 +721,102 @@ public class K8SServiceImpl implements K8SService {
     }*/
 
     @Override
-    public PersistentVolumeClaim createPVC(K8SPersistentVolumeClaim pvcInfo) {
-        PersistentVolumeClaim pvc = new PersistentVolumeClaim();
-        ObjectMeta objectMeta = new ObjectMeta();
-        objectMeta.setName(pvcInfo.getName());
-        objectMeta.setNamespace(pvcInfo.getNamespace());
-        // objectMeta.setLabels(metadata.getObject(("labels"), Map.class));
-        Map<String, String> map = new HashMap<>();
-        map.put("k8s.kuboard.cn/pvcType", "Dynamic");
-        objectMeta.setAnnotations(map);
-        PersistentVolumeClaimSpec pvcs = new PersistentVolumeClaimSpec();
-        pvcs.setStorageClassName(pvcInfo.getStorageType());
-        List<String> accessModes = (List<String>) pvcInfo.getAccessmode();
-        List<String> accessModesFin = new ArrayList<>();
-        for (String accessMode : accessModes) {
-            if (accessMode.equals("只能被单点读写")) {
-                accessModesFin.add("ReadWriteOnce");
-            } else if (accessMode.equals("可被多节点只读")) {
-                accessModesFin.add("ReadOnlyMany");
-            } else {
-                accessModesFin.add("ReadWriteMany");
+    public ResultVO<?> createPVC(K8SPersistentVolumeClaim pvcInfo) {
+        PersistentVolumeClaim persistentVolumeClaim;
+        try {
+            PersistentVolumeClaim pvc = new PersistentVolumeClaim();
+            ObjectMeta objectMeta = new ObjectMeta();
+            objectMeta.setName(pvcInfo.getName());
+            objectMeta.setNamespace(pvcInfo.getNamespace());
+            // objectMeta.setLabels(metadata.getObject(("labels"), Map.class));
+            Map<String, String> map = new HashMap<>();
+            map.put("k8s.kuboard.cn/pvcType", "Dynamic");
+            objectMeta.setAnnotations(map);
+            PersistentVolumeClaimSpec pvcs = new PersistentVolumeClaimSpec();
+            pvcs.setStorageClassName(pvcInfo.getStorageType());
+            List<String> accessModes = (List<String>) pvcInfo.getAccessmode();
+            List<String> accessModesFin = new ArrayList<>();
+            for (String accessMode : accessModes) {
+                if (accessMode.equals("只能被单点读写")) {
+                    accessModesFin.add("ReadWriteOnce");
+                } else if (accessMode.equals("可被多节点只读")) {
+                    accessModesFin.add("ReadOnlyMany");
+                } else {
+                    accessModesFin.add("ReadWriteMany");
+                }
             }
+            pvcs.setAccessModes(accessModesFin);
+            ResourceRequirements resourceRequirements = new ResourceRequirements();
+            Map<String, Quantity> requestsMap = new HashMap<>();
+            String amountStr = pvcInfo.getTotal();
+            Quantity quantity = new Quantity(amountStr);
+            requestsMap.put("storage", quantity);
+            resourceRequirements.setRequests(requestsMap);
+            pvcs.setResources(resourceRequirements);
+            pvc.setMetadata(objectMeta);
+            pvc.setSpec(pvcs);
+            persistentVolumeClaim = kClient.persistentVolumeClaims().inNamespace(pvcInfo.getNamespace()).create(pvc);
+        } catch (Exception e) {
+            return new ResultVO<>(ResultCode.SYSYTEM_CLIENT_ERROR, e);
         }
-        pvcs.setAccessModes(accessModesFin);
-        ResourceRequirements resourceRequirements = new ResourceRequirements();
-        Map<String, Quantity> requestsMap = new HashMap<>();
-        String amountStr = pvcInfo.getTotal();
-        Quantity quantity = new Quantity(amountStr);
-        requestsMap.put("storage", quantity);
-        resourceRequirements.setRequests(requestsMap);
-        pvcs.setResources(resourceRequirements);
-        pvc.setMetadata(objectMeta);
-        pvc.setSpec(pvcs);
-        PersistentVolumeClaim persistentVolumeClaim =
-                kClient.persistentVolumeClaims().inNamespace(pvcInfo.getNamespace()).create(pvc);
-        return persistentVolumeClaim;
+        return new ResultVO<>(persistentVolumeClaim);
     }
 
     @Override
-    public PersistentVolumeClaim findPVCDetail(String name, String namespace) {
-        PersistentVolumeClaim pvc =
-                kClient.persistentVolumeClaims().inNamespace(namespace).withName(name).get();
-        return pvc;
+    public ResultVO<?> findPVCDetail(String name, String namespace) {
+        PersistentVolumeClaim pvc;
+        try {
+            pvc = kClient.persistentVolumeClaims().inNamespace(namespace).withName(name).get();
+        } catch (Exception e) {
+            return new ResultVO<>(ResultCode.SYSYTEM_CLIENT_ERROR, e);
+        }
+        return new ResultVO<>(pvc);
     }
 
     @Override
-    public PersistentVolumeClaimList listPVC(String namespace) {
-        PersistentVolumeClaimList persistentVolumeClaimList = kClient.persistentVolumeClaims().inNamespace(namespace).list();
-        return persistentVolumeClaimList;
+    public ResultVO<?> listPVC(String namespace) {
+        PersistentVolumeClaimList persistentVolumeClaimList;
+        try {
+            persistentVolumeClaimList = kClient.persistentVolumeClaims().inNamespace(namespace).list();
+        } catch (Exception e) {
+            return new ResultVO<>(ResultCode.SYSYTEM_CLIENT_ERROR, e);
+        }
+        return new ResultVO<>(persistentVolumeClaimList);
     }
 
     @Override
-    public boolean delPVC(String namespace, String pvcName) {
-        Boolean deleted = kClient.persistentVolumeClaims().inNamespace(namespace).withName(pvcName).delete();
-        return deleted;
+    public ResultVO<?> delPVC(String namespace, String pvcName) {
+        Boolean deleted;
+        try {
+            deleted = kClient.persistentVolumeClaims().inNamespace(namespace).withName(pvcName).delete();
+        } catch (Exception e) {
+            return new ResultVO<>(ResultCode.NOT_FIND_RESOURCE, e);
+        }
+        return new ResultVO<>(deleted);
     }
 
     @Override
-    public boolean delPVCs(String namespace, List<String> pvcNames) {
+    public ResultVO<?> delPVCs(String namespace, List<String> pvcNames) {
         boolean deleted = true;
         try {
             for (int i = 0; i < pvcNames.size(); i++) {
                 delPVC(namespace, pvcNames.get(i));
             }
         } catch (Exception e) {
-            deleted = false;
+            return new ResultVO<>(ResultCode.NOT_FIND_RESOURCE, e);
         }
-        return deleted;
+        return new ResultVO<>(deleted);
     }
 
     @Override
-    public boolean delPVCsAll(String namespace) {
-        Boolean deleted = kClient.persistentVolumeClaims().inNamespace(namespace).delete();
-        return deleted;
+    public ResultVO<?> delPVCsAll(String namespace) {
+        Boolean deleted;
+        try {
+            deleted = kClient.persistentVolumeClaims().inNamespace(namespace).delete();
+        } catch (Exception e) {
+            return new ResultVO<>(ResultCode.NOT_FIND_RESOURCE, e);
+        }
+        return new ResultVO<>(deleted);
     }
 
     /**

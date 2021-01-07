@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: dev 
   rabbitmq:
     host: ${RABBIT_MQ_HOST:172.16.0.13}
     port: ${RABBIT_MQ_PORT:31352}
@@ -41,13 +43,13 @@ jetcache:
   areaInCacheName: false
   hidePackages: com.springboot.cloud
   local:
-    # 默认永久本地缓存
+    # 榛樿姘镐箙鏈湴缂撳瓨
     default:
       type: caffeine
       #type: linkedhashmap
       keyConvertor: fastjson
   remote:
-    # 默认永久的远程缓存
+    # 榛樿姘镐箙鐨勮繙绋嬬紦瀛�
     default:
       type: redis.lettuce
       uri[0]: redis://172.16.0.9:7000/
@@ -86,5 +88,5 @@ management:
 #    max-size: 1GB
 mybatis-plus:
   configuration:
-    # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
+    # 杩欎釜閰嶇疆浼氬皢鎵ц鐨剆ql鎵撳嵃鍑烘潵锛屽湪寮�鍙戞垨娴嬭瘯鐨勬椂鍊欏彲浠ョ敤
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
